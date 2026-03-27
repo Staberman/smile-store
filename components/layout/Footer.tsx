@@ -14,7 +14,7 @@ const nav = [
     links: [
       { label: "Invicta", href: "/tienda/marcas/invicta" },
       { label: "Tommy Hilfiger", href: "/tienda/marcas/tommy-hilfiger" },
-      { label: "Ray-Ban", href: "/tienda" },
+      { label: "Ray-Ban", href: "/tienda/marcas/ray-ban" },
     ],
   },
   {
