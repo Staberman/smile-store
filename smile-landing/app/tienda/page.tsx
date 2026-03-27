@@ -69,7 +69,7 @@ export default function TiendaPage() {
                 key={boutique.slug}
                 className="group overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/[0.02]"
               >
-                <a href={`/marcas/${boutique.slug}`} className="block">
+                <a href={`/tienda/marcas/${boutique.slug}`} className="block">
                   <div className="relative h-[720px] overflow-hidden">
                     <img
                       src={boutique.image}
