@@ -31,7 +31,7 @@ const boutiques = [
 export default function TiendaPage() {
   return (
     <main className="min-h-screen bg-black text-white">
-      <section className="relative overflow-hidden border-b border-white/10 px-6 pb-20 pt-28 md:px-12 md:pb-24 md:pt-32">
+      <section className="relative overflow-hidden border-b border-white/10 px-6 pb-20 pt-14 md:px-12 md:pb-24 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_40%)]" />
 
         <div className="relative mx-auto max-w-7xl">
