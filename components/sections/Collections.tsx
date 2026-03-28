@@ -10,7 +10,7 @@ const collections = [
     description:
       "Piezas seleccionadas de Invicta y Tommy Hilfiger construidas para destacar fuerza visual, proporción y carácter.",
     image: "/images/card-relojes.jpg",
-    href: "/tienda",
+    href: "/tienda?cat=relojes",
     cta: "Ver relojes en tienda",
   },
   {

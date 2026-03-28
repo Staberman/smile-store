@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/brand/ProductGrid";
 import {
   raybanProducts,
@@ -41,9 +42,14 @@ const categories = [
   },
 ];
 
-export default function TiendaPage() {
-  const [activeCat, setActiveCat] = useState("lentes");
-  const [activeSub, setActiveSub] = useState("ray-ban");
+function TiendaContent() {
+  const searchParams = useSearchParams();
+  const initialCat = searchParams.get("cat") === "relojes" ? "relojes" : "lentes";
+
+  const [activeCat, setActiveCat] = useState(initialCat);
+  const [activeSub, setActiveSub] = useState(
+    initialCat === "relojes" ? "invicta" : "ray-ban"
+  );
 
   const currentCategory = categories.find((c) => c.id === activeCat)!;
   const currentSub =
@@ -108,5 +114,13 @@ export default function TiendaPage() {
         filterBy={currentSub.filterBy}
       />
     </main>
+  );
+}
+
+export default function TiendaPage() {
+  return (
+    <Suspense>
+      <TiendaContent />
+    </Suspense>
   );
 }
