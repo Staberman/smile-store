@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 
 const collections = [
@@ -24,12 +23,6 @@ const collections = [
     href: "/tienda",
     cta: "Ver lentes en tienda",
   },
-];
-
-const brandLogos = [
-  { name: "Invicta", src: "/images/invicta-logo.png" },
-  { name: "Tommy Hilfiger", src: "/images/tommy-logo.png" },
-  { name: "Ray-Ban", src: "/images/ray-ban-logo.png" },
 ];
 
 const container = {
@@ -141,35 +134,6 @@ export default function Collections() {
           ))}
         </div>
 
-        {/* Franja marcas con logos */}
-        <motion.div
-          variants={item}
-          className="mt-12 rounded-[2rem] border border-white/10 bg-white/[0.03] px-8 py-8 md:px-12 md:py-10"
-        >
-          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.42em] text-white/40">
-                Marcas destacadas
-              </p>
-              <p className="mt-3 max-w-sm text-sm leading-[1.8] text-white/58">
-                Curaduría orientada a diseño, presencia y reconocimiento visual.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-x-10 gap-y-6">
-              {brandLogos.map((brand) => (
-                <Image
-                  key={brand.name}
-                  src={brand.src}
-                  alt={brand.name}
-                  width={120}
-                  height={40}
-                  className="h-7 w-auto object-contain opacity-55 transition duration-300 hover:opacity-90 md:h-8"
-                />
-              ))}
-            </div>
-          </div>
-        </motion.div>
       </motion.div>
     </section>
   );

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import type { Product } from "@/lib/products";
 import { formatPrice } from "@/lib/products";
 
@@ -25,39 +26,6 @@ export default function BrandCarousel({ products, brand }: Props) {
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(0);
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const ringPosRef = useRef({ x: 0, y: 0 });
-
-  // Custom cursor
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-      if (cursorRef.current) {
-        cursorRef.current.style.left = `${e.clientX}px`;
-        cursorRef.current.style.top = `${e.clientY}px`;
-      }
-    };
-    window.addEventListener("mousemove", onMove);
-
-    const animRing = () => {
-      ringPosRef.current.x += (mouseRef.current.x - ringPosRef.current.x) * 0.12;
-      ringPosRef.current.y += (mouseRef.current.y - ringPosRef.current.y) * 0.12;
-      if (ringRef.current) {
-        ringRef.current.style.left = `${ringPosRef.current.x}px`;
-        ringRef.current.style.top = `${ringPosRef.current.y}px`;
-      }
-      rafRef.current = requestAnimationFrame(animRing);
-    };
-    rafRef.current = requestAnimationFrame(animRing);
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
 
   // Auto-advance
   useEffect(() => {
@@ -94,19 +62,7 @@ export default function BrandCarousel({ products, brand }: Props) {
   return (
     <section
       className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]"
-      style={{ cursor: "none" }}
     >
-      {/* Custom cursor */}
-      <div
-        ref={cursorRef}
-        className="pointer-events-none fixed z-[9999] h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ background: ACCENT, transition: "transform 0.1s" }}
-      />
-      <div
-        ref={ringRef}
-        className="pointer-events-none fixed z-[9998] h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ border: `1px solid ${ACCENT}66`, transition: "width 0.3s, height 0.3s" }}
-      />
 
       {/* Grain overlay */}
       <div
@@ -131,23 +87,31 @@ export default function BrandCarousel({ products, brand }: Props) {
       </AnimatePresence>
 
       {/* Nav bar */}
-      <nav className="absolute left-0 right-0 top-0 z-50 flex items-center justify-between px-12 py-8">
-        <a
-          href="/"
-          className="font-display text-xl font-light tracking-[0.28em] uppercase text-[#f0ece4]"
-          style={{ cursor: "none" }}
-        >
-          Smile
+      <nav className="absolute left-0 right-0 top-0 z-50 flex items-center justify-between px-12 py-7">
+        <a href="/" aria-label="Smile inicio">
+          <Image
+            src="/images/smile-logo.svg"
+            alt="Smile"
+            width={120}
+            height={44}
+            className="h-auto w-[88px] opacity-90 transition hover:opacity-100"
+          />
         </a>
-        <ul className="flex gap-10 list-none">
-          {["Colecciones", "Tienda", "Marcas"].map((l) => (
-            <li key={l}>
+        <ul className="flex items-center gap-1 list-none">
+          {[
+            { label: "Colecciones", href: "/#colecciones" },
+            { label: "Tienda", href: "/tienda" },
+            { label: "Marcas", href: "/tienda" },
+          ].map((link, i) => (
+            <li key={link.label} className="flex items-center">
+              {i > 0 && (
+                <span className="mx-1 h-3 w-px bg-white/15" aria-hidden="true" />
+              )}
               <a
-                href={l === "Tienda" ? "/tienda" : "#"}
-                className="text-[0.62rem] uppercase tracking-[0.2em] text-[#4a4540] transition-colors hover:text-[#f0ece4]"
-                style={{ cursor: "none" }}
+                href={link.href}
+                className="px-3 py-1.5 text-[0.6rem] uppercase tracking-[0.22em] text-white/38 transition-colors hover:text-white/90"
               >
-                {l}
+                {link.label}
               </a>
             </li>
           ))}
@@ -227,7 +191,6 @@ export default function BrandCarousel({ products, brand }: Props) {
                     className="mt-10 inline-flex items-center gap-4 border-b pb-2 text-[0.6rem] uppercase tracking-[0.26em] text-[#f0ece4] transition-all hover:gap-6"
                     style={{
                       borderColor: "#4a4540",
-                      cursor: "none",
                     }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLAnchorElement).style.borderColor = ACCENT;
@@ -305,7 +268,7 @@ export default function BrandCarousel({ products, brand }: Props) {
                         }}
                       />
                       <img
-                        src={prod.image}
+                        src={prod.images[0]}
                         alt={prod.name}
                         className="h-full w-full object-cover"
                         style={{ filter: "brightness(0.92) contrast(1.04)" }}
@@ -344,7 +307,6 @@ export default function BrandCarousel({ products, brand }: Props) {
               width: i === current ? "16px" : "4px",
               height: "4px",
               background: i === current ? ACCENT : "#4a4540",
-              cursor: "none",
             }}
             aria-label={`Slide ${i + 1}`}
           />
@@ -352,7 +314,7 @@ export default function BrandCarousel({ products, brand }: Props) {
       </div>
 
       {/* Arrows */}
-      <div className="absolute right-12 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-3">
+      <div className="absolute right-12 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-6">
         {[
           {
             dir: "up",
@@ -368,31 +330,24 @@ export default function BrandCarousel({ products, brand }: Props) {
           <button
             key={dir}
             onClick={onClick}
-            className="flex h-11 w-11 items-center justify-center border transition-all"
-            style={{
-              borderColor: "#4a4540",
-              background: "transparent",
-              cursor: "none",
-            }}
-            onMouseEnter={(e) => {
-              const btn = e.currentTarget;
-              btn.style.borderColor = ACCENT;
-              btn.style.background = `${ACCENT}14`;
-            }}
-            onMouseLeave={(e) => {
-              const btn = e.currentTarget;
-              btn.style.borderColor = "#4a4540";
-              btn.style.background = "transparent";
-            }}
+            className="group flex h-8 w-8 items-center justify-center transition-all duration-300"
+            style={{ background: "transparent" }}
             aria-label={dir === "up" ? "Anterior" : "Siguiente"}
           >
             <svg
-              width="14"
-              height="14"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#f0ece4"
-              strokeWidth="1.5"
+              strokeWidth="1.2"
+              className="transition-all duration-300"
+              style={{ stroke: "#4a4540" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as SVGElement).style.stroke = ACCENT;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as SVGElement).style.stroke = "#4a4540";
+              }}
             >
               <polyline points={path} />
             </svg>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
+import CollectionLinks from "@/components/brand/CollectionLinks";
 import { raybanProducts } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -34,9 +35,7 @@ export default function RayBanPage() {
             </p>
           </div>
           <a
-            href="https://www.smiletiendaimp.com.ar/lentes-de-sol/ray-ban/scuderia-ferrari-collection"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/tienda/marcas/ray-ban/ferrari"
             className="inline-flex shrink-0 cursor-pointer items-center gap-3 rounded-full border px-6 py-3 text-[10px] uppercase tracking-[0.24em] text-[#f0ece4] transition hover:border-[#c9a96e] hover:bg-[#c9a96e] hover:text-[#0a0a0a]"
             style={{ borderColor: "#2a2520" }}
           >
@@ -46,6 +45,7 @@ export default function RayBanPage() {
       </section>
 
       <ProductGrid products={raybanProducts} brandLabel="Colección Ray-Ban" />
+      <CollectionLinks current="ray-ban" />
     </main>
   );
 }
