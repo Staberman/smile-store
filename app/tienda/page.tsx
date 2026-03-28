@@ -67,7 +67,7 @@ function TiendaContent() {
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
       {/* Inspiracional — featured products carousel */}
       <BrandCarousel
-        key={currentSub.id}
+        key={`carousel-${currentSub.id}`}
         products={currentSub.products}
         brand={currentSub.brandLabel}
         showNav={false}
@@ -117,7 +117,7 @@ function TiendaContent() {
 
       {/* Product grid — key forces remount on subcategory change (resets filters) */}
       <ProductGrid
-        key={currentSub.id}
+        key={`grid-${currentSub.id}`}
         products={currentSub.products}
         brandLabel={currentSub.brandLabel}
         filterBy={currentSub.filterBy}
