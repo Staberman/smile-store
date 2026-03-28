@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/brand/ProductGrid";
+import BrandCarousel from "@/components/brand/BrandCarousel";
 import {
   raybanProducts,
   invictaProducts,
@@ -64,6 +65,14 @@ function TiendaContent() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
+      {/* Inspiracional — featured products carousel */}
+      <BrandCarousel
+        key={currentSub.id}
+        products={currentSub.products}
+        brand={currentSub.brandLabel}
+        showNav={false}
+      />
+
       {/* Main category tabs */}
       <div className="sticky top-[72px] z-20 border-b border-white/8 bg-[#0a0a0a]/95 px-6 backdrop-blur-md md:top-[80px] md:px-12">
         <div className="mx-auto max-w-7xl">
@@ -73,7 +82,7 @@ function TiendaContent() {
                 key={cat.id}
                 onClick={() => handleCatChange(cat.id)}
                 className="relative cursor-pointer px-6 py-5 text-[11px] uppercase tracking-[0.28em] transition-colors"
-                style={{ color: activeCat === cat.id ? "#f0ece4" : "#4a4540" }}
+                style={{ color: activeCat === cat.id ? "#f0ece4" : "#6a6560" }}
               >
                 {cat.label}
                 {activeCat === cat.id && (
@@ -97,7 +106,7 @@ function TiendaContent() {
                 key={sub.id}
                 onClick={() => setActiveSub(sub.id)}
                 className="cursor-pointer px-5 py-4 text-[10px] uppercase tracking-[0.24em] transition-colors"
-                style={{ color: activeSub === sub.id ? ACCENT : "#4a4540" }}
+                style={{ color: activeSub === sub.id ? ACCENT : "#6a6560" }}
               >
                 {sub.label}
               </button>

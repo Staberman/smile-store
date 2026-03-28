@@ -10,6 +10,7 @@ interface Props {
   products: Product[];
   brand: string;
   accentColor?: string; // CSS hex, default gold
+  showNav?: boolean; // show internal nav bar (default true)
 }
 
 const ACCENT = "#c9a96e";
@@ -21,7 +22,7 @@ const BG_GRADIENTS = [
   "radial-gradient(ellipse at 44% 48%, #14100a 0%, #0a0a0a 72%)",
 ];
 
-export default function BrandCarousel({ products, brand }: Props) {
+export default function BrandCarousel({ products, brand, showNav = true }: Props) {
   const featured = products.filter((p) => p.featured).slice(0, 5);
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState<number | null>(null);
@@ -87,7 +88,7 @@ export default function BrandCarousel({ products, brand }: Props) {
       </AnimatePresence>
 
       {/* Nav bar */}
-      <nav className="absolute left-0 right-0 top-0 z-50 flex items-center justify-between px-12 py-7">
+      {showNav && <nav className="absolute left-0 right-0 top-0 z-50 flex items-center justify-between px-12 py-7">
         <a href="/" aria-label="Smile inicio">
           <Image
             src="/images/smile-logo.svg"
@@ -116,7 +117,7 @@ export default function BrandCarousel({ products, brand }: Props) {
             </li>
           ))}
         </ul>
-      </nav>
+      </nav>}
 
       {/* Slides */}
       <div className="absolute inset-0 flex items-center justify-center">
