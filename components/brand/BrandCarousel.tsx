@@ -193,12 +193,14 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     {String(index + 1).padStart(2, "0")} — {brand}
                   </p>
 
-                  <h2
-                    className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-[1.04] text-[#f0ece4]"
-                    dangerouslySetInnerHTML={{
-                      __html: prod.name.replace(" ", "<br>"),
-                    }}
-                  />
+                  <h2 className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-[1.04] text-[#f0ece4]">
+                    {prod.name.split(" ").map((part, wordIndex, words) => (
+                      <span key={`${part}-${wordIndex}`}>
+                        {part}
+                        {wordIndex === 0 && words.length > 1 ? <br /> : " "}
+                      </span>
+                    ))}
+                  </h2>
 
                   <p
                     className="font-display mt-2 text-[1.05rem] italic"

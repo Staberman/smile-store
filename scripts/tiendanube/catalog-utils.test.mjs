@@ -33,8 +33,8 @@ test("stripBase64Images removes embedded image payloads", () => {
 
 test("htmlToText creates readable product copy", () => {
   assert.equal(
-    htmlToText("<p>Linea uno</p><ul><li>Formato: Aviador.</li></ul>"),
-    "Linea uno Formato: Aviador.",
+    htmlToText("<p>L&iacute;nea uno &bull; dise&ntilde;o</p><ul><li>Formato: Aviador.</li></ul>"),
+    "Línea uno • diseño Formato: Aviador.",
   );
 });
 

@@ -334,6 +334,36 @@ function resolveBrand(row, pageData, category) {
   );
 }
 
+function inferCategoryPath(row, pageData, category, brand) {
+  if (category.path.length > 0) return category.path;
+
+  const tokenSource = [
+    row.Nombre,
+    row.Tags,
+    pageData.product?.name,
+    ...(Array.isArray(pageData.product?.tags) ? pageData.product.tags : []),
+  ]
+    .map((value) => normalizeTokenText(value))
+    .filter(Boolean)
+    .join(" | ");
+
+  if (normalizeTokenText(brand) === "RAY BAN") {
+    const rayBanPath = ["LENTES DE SOL", "RAY BAN"];
+    if (tokenSource.includes("WAYFARER")) return [...rayBanPath, "WAYFARER"];
+    if (tokenSource.includes("BIO BASED") || tokenSource.includes("ZURI")) {
+      return [...rayBanPath, "BIO BASED"];
+    }
+    return rayBanPath;
+  }
+
+  if (normalizeTokenText(brand) === "TOMMY HILFIGER") return ["RELOJES", "TOMMY HILFIGER"];
+  if (normalizeTokenText(brand) === "INVICTA") return ["RELOJES", "INVICTA"];
+  if (normalizeTokenText(brand) === "OMEGA X SWATCH") return ["RELOJES", "OMEGA X Swatch"];
+
+  if (brand) return ["SIN CATEGORIA", brand];
+  return ["SIN CATEGORIA"];
+}
+
 function normalizeVariant(row, variant) {
   const currentPrice = numberOrNull(variant.price_number);
   const compareAtPrice = numberOrNull(variant.compare_at_price_number);
@@ -388,13 +418,19 @@ function normalizeProduct(row, pageData) {
     warnings.push("Producto sin imágenes extraídas.");
   }
 
+  const brand = resolveBrand(row, pageData, category);
+  const categories = inferCategoryPath(row, pageData, category, brand);
+  if (category.path.length === 0) {
+    warnings.push(`Categoría inferida: ${categories.join(" > ")}`);
+  }
+
   return {
     id: String(pageData.product?.id ?? slug),
     tiendanubeProductId: pageData.product?.id ?? null,
     slug,
     name: String(row.Nombre ?? "").trim(),
-    brand: resolveBrand(row, pageData, category),
-    categories: category.path,
+    brand,
+    categories,
     tags: unique([...category.tags, ...csvTags, ...pageTags]),
     descriptionHtml,
     descriptionText: htmlToText(descriptionHtml),
