@@ -6,5 +6,7 @@
   "productsWithScrapeErrors": 0,
   "scrapeErrors": [],
   "productsWithVariants": 178,
-  "productsWithoutImages": []
+  "productsWithBlankBrand": 0,
+  "productsWithoutImages": [],
+  "variantsWithZeroPromotionalPrice": 0
 }

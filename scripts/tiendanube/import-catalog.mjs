@@ -84,6 +84,58 @@ function numberOrNull(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function nonEmptyString(value) {
+  const normalized = String(value ?? "").trim();
+  return normalized ? normalized : null;
+}
+
+function normalizeTokenText(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9&]+/g, " ")
+    .trim();
+}
+
+const DIRECT_BRAND_TOKEN_RULES = [
+  { brand: "Tommy Hilfiger", tokens: ["TOMMY HILFIGER"] },
+  { brand: "Invicta", tokens: ["INVICTA"] },
+  { brand: "OMEGA x Swatch", tokens: ["OMEGA X SWATCH"] },
+  { brand: "Ray Ban", tokens: ["RAY BAN", "RAYBAN"] },
+  { brand: "Prada", tokens: ["PRADA"] },
+  { brand: "Gucci", tokens: ["GUCCI"] },
+  { brand: "Saint Laurent", tokens: ["SAINT LAURENT"] },
+  { brand: "Louis Vuitton", tokens: ["LOUIS VUITTON"] },
+  { brand: "Versace", tokens: ["VERSACE"] },
+  { brand: "Christian Dior", tokens: ["CHRISTIAN DIOR", " DIOR "] },
+  { brand: "Balenciaga", tokens: ["BALENCIAGA"] },
+  { brand: "Cartier", tokens: ["CARTIER"] },
+  { brand: "Fendi", tokens: ["FENDI"] },
+  { brand: "Dolce&Gabbana", tokens: ["DOLCE&GABBANA", "DOLCE GABBANA", "DOLCEGABBANA"] },
+  { brand: "Celine Paris", tokens: ["CELINE PARIS", " CELINE "] },
+  { brand: "Off-White", tokens: ["OFF-WHITE", "OFF WHITE"] },
+];
+
+const RAY_BAN_MODEL_TOKENS = [
+  "4375 POLARIZADO",
+  "AMORE FASHION",
+  "AVIADOR",
+  "BIO BASED",
+  "BLAZE SHOOTER",
+  "CLUB ROUND",
+  "ERIKA",
+  "HEXAGONAL",
+  "HIGHSTREET",
+  "JUSTIN",
+  "MEGA WAYFARER",
+  "SQUARE II",
+  "STATE STREET",
+  "WAYFARER",
+];
+
+const RAY_BAN_STRONG_TOKENS = ["4375 POLARIZADO", "BIO BASED", "SQUARE II"];
+
 function decodeJsString(value) {
   if (!value) return "";
 
@@ -227,22 +279,74 @@ function variantOptions(variant) {
     .filter(Boolean);
 }
 
+function inferBrandFromTokens({ row, pageData, category }) {
+  const tokenSource = [
+    row.Nombre,
+    row["Categorías"],
+    row.Tags,
+    ...(category?.path ?? []),
+    ...(category?.tags ?? []),
+    pageData.product?.name,
+    ...(Array.isArray(pageData.product?.tags) ? pageData.product.tags : []),
+  ]
+    .map((value) => normalizeTokenText(value))
+    .filter(Boolean)
+    .join(" | ");
+
+  const tokenHaystack = ` ${tokenSource} `;
+
+  for (const rule of DIRECT_BRAND_TOKEN_RULES) {
+    if (rule.tokens.some((token) => tokenHaystack.includes(` ${normalizeTokenText(token)} `))) {
+      return rule.brand;
+    }
+  }
+
+  const categoryHaystack = [
+    ...(category?.path ?? []),
+    ...(category?.tags ?? []),
+  ]
+    .map((value) => normalizeTokenText(value))
+    .filter(Boolean)
+    .join(" | ");
+
+  const isSunglassesProduct =
+    categoryHaystack.includes("LENTES DE SOL") || tokenHaystack.includes(" LENTES DE SOL ");
+  const matchesRayBanModel = RAY_BAN_MODEL_TOKENS.some((token) =>
+    tokenHaystack.includes(` ${normalizeTokenText(token)} `),
+  );
+  const matchesStrongRayBanToken = RAY_BAN_STRONG_TOKENS.some((token) =>
+    tokenHaystack.includes(` ${normalizeTokenText(token)} `),
+  );
+
+  if (matchesStrongRayBanToken || (isSunglassesProduct && matchesRayBanModel)) {
+    return "Ray Ban";
+  }
+
+  return "";
+}
+
+function resolveBrand(row, pageData, category) {
+  return (
+    nonEmptyString(row.Marca) ??
+    nonEmptyString(pageData.product?.brand) ??
+    inferBrandFromTokens({ row, pageData, category }) ??
+    ""
+  );
+}
+
 function normalizeVariant(row, variant) {
   const currentPrice = numberOrNull(variant.price_number);
   const compareAtPrice = numberOrNull(variant.compare_at_price_number);
-  const explicitPromotionalPrice = numberOrNull(variant.promotional_price_number);
+  const rawVariantPromotionalPrice = numberOrNull(variant.promotional_price_number);
+  const explicitPromotionalPrice =
+    rawVariantPromotionalPrice !== null && rawVariantPromotionalPrice > 0
+      ? rawVariantPromotionalPrice
+      : null;
   const fallbackPrice = parseTiendanubePrice(row.Precio);
   const fallbackPromotionalPrice = parseTiendanubePrice(row["Precio promocional"]);
   const stock = Number(variant.stock ?? row.Stock ?? 0);
-  const price =
-    compareAtPrice ??
-    currentPrice ??
-    fallbackPrice;
-  const promotionalPrice =
-    explicitPromotionalPrice ??
-    (compareAtPrice !== null && currentPrice !== null && compareAtPrice > currentPrice
-      ? currentPrice
-      : fallbackPromotionalPrice);
+  const price = compareAtPrice ?? currentPrice ?? fallbackPrice;
+  const promotionalPrice = explicitPromotionalPrice ?? fallbackPromotionalPrice ?? null;
 
   return {
     id: numberOrNull(variant.id),
@@ -289,7 +393,7 @@ function normalizeProduct(row, pageData) {
     tiendanubeProductId: pageData.product?.id ?? null,
     slug,
     name: String(row.Nombre ?? "").trim(),
-    brand: String(row.Marca || pageData.product?.brand || "").trim(),
+    brand: resolveBrand(row, pageData, category),
     categories: category.path,
     tags: unique([...category.tags, ...csvTags, ...pageTags]),
     descriptionHtml,
@@ -370,7 +474,13 @@ async function main() {
     productsWithScrapeErrors: errors.length,
     scrapeErrors: errors,
     productsWithVariants: products.filter((product) => product.variants.length > 0).length,
+    productsWithBlankBrand: products.filter((product) => !String(product.brand ?? "").trim()).length,
     productsWithoutImages: products.filter((product) => product.images.length === 0).map((product) => product.slug),
+    variantsWithZeroPromotionalPrice: products.reduce(
+      (count, product) =>
+        count + product.variants.filter((variant) => variant.promotionalPrice === 0).length,
+      0,
+    ),
   };
 
   await fs.mkdir(OUT_DIR, { recursive: true });

@@ -37,3 +37,28 @@ Self-review notes:
 Concerns, if any:
 - 25 imported products ended up with empty `descriptionText` after stripping malformed embedded base64 image payloads from the source CSV descriptions.
 - 46 imported products still have blank `brand` because both the CSV export and the public Tiendanube page expose no brand value for them.
+
+---
+
+Status: FIXED
+
+Review findings addressed:
+- Added `resolveBrand()` / `inferBrandFromTokens()` so brand resolution now prefers CSV `Marca`, then `pageData.product.brand`, then recognized category/name tokens.
+- Added direct token coverage for the requested inferable brands: Tommy Hilfiger, Invicta, OMEGA x Swatch, Ray Ban, Prada, Gucci, Saint Laurent, Louis Vuitton, Versace, Christian Dior, Balenciaga, Cartier, Fendi, Dolce&Gabbana, Celine Paris, and Off-White.
+- Narrowed Ray Ban fallback with model-family tokens used by the blank-brand products in this catalog.
+- Normalized variant promotional price handling so `0`, `null`, and `undefined` no longer suppress CSV `Precio promocional`; missing promo now serializes as `null`.
+- Regenerated `data/tiendanube-catalog.json` and `data/tiendanube-import-summary.json` from the importer after the logic changes.
+
+Commands run:
+- `node --check scripts/tiendanube/import-catalog.mjs` -> PASS
+- `node scripts/tiendanube/import-catalog.mjs` -> PASS (`Imported 178 visible products`, `Scrape errors: 0`)
+- `node - <<'NODE' ... post-fix counts ... NODE` -> PASS (`products: 178`, `blankBrands: 0`, `zeroVariantPromo: 0`)
+
+Post-fix counts:
+- Visible products imported: 178
+- Blank brands: 0
+- Variants with `promotionalPrice === 0`: 0
+- Variants with `promotionalPrice === null`: 165
+
+Concerns, if any:
+- 25 imported products still end up with empty `descriptionText` after stripping malformed embedded base64 image payloads from the source CSV descriptions; this fix did not change description sourcing.
