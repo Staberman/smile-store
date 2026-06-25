@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { omegaSwatchProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Omega × Swatch MoonSwatch | Smile",
@@ -11,6 +11,10 @@ export const metadata: Metadata = {
 };
 
 const ACCENT = "#c9a96e";
+
+const omegaSwatchProducts = allProducts.filter(
+  (product) => product.brand === "OMEGA x Swatch"
+);
 
 export default function OmegaSwatchPage() {
   return (

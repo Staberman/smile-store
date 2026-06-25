@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { versaceProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Versace | Marcas Premium | Smile",
   description: "Lentes de sol Versace — audacia sin límites. Importados con cristal mineral UV400.",
 };
+
+const versaceProducts = allProducts.filter((product) => product.brand === "Versace");
 
 export default function VersacePage() {
   return (

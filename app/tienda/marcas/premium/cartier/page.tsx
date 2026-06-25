@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { cartierProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Cartier | Marcas Premium | Smile",
   description: "Lentes de sol Cartier — la joyería del eyewear. Importados con cristal mineral UV400.",
 };
+
+const cartierProducts = allProducts.filter((product) => product.brand === "Cartier");
 
 export default function CartierPage() {
   return (

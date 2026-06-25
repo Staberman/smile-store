@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { invictaProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Invicta | Smile",
   description:
     "Relojes Invicta originales en Argentina. Pro Diver, cronógrafos y ediciones limitadas disponibles en Smile.",
 };
+
+const invictaProducts = allProducts.filter((product) => product.brand === "Invicta");
 
 export default function InvictaPage() {
   return (

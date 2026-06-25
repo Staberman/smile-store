@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { saintLaurentProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Saint Laurent | Marcas Premium | Smile",
   description: "Lentes de sol Saint Laurent — rock & élégance parisina. Importados con cristal mineral UV400.",
 };
+
+const saintLaurentProducts = allProducts.filter((product) => product.brand === "Saint Laurent");
 
 export default function SaintLaurentPage() {
   return (

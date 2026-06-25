@@ -4,63 +4,108 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/brand/ProductGrid";
 import BrandCarousel from "@/components/brand/BrandCarousel";
-import {
-  raybanProducts,
-  invictaProducts,
-  tommyProducts,
-  premiumSunglassesProducts,
-  omegaSwatchProducts,
-} from "@/lib/products";
-
-const ferrariProducts = raybanProducts.filter((p) => p.subcollection === "ferrari");
-const raybanOnlyProducts = raybanProducts.filter((p) => p.subcollection !== "ferrari");
+import { allProducts, getCategoryTree } from "@/lib/catalog";
 
 const ACCENT = "#c9a96e";
 
-const categories = [
-  {
-    id: "lentes",
-    label: "Lentes de Sol",
+type SubcategoryTab = {
+  id: string;
+  label: string;
+  products: typeof allProducts;
+  brandLabel: string;
+  filterBy?: "collection" | "brand";
+};
+
+function normalizeLabel(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function formatLabel(value: string): string {
+  const normalized = normalizeLabel(value);
+  const specialCases: Record<string, string> = {
+    "lentes de sol": "Lentes de Sol",
+    relojes: "Relojes",
+    "ray ban": "Ray-Ban",
+    "marcas premium": "Marcas Premium",
+    "ray ban scuderia ferrari collection": "Ray-Ban Scuderia Ferrari",
+    "scuderia ferrari": "Scuderia Ferrari",
+    "omega x swatch": "Omega × Swatch",
+    invicta: "Invicta",
+    "tommy hilfiger dama": "Tommy Hilfiger Dama",
+    "tommy hilfiger caballero": "Tommy Hilfiger Caballero",
+  };
+
+  if (specialCases[normalized]) {
+    return specialCases[normalized];
+  }
+
+  return value
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+const categories: Array<{
+  id: string;
+  label: string;
+  subcategories: SubcategoryTab[];
+}> = getCategoryTree()
+  .filter((category) => category.children.length > 0)
+  .map((category) => ({
+    id: category.slug,
+    label: formatLabel(category.label),
     subcategories: [
-      { id: "ray-ban", label: "Ray-Ban", products: raybanOnlyProducts, brandLabel: "Ray-Ban" },
-      { id: "premium", label: "Marcas Premium", products: premiumSunglassesProducts, brandLabel: "Marcas Premium", filterBy: "brand" as const },
       {
-        id: "ferrari",
-        label: "Ray-Ban Scuderia Ferrari",
-        products: ferrariProducts,
-        brandLabel: "Ray-Ban × Scuderia Ferrari Collection",
+        id: "todos",
+        label: "Todos",
+        products: allProducts.filter((product) => product.categories[0] === category.label),
+        brandLabel: formatLabel(category.label),
       },
+      ...category.children.map((child) => ({
+        id: child.slug,
+        label: formatLabel(child.label),
+        products: allProducts.filter((product) => product.categories.includes(child.label)),
+        brandLabel: `${formatLabel(category.label)} · ${formatLabel(child.label)}`,
+        filterBy:
+          normalizeLabel(child.label) === "marcas premium"
+            ? ("brand" as const)
+            : ("collection" as const),
+      })),
     ],
-  },
-  {
-    id: "relojes",
-    label: "Relojes",
-    subcategories: [
-      { id: "invicta", label: "Invicta", products: invictaProducts, brandLabel: "Invicta" },
-      { id: "tommy", label: "Tommy Hilfiger", products: tommyProducts, brandLabel: "Tommy Hilfiger" },
-      { id: "omega", label: "Omega × Swatch", products: omegaSwatchProducts, brandLabel: "Omega × Swatch" },
-    ],
-  },
-];
+  }));
 
 function TiendaContent() {
   const searchParams = useSearchParams();
-  const initialCat = searchParams.get("cat") === "relojes" ? "relojes" : "lentes";
+  const defaultCategoryId =
+    categories.find((category) => category.id === "lentes-de-sol")?.id ?? categories[0]?.id ?? "";
+  const initialCat =
+    searchParams.get("cat") === "relojes"
+      ? categories.find((category) => category.id === "relojes")?.id ?? defaultCategoryId
+      : defaultCategoryId;
 
   const [activeCat, setActiveCat] = useState(initialCat);
-  const [activeSub, setActiveSub] = useState(
-    initialCat === "relojes" ? "invicta" : "ray-ban"
-  );
+  const [activeSub, setActiveSub] = useState("todos");
 
-  const currentCategory = categories.find((c) => c.id === activeCat)!;
+  const currentCategory = categories.find((c) => c.id === activeCat) ?? categories[0];
   const currentSub =
-    currentCategory.subcategories.find((s) => s.id === activeSub) ??
-    currentCategory.subcategories[0];
+    currentCategory?.subcategories.find((s) => s.id === activeSub) ??
+    currentCategory?.subcategories[0];
 
   function handleCatChange(catId: string) {
     setActiveCat(catId);
     const cat = categories.find((c) => c.id === catId)!;
     setActiveSub(cat.subcategories[0].id);
+  }
+
+  if (!currentCategory || !currentSub) {
+    return null;
   }
 
   return (

@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { celineProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Celine | Marcas Premium | Smile",
   description: "Lentes de sol Celine Paris — minimalismo parisino. Importados con cristal mineral UV400.",
 };
+
+const celineProducts = allProducts.filter((product) => product.brand === "Celine Paris");
 
 export default function CelinePage() {
   return (

@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { tommyProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Tommy Hilfiger | Smile",
   description:
     "Lentes Tommy Hilfiger en Argentina. Diseño americano contemporáneo con identidad de moda propia.",
 };
+
+const tommyProducts = allProducts.filter((product) => product.brand === "Tommy Hilfiger");
 
 export default function TommyHilfigerPage() {
   return (

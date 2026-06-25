@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { louisVuittonProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Louis Vuitton | Marcas Premium | Smile",
   description: "Lentes de sol Louis Vuitton — el arte de viajar con estilo. Importados con cristal mineral UV400.",
 };
+
+const louisVuittonProducts = allProducts.filter((product) => product.brand === "Louis Vuitton");
 
 export default function LouisVuittonPage() {
   return (

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { raybanProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Ray-Ban | Smile",
@@ -10,11 +10,16 @@ export const metadata: Metadata = {
     "Descubre la colección completa de lentes Ray-Ban en Smile. Aviador, Wayfarer, Clubmaster, Round y la exclusiva Scuderia Ferrari Collection.",
 };
 
+const rayBanProducts = allProducts.filter((product) => {
+  const values = [product.brand, ...product.categories];
+  return values.some((value) => value.toLowerCase().includes("ray ban"));
+});
+
 export default function RayBanPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <BrandCarousel
-        products={raybanProducts}
+        products={rayBanProducts}
         brand="Ray-Ban"
       />
 
@@ -44,7 +49,7 @@ export default function RayBanPage() {
         </div>
       </section>
 
-      <ProductGrid products={raybanProducts} brandLabel="Colección Ray-Ban" />
+      <ProductGrid products={rayBanProducts} brandLabel="Colección Ray-Ban" />
       <CollectionLinks current="ray-ban" />
     </main>
   );

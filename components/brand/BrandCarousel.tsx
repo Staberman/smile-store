@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import type { Product } from "@/lib/products";
-import { formatPrice } from "@/lib/products";
+import type { CatalogProduct } from "@/lib/catalog";
+import { formatPrice } from "@/lib/catalog";
 
 interface Props {
-  products: Product[];
+  products: CatalogProduct[];
   brand: string;
   accentColor?: string; // CSS hex, default gold
   showNav?: boolean; // show internal nav bar (default true)
@@ -22,29 +22,61 @@ const BG_GRADIENTS = [
   "radial-gradient(ellipse at 44% 48%, #14100a 0%, #0a0a0a 72%)",
 ];
 
+function hasAvailableVariant(product: CatalogProduct) {
+  return product.variants.some((variant) => variant.available);
+}
+
+function buildSlides(products: CatalogProduct[]) {
+  const preferred = products.filter(hasAvailableVariant);
+  const source = preferred.length > 0 ? preferred : products;
+  const slides: CatalogProduct[] = [];
+  const seen = new Set<string>();
+
+  for (const product of source) {
+    if (slides.length >= 5) break;
+    slides.push(product);
+    seen.add(product.id);
+  }
+
+  if (preferred.length > 0 && slides.length < 5) {
+    for (const product of products) {
+      if (slides.length >= 5) break;
+      if (seen.has(product.id)) continue;
+      slides.push(product);
+    }
+  }
+
+  return slides.slice(0, 5);
+}
+
 export default function BrandCarousel({ products, brand, showNav = true }: Props) {
-  const featured = products.filter((p) => p.featured).slice(0, 5);
+  const featured = buildSlides(products);
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
+  const slideCount = featured.length;
+  const currentIndex = slideCount > 0 ? current % slideCount : 0;
+  const slide = featured[currentIndex];
 
   // Auto-advance
   useEffect(() => {
-    const t = setInterval(() => goTo((current + 1) % featured.length), 5500);
+    if (slideCount <= 1) return;
+    const t = setInterval(() => goTo((current + 1) % slideCount), 5500);
     return () => clearInterval(t);
-  }, [current, featured.length]);
+  }, [current, slideCount]);
 
   // Keyboard
   useEffect(() => {
+    if (slideCount <= 1) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === "ArrowDown")
-        goTo((current + 1) % featured.length);
+        goTo((current + 1) % slideCount);
       if (e.key === "ArrowLeft" || e.key === "ArrowUp")
-        goTo((current - 1 + featured.length) % featured.length);
+        goTo((current - 1 + slideCount) % slideCount);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [current, featured.length]);
+  }, [current, slideCount]);
 
   function goTo(next: number) {
     if (animating || next === current) return;
@@ -57,8 +89,14 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
     }, 80);
   }
 
-  const slide = featured[current];
-  const bgGradient = BG_GRADIENTS[current % BG_GRADIENTS.length];
+  if (slideCount === 0) {
+    return null;
+  }
+
+  const bgGradient = BG_GRADIENTS[currentIndex % BG_GRADIENTS.length];
+  const subtitle = slide.categories[slide.categories.length - 1] ?? slide.brand;
+  const detailTag = slide.tags[0] ?? slide.categories[slide.categories.length - 1] ?? null;
+  const price = slide.promotionalPrice ?? slide.price;
 
   return (
     <section
@@ -122,7 +160,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
       {/* Slides */}
       <div className="absolute inset-0 flex items-center justify-center">
         {featured.map((prod, index) => {
-          const isActive = index === current;
+          const isActive = index === currentIndex;
           const isExiting = index === exiting;
 
           return (
@@ -166,15 +204,17 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     className="font-display mt-2 text-[1.05rem] italic"
                     style={{ color: "#4a4540" }}
                   >
-                    {prod.subtitle}
+                    {index === currentIndex
+                      ? subtitle
+                      : (prod.categories[prod.categories.length - 1] ?? prod.brand)}
                   </p>
 
-                  {prod.badge && (
+                  {index === currentIndex && detailTag && (
                     <p
                       className="mt-3 text-[0.62rem] uppercase tracking-[0.18em]"
                       style={{ color: ACCENT }}
                     >
-                      ✦ {prod.badge}
+                      ✦ {detailTag}
                     </p>
                   )}
 
@@ -182,13 +222,11 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     className="mt-6 text-[0.72rem] tracking-[0.14em]"
                     style={{ color: ACCENT }}
                   >
-                    {formatPrice(prod.price)}
+                    {formatPrice(index === currentIndex ? price : prod.promotionalPrice ?? prod.price)}
                   </p>
 
                   <a
-                    href={prod.storeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={`/tienda/productos/${prod.slug}`}
                     className="mt-10 inline-flex items-center gap-4 border-b pb-2 text-[0.6rem] uppercase tracking-[0.26em] text-[#f0ece4] transition-all hover:gap-6"
                     style={{
                       borderColor: "#4a4540",
@@ -199,8 +237,8 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLAnchorElement).style.borderColor = "#4a4540";
                     }}
-                  >
-                    Ver en tienda{" "}
+                    >
+                    Ver detalle{" "}
                     <span style={{ color: ACCENT }}>→</span>
                   </a>
                 </div>
@@ -319,12 +357,12 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
         {[
           {
             dir: "up",
-            onClick: () => goTo((current - 1 + featured.length) % featured.length),
+            onClick: () => goTo((current - 1 + slideCount) % slideCount),
             path: "M18 15 L12 9 L6 15",
           },
           {
             dir: "down",
-            onClick: () => goTo((current + 1) % featured.length),
+            onClick: () => goTo((current + 1) % slideCount),
             path: "M6 9 L12 15 L18 9",
           },
         ].map(({ dir, onClick, path }) => (
@@ -362,9 +400,9 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
         style={{ color: "#4a4540" }}
       >
         <span style={{ color: ACCENT, fontWeight: 400 }}>
-          {String(current + 1).padStart(2, "0")}
+          {String(currentIndex + 1).padStart(2, "0")}
         </span>{" "}
-        / {String(featured.length).padStart(2, "0")}
+        / {String(slideCount).padStart(2, "0")}
       </div>
 
       {/* CSS rotate keyframe */}

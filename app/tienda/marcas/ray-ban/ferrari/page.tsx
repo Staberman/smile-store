@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { raybanProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -13,9 +13,10 @@ export const metadata: Metadata = {
 const ACCENT = "#c9a96e";
 const ferrariRed = "#dc0000";
 
-const ferrariProducts = raybanProducts.filter(
-  (p) => p.subcollection === "ferrari"
-);
+const ferrariProducts = allProducts.filter((product) => {
+  const values = [product.brand, ...product.categories, ...product.tags];
+  return values.some((value) => value.toLowerCase().includes("ferrari"));
+});
 
 export default function FerrariPage() {
   return (
