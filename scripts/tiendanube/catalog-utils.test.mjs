@@ -51,3 +51,10 @@ test("extractAssignedJson reads LS.variants assignment", () => {
     { id: 923, product_id: 207, option0: "STANDARD (M)" },
   ]);
 });
+
+test("extractAssignedJson parses nested LS.variants assignment", () => {
+  const html = '<script>LS.variants = [{"id":1,"options":[{"a":1}]}];</script>';
+  assert.deepEqual(extractAssignedJson(html, "LS.variants"), [
+    { id: 1, options: [{ a: 1 }] },
+  ]);
+});

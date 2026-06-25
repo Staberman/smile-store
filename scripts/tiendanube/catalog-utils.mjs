@@ -62,17 +62,69 @@ export function parseCategoryField(value) {
 
 export function extractAssignedJson(html, assignmentName) {
   const source = String(html ?? "");
-  const escaped = assignmentName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(
-    `${escaped}\\s*=\\s*([\\[{][\\s\\S]*?[\\]}])\\s*;`,
-    "m",
-  );
-  const match = source.match(pattern);
-  if (!match) return null;
+  const assignmentIndex = source.indexOf(assignmentName);
+  if (assignmentIndex === -1) return null;
 
-  try {
-    return JSON.parse(match[1]);
-  } catch {
-    return null;
+  let index = assignmentIndex + assignmentName.length;
+  while (index < source.length && /\s/.test(source[index])) index += 1;
+  if (source[index] !== "=") return null;
+
+  index += 1;
+  while (index < source.length && /\s/.test(source[index])) index += 1;
+
+  const open = source[index];
+  const close = open === "[" ? "]" : open === "{" ? "}" : null;
+  if (!close) return null;
+
+  const stack = [open];
+  let quoted = null;
+  let escaped = false;
+
+  for (let scan = index + 1; scan < source.length; scan += 1) {
+    const char = source[scan];
+
+    if (quoted) {
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+
+      if (char === "\\") {
+        escaped = true;
+        continue;
+      }
+
+      if (char === quoted) quoted = null;
+      continue;
+    }
+
+    if (char === "\"" || char === "'") {
+      quoted = char;
+      continue;
+    }
+
+    if (char === "[" || char === "{") {
+      stack.push(char);
+      continue;
+    }
+
+    if (char === "]" || char === "}") {
+      const last = stack[stack.length - 1];
+      if ((last === "[" && char !== "]") || (last === "{" && char !== "}")) {
+        return null;
+      }
+
+      stack.pop();
+      if (stack.length === 0) {
+        const payload = source.slice(index, scan + 1);
+        try {
+          return JSON.parse(payload);
+        } catch {
+          return null;
+        }
+      }
+    }
   }
+
+  return null;
 }
