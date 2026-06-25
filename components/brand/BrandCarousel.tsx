@@ -388,7 +388,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                 (e.currentTarget as SVGElement).style.stroke = "#4a4540";
               }}
             >
-              <polyline points={path} />
+              <path d={path} />
             </svg>
           </button>
         ))}
