@@ -13,6 +13,7 @@ The Tiendanube checkout remains the payment engine. The new project must not imp
 - Replace the current hand-written catalog data.
 - Remove local cart behavior from the customer experience.
 - Send customers directly from this storefront into Tiendanube's purchase flow.
+- Preserve the current visual style: black premium storefront, gold accent `#c9a96e`, Inter/Cormorant typography, dark product cards, existing header/footer feel, and current listing/detail page rhythm.
 
 ## Source Data
 
@@ -118,6 +119,7 @@ This creates the Tiendanube cart/session in Tiendanube and avoids the local cart
   - local storage cart state
   - WhatsApp checkout action
 - Keep header/footer and existing brand styling where useful.
+- Do not redesign the storefront. Keep the current aesthetic and adapt existing components to the imported catalog.
 
 ## Extraction Rules
 
