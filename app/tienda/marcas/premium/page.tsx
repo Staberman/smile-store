@@ -3,7 +3,7 @@ import Link from "next/link";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 
 export const metadata: Metadata = {
-  title: "Marcas Premium | Smile",
+  title: "Marcas Premium",
   description:
     "Prada, Dior, Versace, Gucci, Balenciaga, Louis Vuitton, Saint Laurent, Fendi, Cartier, Dolce&Gabbana y Celine — lentes de sol premium en Smile.",
 };

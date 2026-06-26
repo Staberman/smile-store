@@ -10,6 +10,7 @@ interface Props {
   products: CatalogProduct[];
   brandLabel: string;
   filterBy?: "collection" | "brand";
+  searchProducts?: CatalogProduct[];
 }
 
 const ACCENT = "#c9a96e";
@@ -113,7 +114,13 @@ function getSearchSuggestions(
     .map((item) => item.product.name);
 }
 
-export default function ProductGrid({ products, brandLabel, filterBy = "collection" }: Props) {
+export default function ProductGrid({
+  products,
+  brandLabel,
+  filterBy = "collection",
+  searchProducts,
+}: Props) {
+  const searchableProducts = searchProducts ?? products;
   const getKey = (product: CatalogProduct) =>
     filterBy === "brand" ? product.brand : getCollectionKey(product);
   const getLabel = (key: string) => filterBy === "brand" ? (BRAND_NAMES[key] ?? key) : key;
@@ -139,11 +146,13 @@ export default function ProductGrid({ products, brandLabel, filterBy = "collecti
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const normalizedSearch = normalizeSearch(search);
-  const suggestions = getSearchSuggestions(products, search, getLabel, getKey);
+  const suggestions = getSearchSuggestions(searchableProducts, search, getLabel, getKey);
+  const baseProducts = normalizedSearch.length > 0 ? searchableProducts : products;
 
-  let filtered = products.filter((product) => {
+  let filtered = baseProducts.filter((product) => {
     const productKey = getKey(product);
-    const matchesFilter = active === "Todos" || productKey === active;
+    const matchesFilter =
+      normalizedSearch.length > 0 || active === "Todos" || productKey === active;
     const matchesSearch =
       normalizedSearch.length === 0 ||
       getSearchText(product, getLabel(productKey)).includes(normalizedSearch);

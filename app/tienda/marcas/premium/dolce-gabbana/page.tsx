@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Dolce&Gabbana | Marcas Premium | Smile",
+  title: "Dolce&Gabbana | Marcas Premium",
   description: "Lentes de sol Dolce&Gabbana — el mediterráneo hecho moda. Importados con cristal mineral UV400.",
 };
 
@@ -14,7 +14,7 @@ const dolceGabbanaProducts = allProducts.filter((product) => product.brand === "
 export default function DolceGabbanaPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={dolceGabbanaProducts} brand="Dolce&Gabbana" />
+      <BrandCarousel products={dolceGabbanaProducts} brand="Dolce&Gabbana" showNav={false} />
       <ProductGrid products={dolceGabbanaProducts} brandLabel="Colección Dolce&Gabbana" />
       <CollectionLinks current="premium" />
     </main>

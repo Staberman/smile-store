@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Omega × Swatch MoonSwatch | Smile",
+  title: "Omega × Swatch MoonSwatch",
   description:
     "La colaboración histórica entre Omega y Swatch. MoonSwatch Bioceramic — Mission to the Moon, Mars, Earth y más. Disponible en Smile.",
 };
@@ -19,7 +19,7 @@ const omegaSwatchProducts = allProducts.filter(
 export default function OmegaSwatchPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={omegaSwatchProducts} brand="Omega × Swatch" />
+      <BrandCarousel products={omegaSwatchProducts} brand="Omega × Swatch" showNav={false} />
 
       {/* Collab callout */}
       <section className="border-b border-white/6 bg-[#0a0a0a] px-6 py-16 text-[#f0ece4] md:px-12">

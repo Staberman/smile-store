@@ -5,7 +5,7 @@ import { allProducts } from "@/lib/catalog";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Scuderia Ferrari Collection | Ray-Ban | Smile",
+  title: "Scuderia Ferrari Collection | Ray-Ban",
   description:
     "La colaboración entre Ray-Ban y Scuderia Ferrari. Lentes de sol exclusivos con diseño inspirado en la Fórmula 1. Disponibles en Smile Argentina.",
 };

@@ -169,6 +169,7 @@ function TiendaContent() {
         products={currentSub.products}
         brandLabel={currentSub.brandLabel}
         filterBy={currentSub.filterBy}
+        searchProducts={allProducts}
       />
     </main>
   );

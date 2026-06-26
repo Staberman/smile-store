@@ -32,7 +32,7 @@ export default function Header() {
 
         <nav className="flex items-center gap-3">
           <a
-            href="#colecciones"
+            href="/#colecciones"
             className="cursor-pointer rounded-full border border-white/25 bg-white/8 px-5 py-2.5 text-[11px] uppercase tracking-[0.24em] text-white backdrop-blur transition hover:border-white hover:bg-white hover:text-black"
           >
             Explorar

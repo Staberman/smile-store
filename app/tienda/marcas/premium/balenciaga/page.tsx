@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Balenciaga | Marcas Premium | Smile",
+  title: "Balenciaga | Marcas Premium",
   description: "Lentes de sol Balenciaga — editorial y futurista. Importados con cristal mineral UV400.",
 };
 
@@ -14,7 +14,7 @@ const balenciagaProducts = allProducts.filter((product) => product.brand === "Ba
 export default function BalenciagaPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={balenciagaProducts} brand="Balenciaga" />
+      <BrandCarousel products={balenciagaProducts} brand="Balenciaga" showNav={false} />
       <ProductGrid products={balenciagaProducts} brandLabel="Colección Balenciaga" />
       <CollectionLinks current="premium" />
     </main>

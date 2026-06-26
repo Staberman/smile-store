@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     canonical: "/tienda",
   },
   openGraph: {
-    title: "Tienda online de relojes y lentes premium | Smile",
+    title: "Tienda online de relojes y lentes premium",
     description:
       "Catalogo actualizado de relojes, lentes de sol y accesorios premium en Argentina.",
     url: "/tienda",

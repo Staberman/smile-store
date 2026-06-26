@@ -363,6 +363,19 @@ function resolveBrand(row, pageData, category) {
 }
 
 function inferCategoryPath(row, pageData, category, brand) {
+  if (category.path.some((item) => normalizeTokenText(item).includes("SMILE SALE"))) {
+    if (normalizeTokenText(brand) === "RAY BAN") {
+      const tokenSource = normalizeTokenText([row.Nombre, row.Tags, pageData.product?.name].join(" "));
+      const rayBanPath = ["LENTES DE SOL", "RAY BAN"];
+      if (tokenSource.includes("SCUDERIA") || tokenSource.includes("FERRARI")) {
+        return [...rayBanPath, "SCUDERIA FERRARI"];
+      }
+      if (tokenSource.includes("HEXAGONAL")) return [...rayBanPath, "HEXAGONAL"];
+      return rayBanPath;
+    }
+    return brand ? ["SIN CATEGORIA", brand] : ["SIN CATEGORIA"];
+  }
+
   if (category.path.some((item) => normalizeTokenText(item).includes("MES DE LA MADRE"))) {
     if (normalizeTokenText(brand) === "RAY BAN") return ["LENTES DE SOL", "RAY BAN", "SQUARE II"];
     return brand ? ["SIN CATEGORIA", brand] : ["SIN CATEGORIA"];
@@ -444,7 +457,9 @@ function extractModelFromSlug(slug) {
 }
 
 function normalizeProductName(rawName, slug, brand, warnings) {
-  const name = String(rawName ?? "").trim();
+  const name = String(rawName ?? "")
+    .replace(/\s+-\s+SALE\b/gi, "")
+    .trim();
   const slugModel = extractModelFromSlug(slug);
   const nameModel = extractModelFromName(name, brand).match(/\d{6,}/)?.[0] ?? "";
 

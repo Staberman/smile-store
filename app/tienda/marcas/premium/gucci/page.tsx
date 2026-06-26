@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Gucci | Marcas Premium | Smile",
+  title: "Gucci | Marcas Premium",
   description: "Lentes de sol Gucci — la casa florentina. Importados con cristal mineral UV400.",
 };
 
@@ -14,7 +14,7 @@ const gucciProducts = allProducts.filter((product) => product.brand === "Gucci")
 export default function GucciPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={gucciProducts} brand="Gucci" />
+      <BrandCarousel products={gucciProducts} brand="Gucci" showNav={false} />
       <ProductGrid products={gucciProducts} brandLabel="Colección Gucci" />
       <CollectionLinks current="premium" />
     </main>

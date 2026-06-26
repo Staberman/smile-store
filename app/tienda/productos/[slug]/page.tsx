@@ -26,7 +26,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProductBySlug(params.slug);
-  if (!product) return { title: "Producto | Smile" };
+  if (!product) return { title: "Producto" };
 
   const metaTitle = product.seoTitle || product.name;
   const metaDescription =
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       locale: "es_AR",
       siteName: SITE_NAME,
-      title: `${metaTitle} | Smile`,
+      title: metaTitle,
       description: truncateMetaDescription(metaDescription),
       url: canonical,
       images: image
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${metaTitle} | Smile`,
+      title: metaTitle,
       description: truncateMetaDescription(metaDescription),
       images: image ? [image] : undefined,
     },

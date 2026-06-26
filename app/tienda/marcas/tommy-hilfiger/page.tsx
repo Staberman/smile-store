@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Relojes Tommy Hilfiger | Smile",
+  title: "Relojes Tommy Hilfiger",
   description:
     "Relojes Tommy Hilfiger en Argentina. Modelos para dama y caballero con diseño americano contemporáneo y checkout seguro por Tiendanube.",
   alternates: {
@@ -18,7 +18,7 @@ const tommyProducts = allProducts.filter((product) => product.brand === "Tommy H
 export default function TommyHilfigerPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={tommyProducts} brand="Tommy Hilfiger" />
+      <BrandCarousel products={tommyProducts} brand="Tommy Hilfiger" showNav={false} />
       <ProductGrid products={tommyProducts} brandLabel="Colección Tommy Hilfiger" />
       <CollectionLinks current="tommy-hilfiger" />
     </main>

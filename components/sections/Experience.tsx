@@ -30,7 +30,7 @@ const items = [
   },
 ];
 
-const videos = ["/videos/smile-watch.mp4", "/videos/smile-glasses.mp4"];
+const videos = ["/videos/smile-glasses.mp4"];
 
 const container = {
   hidden: {},

@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Louis Vuitton | Marcas Premium | Smile",
+  title: "Louis Vuitton | Marcas Premium",
   description: "Lentes de sol Louis Vuitton — el arte de viajar con estilo. Importados con cristal mineral UV400.",
 };
 
@@ -14,7 +14,7 @@ const louisVuittonProducts = allProducts.filter((product) => product.brand === "
 export default function LouisVuittonPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={louisVuittonProducts} brand="Louis Vuitton" />
+      <BrandCarousel products={louisVuittonProducts} brand="Louis Vuitton" showNav={false} />
       <ProductGrid products={louisVuittonProducts} brandLabel="Colección Louis Vuitton" />
       <CollectionLinks current="premium" />
     </main>

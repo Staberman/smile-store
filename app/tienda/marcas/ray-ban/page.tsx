@@ -5,7 +5,7 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Ray-Ban | Smile",
+  title: "Ray-Ban",
   description:
     "Descubre la colección completa de lentes Ray-Ban en Smile. Aviador, Wayfarer, Clubmaster, Round y la exclusiva Scuderia Ferrari Collection.",
 };
@@ -21,6 +21,7 @@ export default function RayBanPage() {
       <BrandCarousel
         products={rayBanProducts}
         brand="Ray-Ban"
+        showNav={false}
       />
 
       {/* Ferrari sub-collection callout */}
