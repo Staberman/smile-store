@@ -324,20 +324,22 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
       onMouseLeave={() => setHovered(false)}
     >
       <Link href={`/tienda/productos/${product.slug}`} className="block">
-        <div className="relative h-56 overflow-hidden bg-[#121010]">
-          <img
-            src={image ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E"}
-            alt={product.name}
-            className="h-full w-full object-contain p-4 transition-transform duration-[1100ms]"
-            style={{
-              transform: hovered ? "scale(1.07)" : "scale(1)",
-              filter: "brightness(0.9) contrast(1.02)",
-            }}
-            onError={(event) => {
-              (event.target as HTMLImageElement).src =
-                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E";
-            }}
-          />
+        <div className="relative flex h-60 items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,rgba(201,169,110,0.12),rgba(18,16,16,0)_62%)] sm:h-56">
+          <div className="relative h-44 w-44 overflow-hidden rounded-full border border-[#c9a96e]/20 bg-[#121010] shadow-[0_0_0_10px_rgba(201,169,110,0.04),0_26px_70px_rgba(0,0,0,0.45)] sm:h-48 sm:w-48">
+            <img
+              src={image ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E"}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-[1100ms]"
+              style={{
+                transform: hovered ? "scale(1.13)" : "scale(1.06)",
+                filter: "brightness(0.9) contrast(1.04)",
+              }}
+              onError={(event) => {
+                (event.target as HTMLImageElement).src =
+                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E";
+              }}
+            />
+          </div>
 
           {!product.stock && (
             <div
