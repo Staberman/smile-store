@@ -855,7 +855,7 @@
         "options": [
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -867,7 +867,7 @@
         "options": [
           "Transparente/Gris Degrade"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -879,7 +879,7 @@
         "options": [
           "Carey/ Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -998,7 +998,7 @@
         "id": 1365410640,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 295000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1035,7 +1035,7 @@
         "id": 1365409840,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 290000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1072,7 +1072,7 @@
         "id": 1365408887,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 332000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1109,7 +1109,7 @@
         "id": 1365408308,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 398500,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1146,7 +1146,7 @@
         "id": 1365407924,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 285000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1183,7 +1183,7 @@
         "id": 1365407270,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 265000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1220,7 +1220,7 @@
         "id": 1365406358,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 250000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1473,7 +1473,7 @@
         "options": [
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -1485,7 +1485,7 @@
         "options": [
           "Transparente Marrón/Marrón degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2140,7 +2140,7 @@
         "id": 1294554457,
         "sku": "GG1443S",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2192,7 +2192,7 @@
         "id": 1294546027,
         "sku": "GG1528S",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2245,7 +2245,7 @@
         "id": 1294538158,
         "sku": "CL40194U",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2299,7 +2299,7 @@
         "id": 1294531057,
         "sku": "CL40282U",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2351,7 +2351,7 @@
         "id": 1293361646,
         "sku": "DG005",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2403,7 +2403,7 @@
         "id": 1293358388,
         "sku": "DG004",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2455,7 +2455,7 @@
         "id": 1293354303,
         "sku": "DG003",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2507,7 +2507,7 @@
         "id": 1293346209,
         "sku": "CA002",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2559,7 +2559,7 @@
         "id": 1293342307,
         "sku": "CA005",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2611,7 +2611,7 @@
         "id": 1293332960,
         "sku": "CA010",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2663,7 +2663,7 @@
         "id": 1293329562,
         "sku": "CA003",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2715,7 +2715,7 @@
         "id": 1293320195,
         "sku": "FE016",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2767,7 +2767,7 @@
         "id": 1293316378,
         "sku": "FE013",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2819,7 +2819,7 @@
         "id": 1293308857,
         "sku": "FE023",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -2871,7 +2871,7 @@
         "id": 1293302917,
         "sku": "FE008",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2923,7 +2923,7 @@
         "id": 1293292726,
         "sku": "SL009",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -2975,7 +2975,7 @@
         "id": 1293287909,
         "sku": "SL001",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3027,7 +3027,7 @@
         "id": 1293283323,
         "sku": "SL012",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3079,7 +3079,7 @@
         "id": 1293276528,
         "sku": "SL008",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3131,7 +3131,7 @@
         "id": 1293270501,
         "sku": "2140SL",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3183,7 +3183,7 @@
         "id": 1293263690,
         "sku": "SL003",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3238,7 +3238,7 @@
         "id": 1290078355,
         "sku": "LV1008",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3289,7 +3289,7 @@
         "id": 1290074806,
         "sku": "LV1026",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3340,7 +3340,7 @@
         "id": 1290070853,
         "sku": "LV1046",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3391,7 +3391,7 @@
         "id": 1290063477,
         "sku": "LV1030",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3442,7 +3442,7 @@
         "id": 1290058747,
         "sku": "LV1042",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3493,7 +3493,7 @@
         "id": 1290053727,
         "sku": "LV1007",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3544,7 +3544,7 @@
         "id": 1290048747,
         "sku": "BA001",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3595,7 +3595,7 @@
         "id": 1290045400,
         "sku": "BA013",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3646,7 +3646,7 @@
         "id": 1290041843,
         "sku": "BA014",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3697,7 +3697,7 @@
         "id": 1290040059,
         "sku": "BA012",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3748,7 +3748,7 @@
         "id": 1290037904,
         "sku": "BA004",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3799,7 +3799,7 @@
         "id": 1290027713,
         "sku": "G011",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3849,7 +3849,7 @@
         "id": 1290025093,
         "sku": "G023",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -3900,7 +3900,7 @@
         "id": 1290022806,
         "sku": "G012",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -3951,7 +3951,7 @@
         "id": 1290020340,
         "sku": "G020",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4002,7 +4002,7 @@
         "id": 1290018850,
         "sku": "GG0811S",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -4053,7 +4053,7 @@
         "id": 1290016605,
         "sku": "G028",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -4104,7 +4104,7 @@
         "id": 1290010129,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -4155,7 +4155,7 @@
         "id": 1290008031,
         "sku": "",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4206,7 +4206,7 @@
         "id": 1290004575,
         "sku": "V025",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4257,7 +4257,7 @@
         "id": 1290002480,
         "sku": "V023",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4308,7 +4308,7 @@
         "id": 1290000042,
         "sku": "V012",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4361,7 +4361,7 @@
         "id": 1289997453,
         "sku": "v001",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4412,7 +4412,7 @@
         "id": 1289992594,
         "sku": "CD027",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4463,7 +4463,7 @@
         "id": 1289989843,
         "sku": "CD016",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4516,7 +4516,7 @@
         "id": 1289986761,
         "sku": "CD029",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4569,7 +4569,7 @@
         "id": 1289982749,
         "sku": "CD019",
         "options": [],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4622,7 +4622,7 @@
         "id": 1289978601,
         "sku": "CD033",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4675,7 +4675,7 @@
         "id": 1289970960,
         "sku": "CD006",
         "options": [],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -4725,7 +4725,7 @@
         "options": [
           "Negro/verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -4737,7 +4737,7 @@
         "options": [
           "Gris"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -4749,7 +4749,7 @@
         "options": [
           "Marrón traslúcido"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4761,7 +4761,7 @@
         "options": [
           "Traslúcido azul"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -4803,7 +4803,7 @@
         "options": [
           "Negro/verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -4900,8 +4900,8 @@
         "options": [
           "Negro/gris degrade"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/state-street-negro-azul-degrade-c6bfff9eb4a2d2524d17417889996087-1024-1024.webp"
@@ -5228,7 +5228,7 @@
         "options": [
           "Negro/verde"
         ],
-        "price": 0,
+        "price": 245500,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -5348,7 +5348,7 @@
           "Dorado/Rosa espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 145900,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -5361,7 +5361,7 @@
           "Plateado/Turquesa espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 145900,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -5530,7 +5530,7 @@
         "options": [
           "Madera Clasica/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -5614,7 +5614,7 @@
         "options": [
           "Carey/Marrón liso"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -5626,7 +5626,7 @@
         "options": [
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -5665,7 +5665,7 @@
         "options": [
           "Dorado/Azul liso"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6004,7 +6004,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6016,7 +6016,7 @@
         "options": [
           "Transparente"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6087,7 +6087,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6099,7 +6099,7 @@
         "options": [
           "Negro/Havana Gris"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6111,7 +6111,7 @@
         "options": [
           "Transparente"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6184,7 +6184,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6196,7 +6196,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6208,7 +6208,7 @@
         "options": [
           "Negro Marmolado"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6281,7 +6281,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6363,7 +6363,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6375,7 +6375,7 @@
         "options": [
           "Negro/Azul Degrade"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6387,7 +6387,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6399,7 +6399,7 @@
         "options": [
           "Negro/Amarillo"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6411,7 +6411,7 @@
         "options": [
           "Transparente"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6485,7 +6485,7 @@
         "options": [
           "Negro/Negro"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6497,7 +6497,7 @@
         "options": [
           "Negro/Amarillo"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6574,7 +6574,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6586,7 +6586,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6598,7 +6598,7 @@
         "options": [
           "Blanco"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6672,7 +6672,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -6684,7 +6684,7 @@
         "options": [
           "Carey Escarlata"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6761,7 +6761,7 @@
         "options": [
           "Nacar Verde Azulado"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6773,7 +6773,7 @@
         "options": [
           "Carey Azul"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6785,7 +6785,7 @@
         "options": [
           "Carey Verde"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6859,7 +6859,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6871,7 +6871,7 @@
         "options": [
           "Rojo Marmolado"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6945,7 +6945,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -6957,7 +6957,7 @@
         "options": [
           "Negro Marmolado"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7031,7 +7031,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7043,7 +7043,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7117,7 +7117,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -7129,7 +7129,7 @@
         "options": [
           "Blanco Tiza"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7203,7 +7203,7 @@
         "options": [
           "Transparente"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7215,7 +7215,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 408700,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -7292,7 +7292,7 @@
         "options": [
           "Negro"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7304,7 +7304,7 @@
         "options": [
           "Rosa"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7316,7 +7316,7 @@
         "options": [
           "Blanco"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7328,7 +7328,7 @@
         "options": [
           "Carey"
         ],
-        "price": 0,
+        "price": 437300,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -7414,8 +7414,8 @@
           "STANDARD (M)",
           "Carey/Marón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 210105,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/blaze-wayfarer-carey-marron-degrade-406fb9a8e2f721c45817612406777218-1024-1024.webp"
@@ -7508,8 +7508,8 @@
           "STANDARD (M)",
           "Carey/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-careyverde-75e9684e2a8fdd76b917157495924916-1024-1024.webp"
@@ -7522,7 +7522,7 @@
           "Carey/Marrón degradé"
         ],
         "price": 210105,
-        "promotionalPrice": 175900,
+        "promotionalPrice": 182700,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-carey-marron-degrade-1-f1d46f92c0f98dec3317157492463098-1024-1024.webp"
@@ -7534,8 +7534,8 @@
           "STANDARD (M)",
           "Carey/Marrón liso"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-careymarron-liso-0d2d1d4be27bdcf46e17157495924357-1024-1024.webp"
@@ -7547,8 +7547,8 @@
           "STANDARD (M)",
           "Negro Mate/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negro-mateverde-21e3e25c631804211717157495923561-1024-1024.webp"
@@ -7560,8 +7560,8 @@
           "STANDARD (M)",
           "Negro/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroazul-degrade-1-443af4cb9169d2e7c817157492472230-1024-1024.webp"
@@ -7573,8 +7573,8 @@
           "STANDARD (M)",
           "Negro-Interior Londres/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-rareprint-negro-int-londresverde-1-727572287519d2300717125854653351-1024-1024.webp"
@@ -7586,8 +7586,8 @@
           "STANDARD (M)",
           "Negro/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroazul-espejado-9c28601a67cd6db6f317157492456227-1024-1024.webp"
@@ -7599,8 +7599,8 @@
           "LARGE (L)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroverde-1-2ce5f79bb2e258002817157492457980-1024-1024.webp"
@@ -7612,8 +7612,8 @@
           "LARGE (L)",
           "Carey/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-careyverde-75e9684e2a8fdd76b917157495924916-1024-1024.webp"
@@ -7625,8 +7625,8 @@
           "LARGE (L)",
           "Carey/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-carey-marron-degrade-1-f1d46f92c0f98dec3317157492463098-1024-1024.webp"
@@ -7638,8 +7638,8 @@
           "LARGE (L)",
           "Carey/Marrón liso"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-careymarron-liso-0d2d1d4be27bdcf46e17157495924357-1024-1024.webp"
@@ -7651,8 +7651,8 @@
           "LARGE (L)",
           "Negro Mate/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negro-mateverde-21e3e25c631804211717157495923561-1024-1024.webp"
@@ -7664,8 +7664,8 @@
           "LARGE (L)",
           "Negro/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroazul-degrade-1-443af4cb9169d2e7c817157492472230-1024-1024.webp"
@@ -7677,8 +7677,8 @@
           "LARGE (L)",
           "Negro-Interior Londres/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-rareprint-negro-int-londresverde-1-727572287519d2300717125854653351-1024-1024.webp"
@@ -7690,8 +7690,8 @@
           "LARGE (L)",
           "Negro/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroazul-espejado-9c28601a67cd6db6f317157492456227-1024-1024.webp"
@@ -7703,8 +7703,8 @@
           "SMALL (S)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroverde-1-2ce5f79bb2e258002817157492457980-1024-1024.webp"
@@ -7716,8 +7716,8 @@
           "SMALL (S)",
           "Carey/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-careyverde-75e9684e2a8fdd76b917157495924916-1024-1024.webp"
@@ -7729,8 +7729,8 @@
           "SMALL (S)",
           "Carey/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-carey-marron-degrade-1-f1d46f92c0f98dec3317157492463098-1024-1024.webp"
@@ -7742,8 +7742,8 @@
           "SMALL (S)",
           "Carey/Marrón liso"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-careymarron-liso-0d2d1d4be27bdcf46e17157495924357-1024-1024.webp"
@@ -7755,8 +7755,8 @@
           "SMALL (S)",
           "Negro Mate/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negro-mateverde-21e3e25c631804211717157495923561-1024-1024.webp"
@@ -7768,8 +7768,8 @@
           "SMALL (S)",
           "Negro/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroazul-degrade-1-443af4cb9169d2e7c817157492472230-1024-1024.webp"
@@ -7781,8 +7781,8 @@
           "SMALL (S)",
           "Negro-Interior Londres/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-rareprint-negro-int-londresverde-1-727572287519d2300717125854653351-1024-1024.webp"
@@ -7794,8 +7794,8 @@
           "SMALL (S)",
           "Negro/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 175900,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/wayfarer-negroazul-espejado-9c28601a67cd6db6f317157492456227-1024-1024.webp"
@@ -8010,8 +8010,8 @@
           "STANDARD (M)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/square-plateadogris-degrade-61139e2157c476f05d17157478817563-1024-1024.webp"
@@ -8036,8 +8036,8 @@
           "STANDARD (M)",
           "Dorado/Rosa espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/square-doradorosa-espejado-a58f57d5c6b8c1c71d17157478822567-1024-1024.webp"
@@ -8049,8 +8049,8 @@
           "STANDARD (M)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/square-negroverde-bf77f58773528b007817157478821367-1024-1024.webp"
@@ -8117,7 +8117,7 @@
           "STANDARD (M)",
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -8184,7 +8184,7 @@
           "STANDARD (M)",
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 278500,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -8258,7 +8258,7 @@
           "STANDARD (M)",
           "Negro/Gris degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -8271,7 +8271,7 @@
           "STANDARD (M)",
           "Marrón Claro/Marrón Degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -8284,7 +8284,7 @@
           "STANDARD (M)",
           "Marrón Mate/Marrón Degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -8297,7 +8297,7 @@
           "STANDARD (M)",
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -8364,7 +8364,7 @@
           "STANDARD (M)",
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 278500,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -8432,7 +8432,7 @@
         "options": [
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -8506,7 +8506,7 @@
           "STANDARD (M)",
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -8519,7 +8519,7 @@
           "STANDARD (M)",
           "Gunmetal/Gris degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -8587,7 +8587,7 @@
           "STANDARD (M)",
           "Dorado/Azul Degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -8752,7 +8752,7 @@
         "options": [
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -8834,7 +8834,7 @@
         "options": [
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -8847,7 +8847,7 @@
           "Dorado-Marrón/Marrón Degradé"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-dorado-marronmarron-degrade-2d168b4da279f7e41d17125413007862-1024-1024.webp"
@@ -8859,7 +8859,7 @@
           "Dorado/Azul degradé"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-doradoazul-degrade-1-e85bde0aa46226376d17157460462939-1024-1024.webp"
@@ -8871,7 +8871,7 @@
           "Dorado/Rosa degradé espejado"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-doradorosa-degrade-espejado-2b6f8b398f2b11a40b17157460489679-1024-1024.webp"
@@ -8883,7 +8883,7 @@
           "Negro/Verde"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-negroverde-1-5fc0db68d14b8682df17157460472058-1024-1024.webp"
@@ -8894,7 +8894,7 @@
         "options": [
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -8975,7 +8975,7 @@
           "STANDARD (M)",
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -8988,7 +8988,7 @@
           "STANDARD (M)",
           "Bronce/Rojo degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9002,7 +9002,7 @@
           "Dorado/Rosa espejado"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/blaze-round-doradorosa-espejado-1-f5cac0e6c304b9214317155684628359-1024-1024.webp"
@@ -9014,7 +9014,7 @@
           "STANDARD (M)",
           "Gunmetal/Marrón degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9028,7 +9028,7 @@
           "Negro/Gris degradé"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/blaze-round-negrogris-degrade-b86ab9cceb4df098a717155684626009-1024-1024.webp"
@@ -9040,7 +9040,7 @@
           "STANDARD (M)",
           "Plateado/Plateado espejado"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -9110,7 +9110,7 @@
         "options": [
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -9122,7 +9122,7 @@
         "options": [
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9134,7 +9134,7 @@
         "options": [
           "Plateado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -9146,7 +9146,7 @@
         "options": [
           "Plateado/Gris degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9218,7 +9218,7 @@
           "STANDARD (M)",
           "Negro/Gris degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9231,7 +9231,7 @@
           "STANDARD (M)",
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -9245,7 +9245,7 @@
           "Dorado/Marrón degrade"
         ],
         "price": 210105,
-        "promotionalPrice": null,
+        "promotionalPrice": 182700,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/f1c80c29-3532-4108-bfac-5b193a469a54-256c0adae0da8553af17564952361868-1024-1024.webp"
@@ -9312,7 +9312,7 @@
           "STANDARD (M)",
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -9325,7 +9325,7 @@
           "STANDARD (M)",
           "Carey/Marrón degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9393,7 +9393,7 @@
           "STANDARD (M)",
           "Plateado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -9406,7 +9406,7 @@
           "STANDARD (M)",
           "Dorado/Verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -9507,8 +9507,8 @@
           "STANDARD (M)",
           "Dorado/Marrón liso"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/octagonal-doradomarron-liso-7b879953bd00d1691617157441877181-1024-1024.webp"
@@ -9671,7 +9671,7 @@
           "STANDARD (M)",
           "Negro/Verde"
         ],
-        "price": 0,
+        "price": 179900,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -9684,7 +9684,7 @@
           "STANDARD (M)",
           "Carey/Marrón liso"
         ],
-        "price": 0,
+        "price": 179900,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -10067,8 +10067,8 @@
           "STANDARD (M)",
           "Negro/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/justin-negroazul-espejado-54107c0bbcadbd047317157417566204-1024-1024.webp"
@@ -10080,8 +10080,8 @@
           "STANDARD (M)",
           "Negro/Gris espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/justin-negroplateado-espejado-733c0be81e7af7145f17157417561352-1024-1024.webp"
@@ -10224,7 +10224,7 @@
           "STANDARD (M)",
           "Negro/verde"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -10237,7 +10237,7 @@
           "STANDARD (M)",
           "Carey/Marrón degradé"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 2,
         "available": true,
@@ -10250,7 +10250,7 @@
           "STANDARD (M)",
           "Transparente Rojo/Rojo degradé espejado"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -10263,7 +10263,7 @@
           "STANDARD (M)",
           "Azul/Azul degrade"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -10398,8 +10398,8 @@
           "STANDARD (M)",
           "Dorado/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradoazul-degrade-c14a049889fcff5b7017156105591039-1024-1024.webp"
@@ -10450,8 +10450,8 @@
           "SMALL (S)",
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradomarron-degrade-1-85f579a0dff79f1e4117156101323916-1024-1024.webp"
@@ -10463,8 +10463,8 @@
           "SMALL (S)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-negroverde-1-a3a6ae86a6a3a2b48c17156101318588-1024-1024.webp"
@@ -10476,8 +10476,8 @@
           "SMALL (S)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-plateadogris-degrade-1-48a9c37da0e05385b417156101323879-1024-1024.webp"
@@ -10489,8 +10489,8 @@
           "SMALL (S)",
           "Dorado/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradoazul-degrade-c14a049889fcff5b7017156105591039-1024-1024.webp"
@@ -10502,8 +10502,8 @@
           "SMALL (S)",
           "Dorado/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradoazul-espejado-45491087fc0f37fadf17156101331812-1024-1024.webp"
@@ -10515,8 +10515,8 @@
           "SMALL (S)",
           "Dorado/Rosa espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradorosa-espejado-1-a2bea2377debe5b1a217156101325019-1024-1024.webp"
@@ -10541,8 +10541,8 @@
           "LARGE (L)",
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradomarron-degrade-1-85f579a0dff79f1e4117156101323916-1024-1024.webp"
@@ -10554,8 +10554,8 @@
           "LARGE (L)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-negroverde-1-a3a6ae86a6a3a2b48c17156101318588-1024-1024.webp"
@@ -10567,8 +10567,8 @@
           "LARGE (L)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-plateadogris-degrade-1-48a9c37da0e05385b417156101323879-1024-1024.webp"
@@ -10580,8 +10580,8 @@
           "LARGE (L)",
           "Dorado/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradoazul-degrade-c14a049889fcff5b7017156105591039-1024-1024.webp"
@@ -10593,8 +10593,8 @@
           "LARGE (L)",
           "Dorado/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradoazul-espejado-45491087fc0f37fadf17156101331812-1024-1024.webp"
@@ -10606,8 +10606,8 @@
           "LARGE (L)",
           "Dorado/Rosa espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/hexagonal-doradorosa-espejado-1-a2bea2377debe5b1a217156101325019-1024-1024.webp"
@@ -10673,7 +10673,7 @@
           "STANDARD (M)",
           "Bronce/Rosa Fotocromado"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -10950,7 +10950,7 @@
           "Marrón transparente/Marrón degradé"
         ],
         "price": 210105,
-        "promotionalPrice": 179900,
+        "promotionalPrice": 175900,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/erika-transparente-marronmarron-degrade-2-64e915df59033fa2fd17156095201199-1024-1024.webp"
@@ -10963,7 +10963,7 @@
           "Transparente/Gris degradé"
         ],
         "price": 210105,
-        "promotionalPrice": 179900,
+        "promotionalPrice": 175900,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/erika-transparentegris-degrade-2-18cf8d7a02e6280b9817156095200703-1024-1024.webp"
@@ -11064,8 +11064,8 @@
           "Amarillo transparente/Verde",
           "STANDARD (M)"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/corrigan-amarillo-transparenteverde-0a56f462419f72fd8017155664190914-1024-1024.webp"
@@ -11163,8 +11163,8 @@
           "STANDARD (M)",
           "Carey-Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/clubmaster-classic-carey-doradoverde-5537b919de6e04153517156092397133-1024-1024.webp"
@@ -11189,8 +11189,8 @@
           "SMALL (S)",
           "Negro-Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/clubmaster-classic-negro-doradoverde-1-8ee8cf5b015369ff3b17121488611694-1024-1024.webp"
@@ -11202,8 +11202,8 @@
           "SMALL (S)",
           "Carey-Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/clubmaster-classic-carey-doradoverde-5537b919de6e04153517156092397133-1024-1024.webp"
@@ -11215,8 +11215,8 @@
           "SMALL (S)",
           "Carey-Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/clubmaster-classic-carey-doradomarron-degrade-142351e7d14d244f4917156092412633-1024-1024.webp"
@@ -11350,8 +11350,8 @@
           "STANDARD (M)",
           "Gunmetal/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/clubmaster-blaze-gunmetalmarron-degrade-1-a88a898857208f9d6a17155687310760-1024-1024.webp"
@@ -11752,8 +11752,8 @@
           "STANDARD (M)",
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradomarron-degrade-1-921bef2de7825205b817156040172138-1024-1024.webp"
@@ -11778,8 +11778,8 @@
           "STANDARD (M)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-plateadogris-degrade-ad4e06c5ded523187a17156040168280-1024-1024.webp"
@@ -11791,8 +11791,8 @@
           "STANDARD (M)",
           "Negro/azul degrade"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/copia-de-aviador-classic-negro_azul-degrade-4f20ecce3a12317a4f17417822590057-1024-1024.webp"
@@ -11804,8 +11804,8 @@
           "SMALL (S)",
           "Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradoverde-1-64204a86eac68f740b17121121526969-1024-1024.webp"
@@ -11817,8 +11817,8 @@
           "SMALL (S)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-negroverde-1-60721f750523b34ce317156040149919-1024-1024.webp"
@@ -11830,8 +11830,8 @@
           "SMALL (S)",
           "Dorado/Marrón"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradomarron-1-fe6ae2ac522376fe0617156040175338-1024-1024.webp"
@@ -11843,8 +11843,8 @@
           "SMALL (S)",
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradomarron-degrade-1-921bef2de7825205b817156040172138-1024-1024.webp"
@@ -11856,8 +11856,8 @@
           "SMALL (S)",
           "Dorado/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradoazul-degrade-1-3a1b9041a63ac6f2e017156040141277-1024-1024.webp"
@@ -11869,8 +11869,8 @@
           "SMALL (S)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-plateadogris-degrade-ad4e06c5ded523187a17156040168280-1024-1024.webp"
@@ -11882,8 +11882,8 @@
           "SMALL (S)",
           "Negro/azul degrade"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/copia-de-aviador-classic-negro_azul-degrade-4f20ecce3a12317a4f17417822590057-1024-1024.webp"
@@ -11895,8 +11895,8 @@
           "LARGE (L)",
           "Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradoverde-1-64204a86eac68f740b17121121526969-1024-1024.webp"
@@ -11908,8 +11908,8 @@
           "LARGE (L)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-negroverde-1-60721f750523b34ce317156040149919-1024-1024.webp"
@@ -11921,8 +11921,8 @@
           "LARGE (L)",
           "Dorado/Marrón"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradomarron-1-fe6ae2ac522376fe0617156040175338-1024-1024.webp"
@@ -11934,8 +11934,8 @@
           "LARGE (L)",
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradomarron-degrade-1-921bef2de7825205b817156040172138-1024-1024.webp"
@@ -11947,8 +11947,8 @@
           "LARGE (L)",
           "Dorado/Azul degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-doradoazul-degrade-1-3a1b9041a63ac6f2e017156040141277-1024-1024.webp"
@@ -11960,8 +11960,8 @@
           "LARGE (L)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-classic-plateadogris-degrade-ad4e06c5ded523187a17156040168280-1024-1024.webp"
@@ -11973,8 +11973,8 @@
           "LARGE (L)",
           "Negro/azul degrade"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/copia-de-aviador-classic-negro_azul-degrade-4f20ecce3a12317a4f17417822590057-1024-1024.webp"
@@ -12082,8 +12082,8 @@
           "STANDARD (M)",
           "Dorado/Azul Degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoazul-degrade-a43acc24262a71173117155672487778-1024-1024.webp"
@@ -12108,8 +12108,8 @@
           "STANDARD (M)",
           "Dorado/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoazul-espejado-509abf9506537a650517155672501896-1024-1024.webp"
@@ -12147,8 +12147,8 @@
           "SMALL (S)",
           "Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoverde-2076586d783f532bb717113631167425-1024-1024.webp"
@@ -12160,8 +12160,8 @@
           "SMALL (S)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-negroverde-1-417ca7cfa8fea8292f17155672491179-1024-1024.webp"
@@ -12174,7 +12174,7 @@
           "Dorado/Marrón degradé"
         ],
         "price": 215000,
-        "promotionalPrice": 182700,
+        "promotionalPrice": 159900,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradomarron-degrade-1-cb4ed33035559fb52b17155672500165-1024-1024.webp"
@@ -12186,8 +12186,8 @@
           "SMALL (S)",
           "Dorado/Azul Degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoazul-degrade-a43acc24262a71173117155672487778-1024-1024.webp"
@@ -12199,8 +12199,8 @@
           "SMALL (S)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-plateado-gris-degrade-53f733b4c32d2e516117155672855339-1024-1024.webp"
@@ -12212,8 +12212,8 @@
           "SMALL (S)",
           "Dorado/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoazul-espejado-509abf9506537a650517155672501896-1024-1024.webp"
@@ -12225,8 +12225,8 @@
           "SMALL (S)",
           "Dorado/Rosa espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradorosa-espejado-df2b56fa931a19925c17155672492374-1024-1024.webp"
@@ -12238,8 +12238,8 @@
           "SMALL (S)",
           "Plateado/Plateado espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-plateadoplateado-espejado-5a8c429aafd20de0c517155672495350-1024-1024.webp"
@@ -12251,8 +12251,8 @@
           "LARGE (L)",
           "Dorado/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoverde-2076586d783f532bb717113631167425-1024-1024.webp"
@@ -12264,8 +12264,8 @@
           "LARGE (L)",
           "Negro/Verde"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-negroverde-1-417ca7cfa8fea8292f17155672491179-1024-1024.webp"
@@ -12277,8 +12277,8 @@
           "LARGE (L)",
           "Dorado/Marrón degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradomarron-degrade-1-cb4ed33035559fb52b17155672500165-1024-1024.webp"
@@ -12290,8 +12290,8 @@
           "LARGE (L)",
           "Dorado/Azul Degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoazul-degrade-a43acc24262a71173117155672487778-1024-1024.webp"
@@ -12303,8 +12303,8 @@
           "LARGE (L)",
           "Plateado/Gris degradé"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 2,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-plateado-gris-degrade-53f733b4c32d2e516117155672855339-1024-1024.webp"
@@ -12316,8 +12316,8 @@
           "LARGE (L)",
           "Dorado/Azul espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradoazul-espejado-509abf9506537a650517155672501896-1024-1024.webp"
@@ -12329,8 +12329,8 @@
           "LARGE (L)",
           "Dorado/Rosa espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-doradorosa-espejado-df2b56fa931a19925c17155672492374-1024-1024.webp"
@@ -12342,8 +12342,8 @@
           "LARGE (L)",
           "Plateado/Plateado espejado"
         ],
-        "price": 0,
-        "promotionalPrice": 182700,
+        "price": 215000,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-metal-plateadoplateado-espejado-5a8c429aafd20de0c517155672495350-1024-1024.webp"
@@ -12416,7 +12416,7 @@
           "Gris/Plateado espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 245500,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12429,7 +12429,7 @@
           "Azul/Azul espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 245500,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12442,7 +12442,7 @@
           "Negro/Verde",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 245500,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12455,7 +12455,7 @@
           "Negro/Plateado espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 245500,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12468,7 +12468,7 @@
           "Gris/Amarillo espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 245500,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12538,7 +12538,7 @@
           "Negro/Gris degradé",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -12551,7 +12551,7 @@
           "Negro/Verde",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 1,
         "available": true,
@@ -12564,7 +12564,7 @@
           "Carey/Marrón degradé",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12577,7 +12577,7 @@
           "Negro/Azul espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -12668,8 +12668,8 @@
           "Dorado/Verde",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-verde-1-d9110fbad20e8993eb17156023082827-1024-1024.webp"
@@ -12681,8 +12681,8 @@
           "Dorado/Verde",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-verde-1-d9110fbad20e8993eb17156023082827-1024-1024.webp"
@@ -12707,8 +12707,8 @@
           "Negro/Verde",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-negro-verde-1-7907293a48d75f759717156023084010-1024-1024.webp"
@@ -12720,8 +12720,8 @@
           "Negro/Verde",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-negro-verde-1-7907293a48d75f759717156023084010-1024-1024.webp"
@@ -12746,8 +12746,8 @@
           "Dorado/Marrón liso",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-marron-liso-0eb0247ce0b5d3480d17156034153631-1024-1024.webp"
@@ -12759,8 +12759,8 @@
           "Dorado/Marrón liso",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-marron-liso-0eb0247ce0b5d3480d17156034153631-1024-1024.webp"
@@ -12772,8 +12772,8 @@
           "Plateado/Verde",
           "STANDARD (M)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-plateado-verde-0b19e5c6c826c52caa17156035262546-1024-1024.webp"
@@ -12785,8 +12785,8 @@
           "Plateado/Verde",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-plateado-verde-0b19e5c6c826c52caa17156035262546-1024-1024.webp"
@@ -12798,8 +12798,8 @@
           "Plateado/Verde",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-plateado-verde-0b19e5c6c826c52caa17156035262546-1024-1024.webp"
@@ -12811,8 +12811,8 @@
           "Gunmetal/Verde",
           "STANDARD (M)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-gunmetal-verde-09254c0cee9a0b8d3417156032834282-1024-1024.webp"
@@ -12824,8 +12824,8 @@
           "Gunmetal/Verde",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 1,
         "available": true,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-gunmetal-verde-09254c0cee9a0b8d3417156032834282-1024-1024.webp"
@@ -12837,8 +12837,8 @@
           "Gunmetal/Verde",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-gunmetal-verde-09254c0cee9a0b8d3417156032834282-1024-1024.webp"
@@ -12850,8 +12850,8 @@
           "Dorado/Marrón degradé",
           "STANDARD (M)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-marron-degrade-c179432dff79849d9017156032840374-1024-1024.webp"
@@ -12863,8 +12863,8 @@
           "Dorado/Marrón degradé",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-marron-degrade-c179432dff79849d9017156032840374-1024-1024.webp"
@@ -12876,8 +12876,8 @@
           "Dorado/Marrón degradé",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-marron-degrade-c179432dff79849d9017156032840374-1024-1024.webp"
@@ -12889,8 +12889,8 @@
           "Dorado/Azul degradé",
           "STANDARD (M)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-azul-degrade-e54764e7868134401c17156032840143-1024-1024.webp"
@@ -12902,8 +12902,8 @@
           "Dorado/Azul degradé",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-azul-degrade-e54764e7868134401c17156032840143-1024-1024.webp"
@@ -12915,8 +12915,8 @@
           "Dorado/Azul degradé",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-azul-degrade-e54764e7868134401c17156032840143-1024-1024.webp"
@@ -12928,8 +12928,8 @@
           "Dorado/Azul espejado",
           "STANDARD (M)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-azul-espejado-02b715e14f8a27b37817156032840596-1024-1024.webp"
@@ -12941,8 +12941,8 @@
           "Dorado/Azul espejado",
           "SMALL (S)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-azul-espejado-02b715e14f8a27b37817156032840596-1024-1024.webp"
@@ -12954,8 +12954,8 @@
           "Dorado/Azul espejado",
           "LARGE (L)"
         ],
-        "price": 0,
-        "promotionalPrice": 236700,
+        "price": 278500,
+        "promotionalPrice": null,
         "stock": 0,
         "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/aviador-polarizado-dorado-azul-espejado-02b715e14f8a27b37817156032840596-1024-1024.webp"
@@ -13021,7 +13021,7 @@
           "Dorado/Verde",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,
@@ -13034,7 +13034,7 @@
           "Dorado/Marrón degradé",
           "STANDARD (M)"
         ],
-        "price": 0,
+        "price": 215000,
         "promotionalPrice": null,
         "stock": 0,
         "available": false,

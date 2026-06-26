@@ -84,6 +84,11 @@ function numberOrNull(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function positiveNumberOrNull(value) {
+  const parsed = numberOrNull(value);
+  return parsed !== null && parsed > 0 ? parsed : null;
+}
+
 function nonEmptyString(value) {
   const normalized = String(value ?? "").trim();
   return normalized ? normalized : null;
@@ -365,18 +370,22 @@ function inferCategoryPath(row, pageData, category, brand) {
 }
 
 function normalizeVariant(row, variant) {
-  const currentPrice = numberOrNull(variant.price_number);
-  const compareAtPrice = numberOrNull(variant.compare_at_price_number);
-  const rawVariantPromotionalPrice = numberOrNull(variant.promotional_price_number);
-  const explicitPromotionalPrice =
-    rawVariantPromotionalPrice !== null && rawVariantPromotionalPrice > 0
-      ? rawVariantPromotionalPrice
-      : null;
+  const currentPrice = positiveNumberOrNull(variant.price_number);
+  const compareAtPrice = positiveNumberOrNull(variant.compare_at_price_number);
+  const explicitPromotionalPrice = positiveNumberOrNull(variant.promotional_price_number);
   const fallbackPrice = parseTiendanubePrice(row.Precio);
   const fallbackPromotionalPrice = parseTiendanubePrice(row["Precio promocional"]);
   const stock = Number(variant.stock ?? row.Stock ?? 0);
-  const price = compareAtPrice ?? currentPrice ?? fallbackPrice;
-  const promotionalPrice = explicitPromotionalPrice ?? fallbackPromotionalPrice ?? null;
+  const salePrice = explicitPromotionalPrice ?? currentPrice ?? fallbackPromotionalPrice;
+  const regularPrice =
+    compareAtPrice !== null && salePrice !== null && compareAtPrice > salePrice
+      ? compareAtPrice
+      : fallbackPrice !== null && salePrice !== null && fallbackPrice > salePrice
+        ? fallbackPrice
+        : null;
+  const price = regularPrice ?? salePrice ?? fallbackPrice;
+  const promotionalPrice =
+    salePrice !== null && price !== null && salePrice < price ? salePrice : null;
 
   return {
     id: numberOrNull(variant.id),
@@ -403,6 +412,7 @@ function normalizeProduct(row, pageData) {
     variants.length > 0
       ? variants.reduce((total, variant) => total + (Number.isFinite(variant.stock) ? variant.stock : 0), 0)
       : Number(row.Stock || 0);
+  const representativeVariant = variants.find((variant) => variant.available) ?? variants[0];
   const pageTags = Array.isArray(pageData.product?.tags) ? pageData.product.tags : [];
   const csvTags = String(row.Tags ?? "")
     .split(",")
@@ -434,8 +444,9 @@ function normalizeProduct(row, pageData) {
     tags: unique([...category.tags, ...csvTags, ...pageTags]),
     descriptionHtml,
     descriptionText: htmlToText(descriptionHtml),
-    price: parseTiendanubePrice(row.Precio),
-    promotionalPrice: parseTiendanubePrice(row["Precio promocional"]),
+    price: representativeVariant?.price ?? parseTiendanubePrice(row.Precio),
+    promotionalPrice:
+      representativeVariant?.promotionalPrice ?? parseTiendanubePrice(row["Precio promocional"]),
     stock,
     images,
     seoTitle: String(row["Título para SEO"] || row.Nombre || "").trim(),
@@ -511,6 +522,12 @@ async function main() {
     scrapeErrors: errors,
     productsWithVariants: products.filter((product) => product.variants.length > 0).length,
     productsWithBlankBrand: products.filter((product) => !String(product.brand ?? "").trim()).length,
+    productsWithPurchasableStock: products.filter((product) =>
+      product.variants.some((variant) => variant.available && variant.stock > 0),
+    ).length,
+    productsHiddenWithoutStock: products
+      .filter((product) => !product.variants.some((variant) => variant.available && variant.stock > 0))
+      .map((product) => product.slug),
     productsWithoutImages: products.filter((product) => product.images.length === 0).map((product) => product.slug),
     variantsWithZeroPromotionalPrice: products.reduce(
       (count, product) =>

@@ -40,7 +40,19 @@ export type CategoryNode = {
   children: CategoryNode[];
 };
 
-export const allProducts = catalog as CatalogProduct[];
+const importedProducts = catalog as CatalogProduct[];
+
+export function hasPurchasableStock(product: CatalogProduct): boolean {
+  return product.variants.some(
+    (variant) =>
+      product.tiendanubeProductId !== null &&
+      variant.id !== null &&
+      variant.available &&
+      variant.stock > 0,
+  );
+}
+
+export const allProducts = importedProducts.filter(hasPurchasableStock);
 
 export function formatPrice(value: number | null | undefined): string {
   if (value === null || value === undefined) return "Consultar";
