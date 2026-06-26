@@ -21,7 +21,7 @@ const nav = [
     heading: "Información",
     links: [
       { label: "Tienda oficial", href: "/tienda" },
-      { label: "Contacto", href: "https://www.smiletiendaimp.com.ar/contacto/", target: "_blank" },
+      { label: "Contacto", href: "/contacto" },
       { label: "Checkout seguro", href: "/tienda" },
     ],
   },
@@ -82,10 +82,7 @@ export default function Footer() {
           <p className="text-[11px] text-white/28">
             © {new Date().getFullYear()} Smile. Todos los derechos reservados.
           </p>
-          <a
-            href="https://smiletiendaimp.com.ar"
-            className="text-[11px] text-white/28 transition hover:text-white/60"
-          >
+          <a href="/" className="text-[11px] text-white/28 transition hover:text-white/60">
             smiletiendaimp.com.ar
           </a>
         </div>

@@ -4,6 +4,7 @@ import { absoluteUrl, productUrl } from "@/lib/seo";
 
 const staticRoutes = [
   "/",
+  "/contacto",
   "/tienda",
   "/tienda/relojes",
   "/tienda/relojes/omega-swatch",

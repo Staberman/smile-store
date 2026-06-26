@@ -57,7 +57,6 @@ const websiteSchema = {
       name: SITE_NAME,
       url: SITE_URL,
       logo: `${SITE_URL}/images/smile-logo.svg`,
-      sameAs: ["https://www.smiletiendaimp.com.ar"],
     },
     {
       "@type": "WebSite",
