@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import JsonLd from "@/components/seo/JsonLd";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -18,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://smiletiendaimp.com.ar"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Smile | Relojes, lentes y accesorios premium en Argentina",
     template: "%s | Smile",
@@ -31,8 +33,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_AR",
-    url: "https://smiletiendaimp.com.ar",
-    siteName: "Smile",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     title: "Smile | Relojes, lentes y accesorios premium en Argentina",
     description:
       "Tienda online de relojes, lentes y accesorios premium en Argentina.",
@@ -45,12 +47,39 @@ export const metadata: Metadata = {
   },
 };
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/images/smile-logo.svg`,
+      sameAs: ["https://www.smiletiendaimp.com.ar"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      inLanguage: "es-AR",
+      publisher: {
+        "@id": `${SITE_URL}/#organization`,
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <JsonLd data={websiteSchema} />
+        {children}
+      </body>
     </html>
   );
 }

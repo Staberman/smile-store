@@ -190,7 +190,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     className="mb-6 text-[0.58rem] uppercase tracking-[0.28em]"
                     style={{ color: ACCENT }}
                   >
-                    {String(index + 1).padStart(2, "0")} — {brand}
+                    {String(index + 1).padStart(2, "0")} - {brand}
                   </p>
 
                   <h2 className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-[1.04] text-[#f0ece4]">
@@ -311,7 +311,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                       <img
                         src={prod.images[0]}
                         alt={prod.name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-contain p-6"
                         style={{ filter: "brightness(0.92) contrast(1.04)" }}
                         onError={(e) => {
                           // fallback to store URL on image error

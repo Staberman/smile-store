@@ -162,7 +162,7 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
           <img
             src={image ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E"}
             alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-[1100ms]"
+            className="h-full w-full object-contain p-4 transition-transform duration-[1100ms]"
             style={{
               transform: hovered ? "scale(1.07)" : "scale(1)",
               filter: "brightness(0.9) contrast(1.02)",
@@ -214,7 +214,7 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
                 className="bg-[#0a0a0a]"
               >
                 {getVariantLabel(product, variant.id)}
-                {!variant.available ? " — sin stock" : ""}
+                {!variant.available ? " - sin stock" : ""}
               </option>
             ))}
           </select>

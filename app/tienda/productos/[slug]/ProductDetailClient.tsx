@@ -95,7 +95,7 @@ export default function ProductDetailClient({
               <img
                 src={activeImage}
                 alt={product.name}
-                className="h-full w-full object-cover transition-opacity duration-300"
+                className="h-full w-full object-contain p-6 transition-opacity duration-300"
                 style={{ filter: "brightness(0.92) contrast(1.04)" }}
                 onError={(event) => {
                   (event.target as HTMLImageElement).src = IMAGE_FALLBACK;
@@ -131,7 +131,7 @@ export default function ProductDetailClient({
                     <img
                       src={image}
                       alt={`${product.name} vista ${index + 1}`}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain p-1"
                       onError={(event) => {
                         (event.target as HTMLImageElement).style.display = "none";
                       }}

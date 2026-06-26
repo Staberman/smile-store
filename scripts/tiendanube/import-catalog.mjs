@@ -94,6 +94,20 @@ function nonEmptyString(value) {
   return normalized ? normalized : null;
 }
 
+function upgradeMarketplaceImageUrl(url) {
+  const normalized = normalizeImageUrl(url);
+  if (!normalized) return null;
+
+  const match = normalized.match(
+    /\/(?:d|D)_(?:q|Q)_(?:np|NP)_([0-9]+)-((?:mla|MLA|mlu|MLU)[0-9]+)_([0-9]+)-[^/]+-\d+-\d+\.webp$/,
+  );
+
+  if (!match) return normalized;
+
+  const [, imageId, listingId, dateCode] = match;
+  return `https://http2.mlstatic.com/D_NQ_NP_${imageId}-${listingId.toUpperCase()}_${dateCode}-F.webp`;
+}
+
 function normalizeTokenText(value) {
   return String(value ?? "")
     .normalize("NFD")
@@ -235,7 +249,7 @@ function extractGalleryImages(html) {
     ...html.matchAll(/property="og:image:secure_url"\s+content="([^"]+)"/g),
     ...html.matchAll(/property="og:image"\s+content="([^"]+)"/g),
   ]
-    .map((match) => normalizeImageUrl(match[1]))
+    .map((match) => upgradeMarketplaceImageUrl(match[1]))
     .filter(Boolean);
 
   return unique(urls);
@@ -395,8 +409,56 @@ function normalizeVariant(row, variant) {
     promotionalPrice,
     stock,
     available: Boolean(variant.available) && stock > 0,
-    image: normalizeImageUrl(variant.image_url),
+    image: upgradeMarketplaceImageUrl(variant.image_url),
   };
+}
+
+function extractModelFromName(name, brand) {
+  const withoutBrand = String(name ?? "")
+    .replace(new RegExp(brand.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "ig"), "")
+    .replace(/\b(reloj|lentes?|anteojos?|gafas?|gift set)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const model = withoutBrand.match(/[A-Z]{0,4}\d{3,}[A-Z0-9-]*/i)?.[0] ?? withoutBrand;
+  return model ? model.toUpperCase() : "";
+}
+
+function extractModelFromSlug(slug) {
+  const match = String(slug ?? "").match(/(?:th|tmy)?(\d{6,})/i);
+  return match?.[1] ?? "";
+}
+
+function normalizeProductName(rawName, slug, brand, warnings) {
+  const name = String(rawName ?? "").trim();
+  const slugModel = extractModelFromSlug(slug);
+  const nameModel = extractModelFromName(name, brand).match(/\d{6,}/)?.[0] ?? "";
+
+  if (brand === "Tommy Hilfiger" && slugModel && nameModel && slugModel !== nameModel) {
+    warnings.push(`Modelo corregido desde slug: ${nameModel} -> ${slugModel}`);
+    return name.replace(nameModel, slugModel);
+  }
+
+  return name;
+}
+
+function buildFallbackDescription({ name, brand, categories }) {
+  const model = extractModelFromName(name, brand);
+  const categoryText = categories.join(" ").toLowerCase();
+  const isWatch = categoryText.includes("reloj");
+  const isSunglasses = categoryText.includes("lentes");
+  const modelText = model ? ` modelo ${model}` : "";
+
+  if (brand === "Tommy Hilfiger" && isWatch) {
+    return `${name} es un reloj Tommy Hilfiger${modelText} disponible en Smile Argentina. Una pieza de estilo urbano y elegante para uso diario, con compra directa por checkout seguro de Tiendanube.`;
+  }
+
+  if (brand === "Ray Ban" && isSunglasses) {
+    return `${name} es un modelo Ray-Ban${modelText} de lentes de sol disponible en Smile Argentina. Diseño icónico, selección importada y compra directa por checkout seguro de Tiendanube.`;
+  }
+
+  const category = isWatch ? "reloj" : isSunglasses ? "lentes de sol" : "producto";
+  return `${name} es un ${category}${modelText} de ${brand || "marca seleccionada"} disponible en Smile Argentina, con stock actualizado y compra directa por checkout seguro de Tiendanube.`;
 }
 
 function normalizeProduct(row, pageData) {
@@ -430,20 +492,26 @@ function normalizeProduct(row, pageData) {
 
   const brand = resolveBrand(row, pageData, category);
   const categories = inferCategoryPath(row, pageData, category, brand);
+  const name = normalizeProductName(row.Nombre, slug, brand, warnings);
+  const descriptionText = htmlToText(descriptionHtml);
   if (category.path.length === 0) {
     warnings.push(`Categoría inferida: ${categories.join(" > ")}`);
+  }
+
+  if (!descriptionText) {
+    warnings.push("Descripción generada desde marca, modelo y categoría por falta de descripción en Tiendanube.");
   }
 
   return {
     id: String(pageData.product?.id ?? slug),
     tiendanubeProductId: pageData.product?.id ?? null,
     slug,
-    name: String(row.Nombre ?? "").trim(),
+    name,
     brand,
     categories,
     tags: unique([...category.tags, ...csvTags, ...pageTags]),
     descriptionHtml,
-    descriptionText: htmlToText(descriptionHtml),
+    descriptionText: descriptionText || buildFallbackDescription({ name, brand, categories }),
     price: representativeVariant?.price ?? parseTiendanubePrice(row.Precio),
     promotionalPrice:
       representativeVariant?.promotionalPrice ?? parseTiendanubePrice(row["Precio promocional"]),

@@ -5,9 +5,12 @@ import CollectionLinks from "@/components/brand/CollectionLinks";
 import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Tommy Hilfiger | Smile",
+  title: "Relojes Tommy Hilfiger | Smile",
   description:
-    "Lentes Tommy Hilfiger en Argentina. Diseño americano contemporáneo con identidad de moda propia.",
+    "Relojes Tommy Hilfiger en Argentina. Modelos para dama y caballero con diseño americano contemporáneo y checkout seguro por Tiendanube.",
+  alternates: {
+    canonical: "/tienda/marcas/tommy-hilfiger",
+  },
 };
 
 const tommyProducts = allProducts.filter((product) => product.brand === "Tommy Hilfiger");
