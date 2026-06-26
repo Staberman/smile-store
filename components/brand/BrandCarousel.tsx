@@ -26,9 +26,20 @@ function hasAvailableVariant(product: CatalogProduct) {
   return product.variants.some((variant) => variant.available);
 }
 
+function getCarouselImage(product: CatalogProduct): string | null {
+  return product.images[0] ?? product.variants.find((variant) => variant.image)?.image ?? null;
+}
+
+function hasCarouselImage(product: CatalogProduct) {
+  return Boolean(getCarouselImage(product));
+}
+
 function buildSlides(products: CatalogProduct[]) {
-  const preferred = products.filter(hasAvailableVariant);
-  const source = preferred.length > 0 ? preferred : products;
+  const preferred = products.filter(
+    (product) => hasAvailableVariant(product) && hasCarouselImage(product),
+  );
+  const imageProducts = products.filter(hasCarouselImage);
+  const source = preferred.length > 0 ? preferred : imageProducts.length > 0 ? imageProducts : products;
   const slides: CatalogProduct[] = [];
   const seen = new Set<string>();
 
@@ -43,6 +54,15 @@ function buildSlides(products: CatalogProduct[]) {
       if (slides.length >= 5) break;
       if (seen.has(product.id)) continue;
       slides.push(product);
+    }
+  }
+
+  if (imageProducts.length > 0 && slides.length < 5) {
+    for (const product of imageProducts) {
+      if (slides.length >= 5) break;
+      if (seen.has(product.id)) continue;
+      slides.push(product);
+      seen.add(product.id);
     }
   }
 
@@ -161,6 +181,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
         {featured.map((prod, index) => {
           const isActive = index === currentIndex;
           const isExiting = index === exiting;
+          const image = getCarouselImage(prod);
 
           return (
             <div
@@ -285,6 +306,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                         height: "260px",
                         borderRadius: "50%",
                         margin: "40px",
+                        background: "radial-gradient(circle at 50% 45%, #f2f0eb 0%, #dfddd8 100%)",
                         boxShadow: `0 0 0 2px ${ACCENT}50, 0 0 0 8px ${ACCENT}14, 0 30px 80px rgba(0,0,0,0.85)`,
                       }}
                     >
@@ -299,12 +321,25 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                         }}
                       />
                       <img
-                        src={prod.images[0]}
+                        src={
+                          image ??
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E"
+                        }
                         alt={prod.name}
-                        className="h-full w-full object-contain p-6"
-                        style={{ filter: "brightness(0.92) contrast(1.04)" }}
+                        style={{
+                          display: "block",
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                          objectPosition: "center",
+                          filter: "brightness(0.94) contrast(1.05)",
+                          transform: "scale(1.08)",
+                          transformOrigin: "center",
+                        }}
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
+                          (e.target as HTMLImageElement).src =
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E";
                         }}
                       />
                       {/* strap bottom */}
