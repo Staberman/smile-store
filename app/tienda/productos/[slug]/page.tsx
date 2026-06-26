@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts, formatPrice, getProductBySlug } from "@/lib/catalog";
+import {
+  allProducts,
+  formatPrice,
+  getProductBySlug,
+  getRecommendedProducts,
+} from "@/lib/catalog";
 import {
   absoluteUrl,
   productAvailability,
@@ -66,6 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default function ProductPage({ params }: Props) {
   const product = getProductBySlug(params.slug);
   if (!product) notFound();
+  const recommendations = getRecommendedProducts(product, 4);
 
   const normalizedBrand = product.brand.trim().toLowerCase();
   const categoryText = product.categories.join(" ").toLowerCase();
@@ -170,6 +176,7 @@ export default function ProductPage({ params }: Props) {
         product={product}
         brandHref={brandHref}
         brandLabel={brandLabel}
+        recommendations={recommendations}
       />
     </>
   );

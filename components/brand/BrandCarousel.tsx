@@ -95,7 +95,6 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
 
   const bgGradient = BG_GRADIENTS[currentIndex % BG_GRADIENTS.length];
   const subtitle = slide.categories[slide.categories.length - 1] ?? slide.brand;
-  const detailTag = slide.tags[0] ?? slide.categories[slide.categories.length - 1] ?? null;
   const price = slide.promotionalPrice ?? slide.price;
 
   return (
@@ -190,7 +189,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     className="mb-6 text-[0.58rem] uppercase tracking-[0.28em]"
                     style={{ color: ACCENT }}
                   >
-                    {String(index + 1).padStart(2, "0")} - {brand}
+                    {brand}
                   </p>
 
                   <h2 className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-[1.04] text-[#f0ece4]">
@@ -210,15 +209,6 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                       ? subtitle
                       : (prod.categories[prod.categories.length - 1] ?? prod.brand)}
                   </p>
-
-                  {index === currentIndex && detailTag && (
-                    <p
-                      className="mt-3 text-[0.62rem] uppercase tracking-[0.18em]"
-                      style={{ color: ACCENT }}
-                    >
-                      ✦ {detailTag}
-                    </p>
-                  )}
 
                   <p
                     className="mt-6 text-[0.72rem] tracking-[0.14em]"
@@ -314,7 +304,6 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                         className="h-full w-full object-contain p-6"
                         style={{ filter: "brightness(0.92) contrast(1.04)" }}
                         onError={(e) => {
-                          // fallback to store URL on image error
                           (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />

@@ -11,6 +11,7 @@ interface Props {
   product: CatalogProduct;
   brandHref: string;
   brandLabel: string;
+  recommendations: CatalogProduct[];
 }
 
 const ACCENT = "#c9a96e";
@@ -28,6 +29,7 @@ export default function ProductDetailClient({
   product,
   brandHref,
   brandLabel,
+  recommendations,
 }: Props) {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
     product.variants.find((variant) => variant.available)?.id ??
@@ -258,7 +260,87 @@ export default function ProductDetailClient({
           </div>
         </div>
       </div>
+      {recommendations.length >= 3 && (
+        <section className="border-t border-white/6 px-6 py-16 md:px-12 md:py-20">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.44em] text-[#4a4540]">
+                  Tambien te puede gustar
+                </p>
+                <h2 className="font-display mt-2 text-[2rem] font-light italic text-[#f0ece4]">
+                  Piezas similares
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {recommendations.map((recommendedProduct) => (
+                <RecommendationCard
+                  key={recommendedProduct.id}
+                  product={recommendedProduct}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       <TrustHighlights />
     </main>
+  );
+}
+
+function RecommendationCard({ product }: { product: CatalogProduct }) {
+  const image =
+    product.images[0] ?? product.variants.find((variant) => variant.image)?.image;
+  const price = product.promotionalPrice ?? product.price;
+  const collectionLabel =
+    product.categories[product.categories.length - 1] ?? product.brand;
+
+  return (
+    <Link
+      href={`/tienda/productos/${product.slug}`}
+      className="group block overflow-hidden rounded-2xl border border-white/8 bg-white/[0.025] transition duration-300 hover:-translate-y-1 hover:border-[#c9a96e]/45"
+    >
+      <div className="relative h-52 bg-[#111]">
+        <img
+          src={image ?? IMAGE_FALLBACK}
+          alt={product.name}
+          className="h-full w-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+          style={{ filter: "brightness(0.9) contrast(1.03)" }}
+          onError={(event) => {
+            (event.target as HTMLImageElement).src = IMAGE_FALLBACK;
+          }}
+        />
+        <div
+          className="absolute right-3 top-3 rounded-full border px-3 py-1 text-[9px] uppercase tracking-[0.18em]"
+          style={{
+            background: `${ACCENT}18`,
+            borderColor: `${ACCENT}40`,
+            color: ACCENT,
+          }}
+        >
+          Disponible
+        </div>
+      </div>
+
+      <div className="p-5">
+        <p className="text-[9px] uppercase tracking-[0.28em] text-[#4a4540]">
+          {collectionLabel}
+        </p>
+        <h3 className="mt-2 min-h-10 text-sm font-medium leading-5 text-[#f0ece4]">
+          {product.name}
+        </h3>
+        <p className="mt-1 text-xs text-[#4a4540]">{product.brand}</p>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="text-[12px]" style={{ color: ACCENT }}>
+            {formatPrice(price)}
+          </p>
+          <span className="text-[10px] uppercase tracking-[0.18em] text-[#6a6560] transition group-hover:text-[#c9a96e]">
+            Ver detalle
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 }

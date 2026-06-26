@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import type { CatalogProduct } from "@/lib/catalog";
@@ -28,6 +28,12 @@ const BRAND_NAMES: Record<string, string> = {
   celine: "Celine",
 };
 
+type FilterOption = {
+  key: string;
+  label: string;
+  count: number;
+};
+
 function getCollectionKey(product: CatalogProduct): string {
   return product.categories[product.categories.length - 1] ?? "Sin categoría";
 }
@@ -47,16 +53,103 @@ function getVariantValue(variantId: number | null): string {
   return variantId === null ? "null" : String(variantId);
 }
 
+function normalizeSearch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function getSearchText(product: CatalogProduct, label: string): string {
+  return normalizeSearch(
+    [
+      product.name,
+      product.brand,
+      label,
+      ...product.categories,
+      ...product.tags,
+      product.descriptionText,
+      product.seoTitle,
+      product.seoDescription,
+    ].join(" ")
+  );
+}
+
+function getPriorityFilters(options: FilterOption[]): FilterOption[] {
+  return [...options]
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+    .slice(0, 6);
+}
+
+function getSearchSuggestions(
+  products: CatalogProduct[],
+  query: string,
+  getLabel: (key: string) => string,
+  getKey: (product: CatalogProduct) => string
+): string[] {
+  const normalizedQuery = normalizeSearch(query);
+  if (normalizedQuery.length < 2) return [];
+
+  return products
+    .map((product) => {
+      const label = getLabel(getKey(product));
+      const haystack = getSearchText(product, label);
+      const normalizedName = normalizeSearch(product.name);
+      const normalizedBrand = normalizeSearch(product.brand);
+      const score = normalizedName.startsWith(normalizedQuery)
+        ? 4
+        : normalizedBrand.startsWith(normalizedQuery)
+          ? 3
+          : haystack.includes(normalizedQuery)
+            ? 2
+            : 0;
+
+      return { product, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.product.name.localeCompare(b.product.name))
+    .slice(0, 5)
+    .map((item) => item.product.name);
+}
+
 export default function ProductGrid({ products, brandLabel, filterBy = "collection" }: Props) {
   const getKey = (product: CatalogProduct) =>
     filterBy === "brand" ? product.brand : getCollectionKey(product);
   const getLabel = (key: string) => filterBy === "brand" ? (BRAND_NAMES[key] ?? key) : key;
 
-  const filterKeys = ["Todos", ...Array.from(new Set(products.map(getKey)))];
+  const filterOptions = useMemo<FilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const product of products) {
+      const key = getKey(product);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+
+    return Array.from(counts.entries())
+      .map(([key, count]) => ({ key, label: getLabel(key), count }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [products, filterBy]);
+
+  const priorityFilters = useMemo(() => getPriorityFilters(filterOptions), [filterOptions]);
+  const priorityKeys = useMemo(() => new Set(priorityFilters.map((item) => item.key)), [priorityFilters]);
+  const secondaryFilters = filterOptions.filter((item) => !priorityKeys.has(item.key));
   const [active, setActive] = useState("Todos");
   const [sort, setSort] = useState<"default" | "asc" | "desc">("default");
+  const [search, setSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  let filtered = active === "Todos" ? products : products.filter((product) => getKey(product) === active);
+  const normalizedSearch = normalizeSearch(search);
+  const suggestions = getSearchSuggestions(products, search, getLabel, getKey);
+
+  let filtered = products.filter((product) => {
+    const productKey = getKey(product);
+    const matchesFilter = active === "Todos" || productKey === active;
+    const matchesSearch =
+      normalizedSearch.length === 0 ||
+      getSearchText(product, getLabel(productKey)).includes(normalizedSearch);
+
+    return matchesFilter && matchesSearch;
+  });
   if (sort === "asc") filtered = [...filtered].sort((a, b) => getSortPrice(a) - getSortPrice(b));
   if (sort === "desc") filtered = [...filtered].sort((a, b) => getSortPrice(b) - getSortPrice(a));
 
@@ -69,32 +162,97 @@ export default function ProductGrid({ products, brandLabel, filterBy = "collecti
             <h2 className="font-display mt-2 text-[2rem] font-light italic">{brandLabel}</h2>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={sort}
-              onChange={(event) => setSort(event.target.value as typeof sort)}
-              className="rounded-full border border-[#2a2520] bg-transparent px-4 py-1.5 text-[10px] uppercase tracking-[0.18em] text-[#4a4540] outline-none transition hover:border-[#4a4540]"
-            >
-              <option value="default">Ordenar</option>
-              <option value="asc">Precio: menor a mayor</option>
-              <option value="desc">Precio: mayor a menor</option>
-            </select>
+          <div className="flex flex-col gap-3 md:items-end">
+            <div className="relative w-full md:w-80">
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => window.setTimeout(() => setShowSuggestions(false), 120)}
+                placeholder="Buscar producto, marca o estilo"
+                className="w-full rounded-full border border-[#2a2520] bg-[#0d0c0b] px-4 py-2 text-sm text-[#f0ece4] outline-none transition placeholder:text-[#4a4540] focus:border-[#c9a96e]"
+              />
 
-            <div className="flex flex-wrap gap-2">
-              {filterKeys.map((key) => (
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-2xl border border-[#2a2520] bg-[#0d0c0b] shadow-2xl shadow-black/40">
+                  {suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        setSearch(suggestion);
+                        setShowSuggestions(false);
+                      }}
+                      className="block w-full px-4 py-2.5 text-left text-xs text-[#b8b0a4] transition hover:bg-[#c9a96e]/10 hover:text-[#c9a96e]"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <select
+                value={sort}
+                onChange={(event) => setSort(event.target.value as typeof sort)}
+                className="rounded-full border border-[#2a2520] bg-[#0d0c0b] px-4 py-1.5 text-[10px] uppercase tracking-[0.18em] text-[#4a4540] outline-none transition hover:border-[#4a4540]"
+              >
+                <option value="default" className="bg-[#0a0a0a]">Ordenar</option>
+                <option value="asc" className="bg-[#0a0a0a]">Precio: menor a mayor</option>
+                <option value="desc" className="bg-[#0a0a0a]">Precio: mayor a menor</option>
+              </select>
+
+              <div className="flex flex-wrap gap-2">
                 <button
-                  key={key}
-                  onClick={() => setActive(key)}
+                  onClick={() => setActive("Todos")}
                   className="cursor-pointer rounded-full border px-4 py-1.5 text-[10px] uppercase tracking-[0.2em] transition-all duration-200"
                   style={{
-                    borderColor: active === key ? ACCENT : "#2a2520",
-                    color: active === key ? ACCENT : "#4a4540",
-                    background: active === key ? `${ACCENT}14` : "transparent",
+                    borderColor: active === "Todos" ? ACCENT : "#2a2520",
+                    color: active === "Todos" ? ACCENT : "#4a4540",
+                    background: active === "Todos" ? `${ACCENT}14` : "transparent",
                   }}
                 >
-                  {getLabel(key)}
+                  Todos
                 </button>
-              ))}
+
+                {priorityFilters.map((option) => (
+                  <button
+                    key={option.key}
+                    onClick={() => setActive(option.key)}
+                    className="cursor-pointer rounded-full border px-4 py-1.5 text-[10px] uppercase tracking-[0.2em] transition-all duration-200"
+                    style={{
+                      borderColor: active === option.key ? ACCENT : "#2a2520",
+                      color: active === option.key ? ACCENT : "#4a4540",
+                      background: active === option.key ? `${ACCENT}14` : "transparent",
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+
+                {secondaryFilters.length > 0 && (
+                  <select
+                    value={priorityKeys.has(active) || active === "Todos" ? "" : active}
+                    onChange={(event) => {
+                      if (event.target.value) setActive(event.target.value);
+                    }}
+                    className="rounded-full border border-[#2a2520] bg-[#0d0c0b] px-4 py-1.5 text-[10px] uppercase tracking-[0.18em] text-[#4a4540] outline-none transition hover:border-[#4a4540]"
+                  >
+                    <option value="" className="bg-[#0a0a0a]">Mas categorias / marcas</option>
+                    {secondaryFilters.map((option) => (
+                      <option key={option.key} value={option.key} className="bg-[#0a0a0a]">
+                        {option.label} ({option.count})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
           </div>
         </div>

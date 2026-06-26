@@ -79,6 +79,15 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function isCatalogNoiseTag(value) {
+  const normalized = normalizeTokenText(value);
+  return normalized.includes("MES DE LA MADRE") || normalized.includes("LENTES EN PROMO");
+}
+
+function cleanCatalogTags(values) {
+  return unique(values).filter((value) => !isCatalogNoiseTag(value));
+}
+
 function numberOrNull(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -239,7 +248,7 @@ function parseProductAssignment(html) {
     id,
     name,
     brand,
-    tags: tags.filter(Boolean),
+    tags: cleanCatalogTags(tags),
   };
 }
 
@@ -354,6 +363,11 @@ function resolveBrand(row, pageData, category) {
 }
 
 function inferCategoryPath(row, pageData, category, brand) {
+  if (category.path.some((item) => normalizeTokenText(item).includes("MES DE LA MADRE"))) {
+    if (normalizeTokenText(brand) === "RAY BAN") return ["LENTES DE SOL", "RAY BAN", "SQUARE II"];
+    return brand ? ["SIN CATEGORIA", brand] : ["SIN CATEGORIA"];
+  }
+
   if (category.path.length > 0) return category.path;
 
   const tokenSource = [
@@ -509,7 +523,7 @@ function normalizeProduct(row, pageData) {
     name,
     brand,
     categories,
-    tags: unique([...category.tags, ...csvTags, ...pageTags]),
+    tags: cleanCatalogTags([...category.tags, ...csvTags, ...pageTags]),
     descriptionHtml,
     descriptionText: descriptionText || buildFallbackDescription({ name, brand, categories }),
     price: representativeVariant?.price ?? parseTiendanubePrice(row.Precio),
