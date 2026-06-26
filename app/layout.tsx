@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import WhatsAppFloatingButton from "@/components/contact/WhatsAppFloatingButton";
 import SessionOfferPopup from "@/components/promo/SessionOfferPopup";
 import JsonLd from "@/components/seo/JsonLd";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
@@ -79,6 +80,7 @@ export default function RootLayout({
       <body>
         <JsonLd data={websiteSchema} />
         {children}
+        <WhatsAppFloatingButton />
         <SessionOfferPopup />
       </body>
     </html>
