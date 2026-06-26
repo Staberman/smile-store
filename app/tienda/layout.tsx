@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Footer from "@/components/layout/Footer";
 
 export default function TiendaLayout({
   children,
@@ -40,6 +41,7 @@ export default function TiendaLayout({
       </header>
 
       <div className="pt-[72px] md:pt-[80px]">{children}</div>
+      <Footer />
     </>
   );
 }

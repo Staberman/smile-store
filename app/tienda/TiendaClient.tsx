@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/brand/ProductGrid";
 import BrandCarousel from "@/components/brand/BrandCarousel";
+import TrustHighlights from "@/components/brand/TrustHighlights";
 import { allProducts, getCategoryTree } from "@/lib/catalog";
 
 const ACCENT = "#c9a96e";
@@ -117,6 +118,8 @@ function TiendaContent() {
         brand={currentSub.brandLabel}
         showNav={false}
       />
+
+      <TrustHighlights />
 
       {/* Main category tabs */}
       <div className="sticky top-[72px] z-20 border-b border-white/8 bg-[#0a0a0a]/95 px-6 backdrop-blur-md md:top-[80px] md:px-12">

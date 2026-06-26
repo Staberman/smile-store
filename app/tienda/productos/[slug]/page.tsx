@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const image = product.images[0];
 
   return {
-    title: `${metaTitle} | Smile`,
+    title: metaTitle,
     description: truncateMetaDescription(metaDescription),
     alternates: {
       canonical,

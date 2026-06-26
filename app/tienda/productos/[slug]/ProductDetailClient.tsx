@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TiendanubeCheckoutForm from "@/components/checkout/TiendanubeCheckoutForm";
+import TrustHighlights from "@/components/brand/TrustHighlights";
 import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
 import { formatPrice } from "@/lib/catalog";
 
@@ -67,7 +68,6 @@ export default function ProductDetailClient({
   const collectionLabel =
     product.categories[product.categories.length - 1] ?? product.brand;
   const subtitle = product.brand;
-  const sourceUrl = product.sourceUrl || "#";
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
@@ -219,29 +219,8 @@ export default function ProductDetailClient({
               product={product}
               variant={selectedVariant}
               disabled={!selectedVariant?.available}
+              className="sticky bottom-4 z-20 md:static"
             />
-
-            <a
-              href={sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border py-4 text-[11px] uppercase tracking-[0.26em] transition-all duration-200 hover:border-white/30 hover:bg-white/5"
-              style={{ borderColor: "#2a2520", color: "#6a6560" }}
-            >
-              Ver en tienda oficial
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-            </a>
 
             {product.descriptionText && (
               <>
@@ -279,6 +258,7 @@ export default function ProductDetailClient({
           </div>
         </div>
       </div>
+      <TrustHighlights />
     </main>
   );
 }

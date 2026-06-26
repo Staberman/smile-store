@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import TiendanubeCheckoutForm from "@/components/checkout/TiendanubeCheckoutForm";
 import type { CatalogProduct } from "@/lib/catalog";
 import { formatPrice } from "@/lib/catalog";
 
@@ -225,12 +224,13 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
             {formatPrice(price)}
           </p>
 
-          <TiendanubeCheckoutForm
-            product={product}
-            variant={selectedVariant}
-            disabled={!selectedVariant?.available}
-            className="w-full max-w-[11.5rem]"
-          />
+          <Link
+            href={`/tienda/productos/${product.slug}`}
+            className="inline-flex min-h-10 items-center justify-center rounded-full border px-4 text-[10px] uppercase tracking-[0.18em] transition hover:border-[#c9a96e] hover:text-[#c9a96e]"
+            style={{ borderColor: "#2a2520", color: "#6a6560" }}
+          >
+            Ver detalle
+          </Link>
         </div>
       </div>
     </div>

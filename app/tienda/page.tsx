@@ -20,5 +20,12 @@ export const metadata: Metadata = {
 };
 
 export default function TiendaPage() {
-  return <TiendaClient />;
+  return (
+    <>
+      <h1 className="sr-only">
+        Tienda Smile: relojes y lentes premium en Argentina
+      </h1>
+      <TiendaClient />
+    </>
+  );
 }
