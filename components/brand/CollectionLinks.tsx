@@ -36,7 +36,7 @@ const COLLECTIONS = [
   {
     slug: "tommy-hilfiger",
     label: "Tommy Hilfiger",
-    sub: "Lentes de sol",
+    sub: "Relojes",
     href: "/tienda/marcas/tommy-hilfiger",
   },
 ];

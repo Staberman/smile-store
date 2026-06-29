@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { raybanProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Scuderia Ferrari Collection | Ray-Ban | Smile",
+  title: "Scuderia Ferrari Collection | Ray-Ban",
   description:
     "La colaboración entre Ray-Ban y Scuderia Ferrari. Lentes de sol exclusivos con diseño inspirado en la Fórmula 1. Disponibles en Smile Argentina.",
+  alternates: { canonical: "/tienda/marcas/ray-ban/ferrari" },
 };
 
 const ACCENT = "#c9a96e";
 const ferrariRed = "#dc0000";
 
-const ferrariProducts = raybanProducts.filter(
-  (p) => p.subcollection === "ferrari"
-);
+const ferrariProducts = allProducts.filter((product) => {
+  const values = [product.brand, ...product.categories, ...product.tags];
+  return values.some((value) => value.toLowerCase().includes("ferrari"));
+});
 
 export default function FerrariPage() {
   return (

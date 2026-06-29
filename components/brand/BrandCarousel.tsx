@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import type { Product } from "@/lib/products";
-import { formatPrice } from "@/lib/products";
+import type { CatalogProduct } from "@/lib/catalog";
+import { formatPrice } from "@/lib/catalog";
 
 interface Props {
-  products: Product[];
+  products: CatalogProduct[];
   brand: string;
   accentColor?: string; // CSS hex, default gold
   showNav?: boolean; // show internal nav bar (default true)
+  semanticHeading?: boolean;
 }
 
 const ACCENT = "#c9a96e";
@@ -22,29 +23,86 @@ const BG_GRADIENTS = [
   "radial-gradient(ellipse at 44% 48%, #14100a 0%, #0a0a0a 72%)",
 ];
 
-export default function BrandCarousel({ products, brand, showNav = true }: Props) {
-  const featured = products.filter((p) => p.featured).slice(0, 5);
+function hasAvailableVariant(product: CatalogProduct) {
+  return product.variants.some((variant) => variant.available);
+}
+
+function getCarouselImage(product: CatalogProduct): string | null {
+  return product.images[0] ?? product.variants.find((variant) => variant.image)?.image ?? null;
+}
+
+function hasCarouselImage(product: CatalogProduct) {
+  return Boolean(getCarouselImage(product));
+}
+
+function buildSlides(products: CatalogProduct[]) {
+  const preferred = products.filter(
+    (product) => hasAvailableVariant(product) && hasCarouselImage(product),
+  );
+  const imageProducts = products.filter(hasCarouselImage);
+  const source = preferred.length > 0 ? preferred : imageProducts.length > 0 ? imageProducts : products;
+  const slides: CatalogProduct[] = [];
+  const seen = new Set<string>();
+
+  for (const product of source) {
+    if (slides.length >= 5) break;
+    slides.push(product);
+    seen.add(product.id);
+  }
+
+  if (preferred.length > 0 && slides.length < 5) {
+    for (const product of products) {
+      if (slides.length >= 5) break;
+      if (seen.has(product.id)) continue;
+      slides.push(product);
+    }
+  }
+
+  if (imageProducts.length > 0 && slides.length < 5) {
+    for (const product of imageProducts) {
+      if (slides.length >= 5) break;
+      if (seen.has(product.id)) continue;
+      slides.push(product);
+      seen.add(product.id);
+    }
+  }
+
+  return slides.slice(0, 5);
+}
+
+export default function BrandCarousel({
+  products,
+  brand,
+  showNav = true,
+  semanticHeading = true,
+}: Props) {
+  const featured = buildSlides(products);
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
+  const slideCount = featured.length;
+  const currentIndex = slideCount > 0 ? current % slideCount : 0;
+  const slide = featured[currentIndex];
 
   // Auto-advance
   useEffect(() => {
-    const t = setInterval(() => goTo((current + 1) % featured.length), 5500);
+    if (slideCount <= 1) return;
+    const t = setInterval(() => goTo((current + 1) % slideCount), 5500);
     return () => clearInterval(t);
-  }, [current, featured.length]);
+  }, [current, slideCount]);
 
   // Keyboard
   useEffect(() => {
+    if (slideCount <= 1) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === "ArrowDown")
-        goTo((current + 1) % featured.length);
+        goTo((current + 1) % slideCount);
       if (e.key === "ArrowLeft" || e.key === "ArrowUp")
-        goTo((current - 1 + featured.length) % featured.length);
+        goTo((current - 1 + slideCount) % slideCount);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [current, featured.length]);
+  }, [current, slideCount]);
 
   function goTo(next: number) {
     if (animating || next === current) return;
@@ -57,13 +115,21 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
     }, 80);
   }
 
-  const slide = featured[current];
-  const bgGradient = BG_GRADIENTS[current % BG_GRADIENTS.length];
+  if (slideCount === 0) {
+    return semanticHeading ? (
+      <h1 className="sr-only">{brand} en Smile Argentina</h1>
+    ) : null;
+  }
+
+  const bgGradient = BG_GRADIENTS[currentIndex % BG_GRADIENTS.length];
+  const subtitle = slide.categories[slide.categories.length - 1] ?? slide.brand;
+  const price = slide.promotionalPrice ?? slide.price;
 
   return (
-    <section
-      className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]"
-    >
+    <section className="relative h-[720px] w-full overflow-hidden bg-[#0a0a0a] md:h-screen md:min-h-[680px]">
+      {semanticHeading && (
+        <h1 className="sr-only">{brand} en Smile Argentina</h1>
+      )}
 
       {/* Grain overlay */}
       <div
@@ -122,8 +188,9 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
       {/* Slides */}
       <div className="absolute inset-0 flex items-center justify-center">
         {featured.map((prod, index) => {
-          const isActive = index === current;
+          const isActive = index === currentIndex;
           const isExiting = index === exiting;
+          const image = getCarouselImage(prod);
 
           return (
             <div
@@ -131,10 +198,10 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
               className="absolute inset-0 flex items-center justify-center"
             >
               {/* Content grid */}
-              <div className="grid w-full max-w-[1100px] grid-cols-2 items-center gap-16 px-16">
+              <div className="grid w-full max-w-[1100px] grid-cols-1 items-center gap-5 px-6 pb-16 pt-8 md:grid-cols-2 md:gap-16 md:px-16 md:py-0">
                 {/* Text side */}
                 <div
-                  className="transition-all duration-[900ms]"
+                  className="order-2 mx-auto max-w-[330px] text-center transition-all duration-[900ms] md:order-1 md:mx-0 md:max-w-none md:text-left"
                   style={{
                     transform: isActive
                       ? "translateX(0)"
@@ -149,47 +216,47 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                   }}
                 >
                   <p
-                    className="mb-6 text-[0.58rem] uppercase tracking-[0.28em]"
+                    className="mb-3 text-[0.58rem] uppercase tracking-[0.28em] md:mb-6"
                     style={{ color: ACCENT }}
                   >
-                    {String(index + 1).padStart(2, "0")} — {brand}
+                    {brand}
                   </p>
 
-                  <h2
-                    className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-[1.04] text-[#f0ece4]"
-                    dangerouslySetInnerHTML={{
-                      __html: prod.name.replace(" ", "<br>"),
-                    }}
-                  />
+                  <h2 className="font-display break-words text-[2.15rem] font-light leading-[1.02] text-[#f0ece4] md:text-[4.5rem]">
+                    {prod.name.split(" ").map((part, wordIndex, words) => (
+                      <span key={`${part}-${wordIndex}`}>
+                        {part}
+                        {wordIndex === 0 && words.length > 1 ? (
+                          <>
+                            {" "}
+                            <br className="hidden md:block" />
+                          </>
+                        ) : (
+                          " "
+                        )}
+                      </span>
+                    ))}
+                  </h2>
 
                   <p
                     className="font-display mt-2 text-[1.05rem] italic"
                     style={{ color: "#4a4540" }}
                   >
-                    {prod.subtitle}
+                    {index === currentIndex
+                      ? subtitle
+                      : (prod.categories[prod.categories.length - 1] ?? prod.brand)}
                   </p>
 
-                  {prod.badge && (
-                    <p
-                      className="mt-3 text-[0.62rem] uppercase tracking-[0.18em]"
-                      style={{ color: ACCENT }}
-                    >
-                      ✦ {prod.badge}
-                    </p>
-                  )}
-
                   <p
-                    className="mt-6 text-[0.72rem] tracking-[0.14em]"
+                    className="mt-4 text-[0.72rem] tracking-[0.14em] md:mt-6"
                     style={{ color: ACCENT }}
                   >
-                    {formatPrice(prod.price)}
+                    {formatPrice(index === currentIndex ? price : prod.promotionalPrice ?? prod.price)}
                   </p>
 
                   <a
-                    href={prod.storeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-10 inline-flex items-center gap-4 border-b pb-2 text-[0.6rem] uppercase tracking-[0.26em] text-[#f0ece4] transition-all hover:gap-6"
+                    href={`/tienda/productos/${prod.slug}`}
+                    className="mt-6 inline-flex items-center gap-4 border-b pb-2 text-[0.6rem] uppercase tracking-[0.26em] text-[#f0ece4] transition-all hover:gap-6 md:mt-10"
                     style={{
                       borderColor: "#4a4540",
                     }}
@@ -199,16 +266,16 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLAnchorElement).style.borderColor = "#4a4540";
                     }}
-                  >
-                    Ver en tienda{" "}
+                    >
+                    Ver detalle{" "}
                     <span style={{ color: ACCENT }}>→</span>
                   </a>
                 </div>
 
                 {/* Visual side */}
-                <div className="flex items-center justify-center">
+                <div className="order-1 flex items-center justify-center md:order-2">
                   <div
-                    className="relative h-[340px] w-[340px] transition-all duration-[900ms]"
+                    className="relative h-[280px] w-[280px] transition-all duration-[900ms] md:h-[340px] md:w-[340px]"
                     style={{
                       transform: isActive
                         ? "translateX(0) translateY(0)"
@@ -249,12 +316,9 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
 
                     {/* Product image */}
                     <div
-                      className="relative overflow-hidden"
+                      className="relative m-[30px] h-[220px] w-[220px] overflow-hidden rounded-full md:m-[40px] md:h-[260px] md:w-[260px]"
                       style={{
-                        width: "260px",
-                        height: "260px",
-                        borderRadius: "50%",
-                        margin: "40px",
+                        background: "radial-gradient(circle at 50% 45%, #f2f0eb 0%, #dfddd8 100%)",
                         boxShadow: `0 0 0 2px ${ACCENT}50, 0 0 0 8px ${ACCENT}14, 0 30px 80px rgba(0,0,0,0.85)`,
                       }}
                     >
@@ -269,13 +333,25 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                         }}
                       />
                       <img
-                        src={prod.images[0]}
+                        src={
+                          image ??
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E"
+                        }
                         alt={prod.name}
-                        className="h-full w-full object-cover"
-                        style={{ filter: "brightness(0.92) contrast(1.04)" }}
+                        style={{
+                          display: "block",
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                          objectPosition: "center",
+                          filter: "brightness(0.94) contrast(1.05)",
+                          transform: "scale(1.08)",
+                          transformOrigin: "center",
+                        }}
                         onError={(e) => {
-                          // fallback to store URL on image error
-                          (e.target as HTMLImageElement).style.display = "none";
+                          (e.target as HTMLImageElement).src =
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E";
                         }}
                       />
                       {/* strap bottom */}
@@ -298,7 +374,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-12 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4">
+      <div className="absolute bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 md:bottom-12">
         {featured.map((_, i) => (
           <button
             key={i}
@@ -315,16 +391,16 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
       </div>
 
       {/* Arrows */}
-      <div className="absolute right-12 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-6">
+      <div className="absolute right-12 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-6 md:flex">
         {[
           {
             dir: "up",
-            onClick: () => goTo((current - 1 + featured.length) % featured.length),
+            onClick: () => goTo((current - 1 + slideCount) % slideCount),
             path: "M18 15 L12 9 L6 15",
           },
           {
             dir: "down",
-            onClick: () => goTo((current + 1) % featured.length),
+            onClick: () => goTo((current + 1) % slideCount),
             path: "M6 9 L12 15 L18 9",
           },
         ].map(({ dir, onClick, path }) => (
@@ -350,7 +426,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                 (e.currentTarget as SVGElement).style.stroke = "#4a4540";
               }}
             >
-              <polyline points={path} />
+              <path d={path} />
             </svg>
           </button>
         ))}
@@ -358,13 +434,13 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
 
       {/* Slide counter */}
       <div
-        className="absolute bottom-12 left-12 z-50 text-[0.6rem] tracking-[0.2em]"
+        className="absolute bottom-5 left-6 z-50 text-[0.6rem] tracking-[0.2em] md:bottom-12 md:left-12"
         style={{ color: "#4a4540" }}
       >
         <span style={{ color: ACCENT, fontWeight: 400 }}>
-          {String(current + 1).padStart(2, "0")}
+          {String(currentIndex + 1).padStart(2, "0")}
         </span>{" "}
-        / {String(featured.length).padStart(2, "0")}
+        / {String(slideCount).padStart(2, "0")}
       </div>
 
       {/* CSS rotate keyframe */}

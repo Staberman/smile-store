@@ -20,9 +20,9 @@ const nav = [
   {
     heading: "Información",
     links: [
-      { label: "Sobre Smile", href: "/" },
-      { label: "Contacto", href: "/" },
-      { label: "Instagram", href: "https://instagram.com", target: "_blank" },
+      { label: "Todos los productos", href: "/tienda" },
+      { label: "Contacto", href: "/contacto" },
+      { label: "Checkout seguro", href: "/tienda" },
     ],
   },
 ];
@@ -44,7 +44,8 @@ export default function Footer() {
               />
             </a>
             <p className="mt-5 max-w-[220px] text-sm leading-[1.85] text-white/42">
-              Relojes, lentes y accesorios premium en Argentina.
+              Relojes, lentes y accesorios premium en Argentina. Compra directa
+              con checkout seguro de Tiendanube.
             </p>
           </div>
 
@@ -81,10 +82,7 @@ export default function Footer() {
           <p className="text-[11px] text-white/28">
             © {new Date().getFullYear()} Smile. Todos los derechos reservados.
           </p>
-          <a
-            href="https://smiletiendaimp.com.ar"
-            className="text-[11px] text-white/28 transition hover:text-white/60"
-          >
+          <a href="/" className="text-[11px] text-white/28 transition hover:text-white/60">
             smiletiendaimp.com.ar
           </a>
         </div>

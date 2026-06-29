@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "sync:catalog": "node scripts/tiendanube/sync-stock-prices.mjs",
+    "test:catalog": "node --test scripts/tiendanube/*.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.36.0",

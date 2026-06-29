@@ -2,20 +2,25 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
-import { omegaSwatchProducts } from "@/lib/products";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Omega × Swatch MoonSwatch | Smile",
+  title: "Omega × Swatch MoonSwatch",
   description:
     "La colaboración histórica entre Omega y Swatch. MoonSwatch Bioceramic — Mission to the Moon, Mars, Earth y más. Disponible en Smile.",
+  alternates: { canonical: "/tienda/relojes/omega-swatch" },
 };
 
 const ACCENT = "#c9a96e";
 
+const omegaSwatchProducts = allProducts.filter(
+  (product) => product.brand === "OMEGA x Swatch"
+);
+
 export default function OmegaSwatchPage() {
   return (
     <main className="bg-[#0a0a0a]">
-      <BrandCarousel products={omegaSwatchProducts} brand="Omega × Swatch" />
+      <BrandCarousel products={omegaSwatchProducts} brand="Omega × Swatch" showNav={false} />
 
       {/* Collab callout */}
       <section className="border-b border-white/6 bg-[#0a0a0a] px-6 py-16 text-[#f0ece4] md:px-12">
