@@ -29,7 +29,7 @@ export default function TiendanubeCheckoutForm({
   return (
     <form
       method="post"
-      action="https://www.smiletiendaimp.com.ar/comprar/"
+      action="https://smiletienda.mitiendanube.com/comprar/"
       className={className}
     >
       <input
@@ -38,6 +38,7 @@ export default function TiendanubeCheckoutForm({
         value={product.tiendanubeProductId ?? ""}
       />
       <input type="hidden" name="quantity" value="1" />
+      <input type="hidden" name="go_to_checkout" value="1" />
       {options.map((option, index) => (
         <input
           key={`${option}-${index}`}

@@ -83,6 +83,23 @@ test("checkout requires positive variant stock", () => {
   assert.match(source, /variant\.stock\s*>\s*0/);
 });
 
+test("checkout posts to Tiendanube and skips the storefront cart", () => {
+  const source = fs.readFileSync(
+    path.join(projectRoot, "components/checkout/TiendanubeCheckoutForm.tsx"),
+    "utf8",
+  );
+
+  assert.match(
+    source,
+    /action="https:\/\/smiletienda\.mitiendanube\.com\/comprar\/"/,
+  );
+  assert.match(source, /name="go_to_checkout"/);
+  assert.doesNotMatch(
+    source,
+    /action="https:\/\/www\.smiletiendaimp\.com\.ar\/comprar\/"/,
+  );
+});
+
 test("collection carousel exposes one semantic page heading", () => {
   const carouselSource = fs.readFileSync(
     path.join(projectRoot, "components/brand/BrandCarousel.tsx"),
