@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Saint Laurent | Marcas Premium",
   description: "Lentes de sol Saint Laurent — rock & élégance parisina. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/saint-laurent" },
 };
 
 const saintLaurentProducts = allProducts.filter((product) => product.brand === "Saint Laurent");

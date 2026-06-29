@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Christian Dior | Marcas Premium",
   description: "Lentes de sol Christian Dior — élégance parisienne. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/christian-dior" },
 };
 
 const diorProducts = allProducts.filter((product) => product.brand === "Christian Dior");

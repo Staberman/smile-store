@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Dolce&Gabbana | Marcas Premium",
   description: "Lentes de sol Dolce&Gabbana — el mediterráneo hecho moda. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/dolce-gabbana" },
 };
 
 const dolceGabbanaProducts = allProducts.filter((product) => product.brand === "Dolce&Gabbana");

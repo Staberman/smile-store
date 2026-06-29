@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Prada | Marcas Premium",
   description: "Lentes de sol Prada — Symbole y más. Importados, con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/prada" },
 };
 
 const pradaProducts = allProducts.filter((product) => product.brand === "Prada");

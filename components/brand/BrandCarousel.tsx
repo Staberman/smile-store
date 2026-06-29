@@ -11,6 +11,7 @@ interface Props {
   brand: string;
   accentColor?: string; // CSS hex, default gold
   showNav?: boolean; // show internal nav bar (default true)
+  semanticHeading?: boolean;
 }
 
 const ACCENT = "#c9a96e";
@@ -69,7 +70,12 @@ function buildSlides(products: CatalogProduct[]) {
   return slides.slice(0, 5);
 }
 
-export default function BrandCarousel({ products, brand, showNav = true }: Props) {
+export default function BrandCarousel({
+  products,
+  brand,
+  showNav = true,
+  semanticHeading = true,
+}: Props) {
   const featured = buildSlides(products);
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState<number | null>(null);
@@ -110,7 +116,9 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
   }
 
   if (slideCount === 0) {
-    return null;
+    return semanticHeading ? (
+      <h1 className="sr-only">{brand} en Smile Argentina</h1>
+    ) : null;
   }
 
   const bgGradient = BG_GRADIENTS[currentIndex % BG_GRADIENTS.length];
@@ -118,9 +126,10 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
   const price = slide.promotionalPrice ?? slide.price;
 
   return (
-    <section
-      className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]"
-    >
+    <section className="relative h-[720px] w-full overflow-hidden bg-[#0a0a0a] md:h-screen md:min-h-[680px]">
+      {semanticHeading && (
+        <h1 className="sr-only">{brand} en Smile Argentina</h1>
+      )}
 
       {/* Grain overlay */}
       <div
@@ -189,10 +198,10 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
               className="absolute inset-0 flex items-center justify-center"
             >
               {/* Content grid */}
-              <div className="grid w-full max-w-[1100px] grid-cols-2 items-center gap-16 px-16">
+              <div className="grid w-full max-w-[1100px] grid-cols-1 items-center gap-5 px-6 pb-16 pt-8 md:grid-cols-2 md:gap-16 md:px-16 md:py-0">
                 {/* Text side */}
                 <div
-                  className="transition-all duration-[900ms]"
+                  className="order-2 mx-auto max-w-[330px] text-center transition-all duration-[900ms] md:order-1 md:mx-0 md:max-w-none md:text-left"
                   style={{
                     transform: isActive
                       ? "translateX(0)"
@@ -207,17 +216,24 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                   }}
                 >
                   <p
-                    className="mb-6 text-[0.58rem] uppercase tracking-[0.28em]"
+                    className="mb-3 text-[0.58rem] uppercase tracking-[0.28em] md:mb-6"
                     style={{ color: ACCENT }}
                   >
                     {brand}
                   </p>
 
-                  <h2 className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-light leading-[1.04] text-[#f0ece4]">
+                  <h2 className="font-display break-words text-[2.15rem] font-light leading-[1.02] text-[#f0ece4] md:text-[4.5rem]">
                     {prod.name.split(" ").map((part, wordIndex, words) => (
                       <span key={`${part}-${wordIndex}`}>
                         {part}
-                        {wordIndex === 0 && words.length > 1 ? <br /> : " "}
+                        {wordIndex === 0 && words.length > 1 ? (
+                          <>
+                            {" "}
+                            <br className="hidden md:block" />
+                          </>
+                        ) : (
+                          " "
+                        )}
                       </span>
                     ))}
                   </h2>
@@ -232,7 +248,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                   </p>
 
                   <p
-                    className="mt-6 text-[0.72rem] tracking-[0.14em]"
+                    className="mt-4 text-[0.72rem] tracking-[0.14em] md:mt-6"
                     style={{ color: ACCENT }}
                   >
                     {formatPrice(index === currentIndex ? price : prod.promotionalPrice ?? prod.price)}
@@ -240,7 +256,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
 
                   <a
                     href={`/tienda/productos/${prod.slug}`}
-                    className="mt-10 inline-flex items-center gap-4 border-b pb-2 text-[0.6rem] uppercase tracking-[0.26em] text-[#f0ece4] transition-all hover:gap-6"
+                    className="mt-6 inline-flex items-center gap-4 border-b pb-2 text-[0.6rem] uppercase tracking-[0.26em] text-[#f0ece4] transition-all hover:gap-6 md:mt-10"
                     style={{
                       borderColor: "#4a4540",
                     }}
@@ -257,9 +273,9 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
                 </div>
 
                 {/* Visual side */}
-                <div className="flex items-center justify-center">
+                <div className="order-1 flex items-center justify-center md:order-2">
                   <div
-                    className="relative h-[340px] w-[340px] transition-all duration-[900ms]"
+                    className="relative h-[280px] w-[280px] transition-all duration-[900ms] md:h-[340px] md:w-[340px]"
                     style={{
                       transform: isActive
                         ? "translateX(0) translateY(0)"
@@ -300,12 +316,8 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
 
                     {/* Product image */}
                     <div
-                      className="relative overflow-hidden"
+                      className="relative m-[30px] h-[220px] w-[220px] overflow-hidden rounded-full md:m-[40px] md:h-[260px] md:w-[260px]"
                       style={{
-                        width: "260px",
-                        height: "260px",
-                        borderRadius: "50%",
-                        margin: "40px",
                         background: "radial-gradient(circle at 50% 45%, #f2f0eb 0%, #dfddd8 100%)",
                         boxShadow: `0 0 0 2px ${ACCENT}50, 0 0 0 8px ${ACCENT}14, 0 30px 80px rgba(0,0,0,0.85)`,
                       }}
@@ -362,7 +374,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-12 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4">
+      <div className="absolute bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 md:bottom-12">
         {featured.map((_, i) => (
           <button
             key={i}
@@ -379,7 +391,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
       </div>
 
       {/* Arrows */}
-      <div className="absolute right-12 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-6">
+      <div className="absolute right-12 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-6 md:flex">
         {[
           {
             dir: "up",
@@ -422,7 +434,7 @@ export default function BrandCarousel({ products, brand, showNav = true }: Props
 
       {/* Slide counter */}
       <div
-        className="absolute bottom-12 left-12 z-50 text-[0.6rem] tracking-[0.2em]"
+        className="absolute bottom-5 left-6 z-50 text-[0.6rem] tracking-[0.2em] md:bottom-12 md:left-12"
         style={{ color: "#4a4540" }}
       >
         <span style={{ color: ACCENT, fontWeight: 400 }}>

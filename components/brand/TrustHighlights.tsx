@@ -4,8 +4,8 @@ const highlights = [
     text: "La compra se confirma con el checkout protegido de Tiendanube.",
   },
   {
-    title: "Stock actualizado",
-    text: "Solo mostramos productos con variantes disponibles para comprar.",
+    title: "Stock disponible",
+    text: "Solo mostramos productos con variantes informadas como disponibles.",
   },
   {
     title: "Atencion personalizada",

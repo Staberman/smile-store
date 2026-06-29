@@ -13,24 +13,32 @@ const staticRoutes = [
   "/tienda/marcas/ray-ban",
   "/tienda/marcas/ray-ban/ferrari",
   "/tienda/marcas/premium",
-  "/tienda/marcas/premium/balenciaga",
-  "/tienda/marcas/premium/cartier",
-  "/tienda/marcas/premium/celine",
-  "/tienda/marcas/premium/christian-dior",
-  "/tienda/marcas/premium/dolce-gabbana",
-  "/tienda/marcas/premium/fendi",
-  "/tienda/marcas/premium/gucci",
-  "/tienda/marcas/premium/louis-vuitton",
-  "/tienda/marcas/premium/prada",
-  "/tienda/marcas/premium/saint-laurent",
-  "/tienda/marcas/premium/versace",
 ];
+
+const premiumBrandRoutes = [
+  ["Balenciaga", "/tienda/marcas/premium/balenciaga"],
+  ["Cartier", "/tienda/marcas/premium/cartier"],
+  ["Celine Paris", "/tienda/marcas/premium/celine"],
+  ["Christian Dior", "/tienda/marcas/premium/christian-dior"],
+  ["Dolce&Gabbana", "/tienda/marcas/premium/dolce-gabbana"],
+  ["Fendi", "/tienda/marcas/premium/fendi"],
+  ["Gucci", "/tienda/marcas/premium/gucci"],
+  ["Louis Vuitton", "/tienda/marcas/premium/louis-vuitton"],
+  ["Prada", "/tienda/marcas/premium/prada"],
+  ["Saint Laurent", "/tienda/marcas/premium/saint-laurent"],
+  ["Versace", "/tienda/marcas/premium/versace"],
+] as const;
+
+const availablePremiumBrandRoutes = premiumBrandRoutes
+  .filter(([brand]) => allProducts.some((product) => product.brand === brand))
+  .map(([, route]) => route);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  const indexableRoutes = [...staticRoutes, ...availablePremiumBrandRoutes];
 
   return [
-    ...staticRoutes.map((route) => ({
+    ...indexableRoutes.map((route) => ({
       url: absoluteUrl(route),
       lastModified: now,
       changeFrequency: route === "/" || route === "/tienda" ? "daily" as const : "weekly" as const,
@@ -41,7 +49,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "daily" as const,
       priority: 0.8,
-      images: product.images.slice(0, 3),
     })),
   ];
 }

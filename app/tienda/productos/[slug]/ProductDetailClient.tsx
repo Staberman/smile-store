@@ -149,7 +149,7 @@ export default function ProductDetailClient({
               {collectionLabel}
             </p>
 
-            <h1 className="font-display mt-3 text-[2.4rem] font-light italic leading-[1.05] md:text-[3rem]">
+            <h1 className="font-display mt-3 break-words text-[2rem] font-light italic leading-[1.08] sm:text-[2.4rem] md:text-[3rem]">
               {product.name}
             </h1>
             <p className="mt-1 text-sm text-[#4a4540]">{subtitle}</p>

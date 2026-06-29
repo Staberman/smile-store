@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Versace | Marcas Premium",
   description: "Lentes de sol Versace — audacia sin límites. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/versace" },
 };
 
 const versaceProducts = allProducts.filter((product) => product.brand === "Versace");

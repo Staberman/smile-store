@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       product.promotionalPrice ?? product.price
     )}`;
   const canonical = productUrl(product);
-  const image = product.images[0];
+  const image = product.images[0] ? absoluteUrl(product.images[0]) : undefined;
 
   return {
     title: metaTitle,
@@ -123,7 +123,7 @@ export default function ProductPage({ params }: Props) {
         "@id": `${productUrl(product)}#product`,
         name: product.name,
         description: product.descriptionText,
-        image: product.images,
+        image: product.images.map(absoluteUrl),
         brand: {
           "@type": "Brand",
           name: brandLabel,

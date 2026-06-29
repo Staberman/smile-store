@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Gucci | Marcas Premium",
   description: "Lentes de sol Gucci — la casa florentina. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/gucci" },
 };
 
 const gucciProducts = allProducts.filter((product) => product.brand === "Gucci");

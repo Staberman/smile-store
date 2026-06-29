@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Invicta",
   description:
     "Relojes Invicta originales en Argentina. Pro Diver, cronógrafos y ediciones limitadas disponibles en Smile.",
+  alternates: { canonical: "/tienda/marcas/invicta" },
 };
 
 const invictaProducts = allProducts.filter((product) => product.brand === "Invicta");

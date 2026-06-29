@@ -117,6 +117,7 @@ function TiendaContent() {
         products={currentSub.products}
         brand={currentSub.brandLabel}
         showNav={false}
+        semanticHeading={false}
       />
 
       <TrustHighlights />

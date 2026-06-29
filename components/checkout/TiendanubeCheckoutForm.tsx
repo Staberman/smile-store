@@ -23,7 +23,8 @@ export default function TiendanubeCheckoutForm({
     !disabled &&
     product.tiendanubeProductId !== null &&
     variant !== null &&
-    variant.available;
+    variant.available &&
+    variant.stock > 0;
 
   return (
     <form

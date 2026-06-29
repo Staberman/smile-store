@@ -97,13 +97,13 @@ export default function WhatsAppFloatingButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Consultar por WhatsApp"
-      className={`group fixed right-5 z-[80] flex items-center gap-3 rounded-full border border-[#c9a96e]/35 bg-[#080706]/92 px-3 py-3 text-[#f0ece4] shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c9a96e]/70 hover:bg-[#0f0d0a] focus:outline-none focus:ring-2 focus:ring-[#c9a96e]/55 md:right-6 md:px-4 ${positionClass}`}
+      className={`group fixed right-3 z-[80] flex items-center gap-3 rounded-full border border-[#c9a96e]/35 bg-[#080706]/92 p-2 text-[#f0ece4] shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c9a96e]/70 hover:bg-[#0f0d0a] focus:outline-none focus:ring-2 focus:ring-[#c9a96e]/55 md:right-6 md:px-4 md:py-3 ${positionClass}`}
     >
-      <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#c9a96e] text-[#0a0a0a] shadow-[0_0_0_6px_rgba(201,169,110,0.1)]">
+      <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-[#c9a96e] text-[#0a0a0a] shadow-[0_0_0_5px_rgba(201,169,110,0.1)] md:h-10 md:w-10 md:shadow-[0_0_0_6px_rgba(201,169,110,0.1)]">
         <svg
           aria-hidden="true"
-          width="22"
-          height="22"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

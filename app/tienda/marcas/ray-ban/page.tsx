@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Ray-Ban",
   description:
     "Descubre la colección completa de lentes Ray-Ban en Smile. Aviador, Wayfarer, Clubmaster, Round y la exclusiva Scuderia Ferrari Collection.",
+  alternates: { canonical: "/tienda/marcas/ray-ban" },
 };
 
 const rayBanProducts = allProducts.filter((product) => {

@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Fendi | Marcas Premium",
   description: "Lentes de sol Fendi — la doble F romana. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/fendi" },
 };
 
 const fendiProducts = allProducts.filter((product) => product.brand === "Fendi");

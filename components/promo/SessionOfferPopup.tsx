@@ -79,7 +79,8 @@ export default function SessionOfferPopup() {
             </h2>
             <p className="mt-4 max-w-[24rem] text-sm leading-[1.8] text-[#8b8580]">
               Tambien tenes 20% OFF abonando en efectivo o transferencia.
-              Stock actualizado y compra segura por checkout de Tiendanube.
+              Productos con stock informado disponible y compra segura por
+              checkout de Tiendanube.
             </p>
 
             <div className="mt-6 grid gap-2 text-[11px] uppercase tracking-[0.2em] text-[#c9a96e]">

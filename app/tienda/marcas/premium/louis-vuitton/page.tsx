@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Louis Vuitton | Marcas Premium",
   description: "Lentes de sol Louis Vuitton — el arte de viajar con estilo. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/louis-vuitton" },
 };
 
 const louisVuittonProducts = allProducts.filter((product) => product.brand === "Louis Vuitton");

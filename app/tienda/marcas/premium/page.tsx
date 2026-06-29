@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import { allProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Marcas Premium",
   description:
     "Prada, Dior, Versace, Gucci, Balenciaga, Louis Vuitton, Saint Laurent, Fendi, Cartier, Dolce&Gabbana y Celine — lentes de sol premium en Smile.",
+  alternates: { canonical: "/tienda/marcas/premium" },
 };
 
 const ACCENT = "#c9a96e";
@@ -90,6 +92,11 @@ const BRANDS = [
   },
 ];
 
+const availableBrands = BRANDS.filter((brand) => {
+  const catalogBrand = brand.slug === "celine" ? "Celine Paris" : brand.name;
+  return allProducts.some((product) => product.brand === catalogBrand);
+});
+
 export default function MarcasPremiumPage() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
@@ -113,7 +120,7 @@ export default function MarcasPremiumPage() {
       <section className="px-6 py-16 md:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {BRANDS.map((brand) => (
+            {availableBrands.map((brand) => (
               <Link
                 key={brand.slug}
                 href={`/tienda/marcas/premium/${brand.slug}`}

@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Cartier | Marcas Premium",
   description: "Lentes de sol Cartier — la joyería del eyewear. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/cartier" },
 };
 
 const cartierProducts = allProducts.filter((product) => product.brand === "Cartier");

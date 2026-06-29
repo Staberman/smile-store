@@ -7,6 +7,7 @@ import { allProducts } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: "Balenciaga | Marcas Premium",
   description: "Lentes de sol Balenciaga — editorial y futurista. Importados con cristal mineral UV400.",
+  alternates: { canonical: "/tienda/marcas/premium/balenciaga" },
 };
 
 const balenciagaProducts = allProducts.filter((product) => product.brand === "Balenciaga");

@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Scuderia Ferrari Collection | Ray-Ban",
   description:
     "La colaboración entre Ray-Ban y Scuderia Ferrari. Lentes de sol exclusivos con diseño inspirado en la Fórmula 1. Disponibles en Smile Argentina.",
+  alternates: { canonical: "/tienda/marcas/ray-ban/ferrari" },
 };
 
 const ACCENT = "#c9a96e";

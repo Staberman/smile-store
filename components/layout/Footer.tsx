@@ -20,7 +20,7 @@ const nav = [
   {
     heading: "Información",
     links: [
-      { label: "Tienda oficial", href: "/tienda" },
+      { label: "Todos los productos", href: "/tienda" },
       { label: "Contacto", href: "/contacto" },
       { label: "Checkout seguro", href: "/tienda" },
     ],

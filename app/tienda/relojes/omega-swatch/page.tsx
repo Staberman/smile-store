@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Omega × Swatch MoonSwatch",
   description:
     "La colaboración histórica entre Omega y Swatch. MoonSwatch Bioceramic — Mission to the Moon, Mars, Earth y más. Disponible en Smile.",
+  alternates: { canonical: "/tienda/relojes/omega-swatch" },
 };
 
 const ACCENT = "#c9a96e";
