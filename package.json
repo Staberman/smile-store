@@ -5,6 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "sync:catalog": "node scripts/tiendanube/sync-stock-prices.mjs",
     "test:catalog": "node --test scripts/tiendanube/*.test.mjs"
   },
   "dependencies": {

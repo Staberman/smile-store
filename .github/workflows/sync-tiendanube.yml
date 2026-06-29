@@ -1,0 +1,66 @@
+name: Sincronizar Tiendanube
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-tiendanube
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TIENDANUBE_ACCESS_TOKEN: ${{ secrets.TIENDANUBE_ACCESS_TOKEN }}
+      TIENDANUBE_STORE_ID: ${{ secrets.TIENDANUBE_STORE_ID }}
+      TIENDANUBE_USER_AGENT: Smile Stock Sync (smiletiendaimp.com.ar)
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Actualizar precios y stock
+        run: npm run sync:catalog
+
+      - name: Detectar cambios
+        id: changes
+        run: |
+          if git diff --quiet -- data/tiendanube-catalog.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verificar catálogo
+        if: steps.changes.outputs.changed == 'true'
+        run: npm run test:catalog
+
+      - name: Verificar compilación
+        if: steps.changes.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Publicar actualización
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "Smile Stock Sync"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/tiendanube-catalog.json
+          git commit -m "chore: sync Tiendanube stock and prices"
+          git push
