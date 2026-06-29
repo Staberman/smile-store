@@ -59,8 +59,8 @@ jobs:
       - name: Publicar actualización
         if: steps.changes.outputs.changed == 'true'
         run: |
-          git config user.name "Smile Stock Sync"
-          git config user.email "actions@users.noreply.github.com"
+          git config user.name "Lautaro Antunez"
+          git config user.email "lautaroantunez@icloud.com"
           git add data/tiendanube-catalog.json
           git commit -m "chore: sync Tiendanube stock and prices"
           git push
