@@ -111,6 +111,15 @@ test("collection carousel exposes one semantic page heading", () => {
   assert.match(storePageSource, /<h1[^>]*className="sr-only"[^>]*>/);
 });
 
+test("only the active carousel slide can capture product-detail clicks", () => {
+  const carouselSource = fs.readFileSync(
+    path.join(projectRoot, "components/brand/BrandCarousel.tsx"),
+    "utf8",
+  );
+
+  assert.match(carouselSource, /pointerEvents:\s*isActive\s*\?\s*"auto"\s*:\s*"none"/);
+});
+
 test("SEO outputs convert local product images to absolute URLs", () => {
   const productPageSource = fs.readFileSync(
     path.join(projectRoot, "app/tienda/productos/[slug]/page.tsx"),

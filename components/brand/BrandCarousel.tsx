@@ -200,6 +200,7 @@ export default function BrandCarousel({
             <div
               key={prod.id}
               className="absolute inset-0 flex items-center justify-center"
+              style={{ pointerEvents: isActive ? "auto" : "none" }}
             >
               {/* Content grid */}
               <div className="grid w-full max-w-[1100px] grid-cols-1 items-center gap-5 px-6 pb-16 pt-8 md:grid-cols-2 md:gap-16 md:px-16 md:py-0">

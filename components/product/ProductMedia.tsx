@@ -35,6 +35,7 @@ export default function ProductMedia({ product, src, hovered = false }: Props) {
               ? "scale(1.08)"
               : "scale(1.02)",
           objectPosition: "center",
+          mixBlendMode: watch ? "multiply" : "normal",
           filter: "brightness(0.96) contrast(1.03)",
         }}
         onError={() => setFailed(true)}
@@ -42,4 +43,3 @@ export default function ProductMedia({ product, src, hovered = false }: Props) {
     </div>
   );
 }
-
