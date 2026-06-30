@@ -1,12 +1,16 @@
 {
   "name": "smile-store",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run build:nube-sdk",
     "build": "next build",
+    "build:nube-sdk": "tsup integrations/tiendanube-checkout/src/main.ts --format esm --minify --clean --out-dir public/tiendanube-checkout && mv public/tiendanube-checkout/main.js public/tiendanube-checkout/main.min.js",
     "start": "next start",
     "sync:catalog": "node scripts/tiendanube/sync-stock-prices.mjs",
-    "test:catalog": "node --test scripts/tiendanube/*.test.mjs"
+    "test:catalog": "node --test scripts/tiendanube/*.test.mjs",
+    "test:nube-sdk": "node --test integrations/tiendanube-checkout/src/*.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.36.0",
@@ -16,12 +20,14 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
+    "@tiendanube/nube-sdk-types": "0.79.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.3",
     "tailwindcss": "^4",
+    "tsup": "8.5.1",
     "typescript": "^5"
   }
 }
