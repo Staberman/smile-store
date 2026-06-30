@@ -9,6 +9,7 @@
     "build:nube-sdk": "tsup integrations/tiendanube-checkout/src/main.ts --format esm --minify --clean --out-dir public/tiendanube-checkout && mv public/tiendanube-checkout/main.js public/tiendanube-checkout/main.min.js",
     "start": "next start",
     "sync:catalog": "node scripts/tiendanube/sync-stock-prices.mjs",
+    "sync:sales": "node scripts/tiendanube/sync-sales-ranking.mjs",
     "test:catalog": "node --test scripts/tiendanube/*.test.mjs",
     "test:nube-sdk": "node --test integrations/tiendanube-checkout/src/*.test.mjs"
   },

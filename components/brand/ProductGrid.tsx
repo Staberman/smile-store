@@ -5,6 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import type { CatalogProduct } from "@/lib/catalog";
 import { formatPrice } from "@/lib/catalog";
+import ProductMedia from "@/components/product/ProductMedia";
+import {
+  getAvailableVariants,
+  getDisplayPrice,
+  getInstallmentPrice,
+  getTransferPrice,
+} from "@/lib/storefront.mjs";
 
 interface Props {
   products: CatalogProduct[];
@@ -297,7 +304,7 @@ export default function ProductGrid({
 }
 
 function ProductCard({ product, collectionLabel }: { product: CatalogProduct; collectionLabel: string }) {
-  const availableVariants = product.variants.filter((variant) => variant.available);
+  const availableVariants = getAvailableVariants(product);
   const [hovered, setHovered] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
     availableVariants[0]?.id ?? product.variants[0]?.id ?? null
@@ -310,11 +317,9 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
     null;
 
   const image = selectedVariant?.image ?? product.images[0];
-  const price =
-    selectedVariant?.promotionalPrice ??
-    selectedVariant?.price ??
-    product.promotionalPrice ??
-    product.price;
+  const price = getDisplayPrice(product, selectedVariant);
+  const transferPrice = getTransferPrice(price);
+  const installmentPrice = getInstallmentPrice(price);
 
   return (
     <div
@@ -325,30 +330,7 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
     >
       <Link href={`/tienda/productos/${product.slug}`} className="block">
         <div className="relative flex h-60 items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,rgba(201,169,110,0.12),rgba(18,16,16,0)_62%)] sm:h-56">
-          <div className="relative h-44 w-44 overflow-hidden rounded-full border border-[#c9a96e]/20 bg-[#121010] shadow-[0_0_0_10px_rgba(201,169,110,0.04),0_26px_70px_rgba(0,0,0,0.45)] sm:h-48 sm:w-48">
-            <img
-              src={image ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E"}
-              alt={product.name}
-              className="h-full w-full object-cover transition-transform duration-[1100ms]"
-              style={{
-                transform: hovered ? "scale(1.13)" : "scale(1.06)",
-                filter: "brightness(0.9) contrast(1.04)",
-              }}
-              onError={(event) => {
-                (event.target as HTMLImageElement).src =
-                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23181410'/%3E%3C/svg%3E";
-              }}
-            />
-          </div>
-
-          {!product.stock && (
-            <div
-              className="absolute left-3 top-3 rounded-full px-3 py-1 text-[9px] uppercase tracking-[0.2em]"
-              style={{ background: `${ACCENT}22`, color: ACCENT, border: `1px solid ${ACCENT}40` }}
-            >
-              Sin stock
-            </div>
-          )}
+          <ProductMedia product={product} src={image} hovered={hovered} />
 
           <div
             className="absolute inset-0 flex items-center justify-center transition-all duration-300"
@@ -366,7 +348,7 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
         <h3 className="mt-1.5 text-sm font-medium text-[#f0ece4]">{product.name}</h3>
         <p className="mt-0.5 text-xs text-[#4a4540]">{product.brand}</p>
 
-        {product.variants.length > 1 && (
+        {availableVariants.length > 1 && (
           <select
             value={getVariantValue(selectedVariantId)}
             onChange={(event) =>
@@ -374,24 +356,30 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
             }
             className="mt-3 w-full rounded-lg border border-white/8 bg-transparent px-3 py-1.5 text-[10px] text-[#6a6560] outline-none"
           >
-            {product.variants.map((variant, index) => (
+            {availableVariants.map((variant, index) => (
               <option
                 key={`${variant.id ?? "null"}-${index}`}
                 value={getVariantValue(variant.id)}
-                disabled={!variant.available}
                 className="bg-[#0a0a0a]"
               >
                 {getVariantLabel(product, variant.id)}
-                {!variant.available ? " - sin stock" : ""}
               </option>
             ))}
           </select>
         )}
 
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="text-[12px]" style={{ color: ACCENT }}>
-            {formatPrice(price)}
-          </p>
+        <div className="mt-4 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[13px]" style={{ color: ACCENT }}>
+              {formatPrice(price)}
+            </p>
+            <p className="mt-1 text-[10px] text-[#b8b0a4]">
+              {formatPrice(transferPrice)} por transferencia
+            </p>
+            <p className="mt-0.5 text-[9px] text-[#6a6560]">
+              6 cuotas de {formatPrice(installmentPrice)}
+            </p>
+          </div>
 
           <Link
             href={`/tienda/productos/${product.slug}`}

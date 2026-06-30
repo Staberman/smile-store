@@ -6,6 +6,12 @@ import TiendanubeCheckoutForm from "@/components/checkout/TiendanubeCheckoutForm
 import TrustHighlights from "@/components/brand/TrustHighlights";
 import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
 import { formatPrice } from "@/lib/catalog";
+import {
+  getAvailableVariants,
+  getDisplayPrice,
+  getInstallmentPrice,
+  getTransferPrice,
+} from "@/lib/storefront.mjs";
 
 interface Props {
   product: CatalogProduct;
@@ -31,15 +37,14 @@ export default function ProductDetailClient({
   brandLabel,
   recommendations,
 }: Props) {
+  const availableVariants = getAvailableVariants(product);
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
-    product.variants.find((variant) => variant.available)?.id ??
-      product.variants[0]?.id ??
-      null
+    availableVariants[0]?.id ?? null
   );
 
   const selectedVariant =
-    product.variants.find((variant) => variant.id === selectedVariantId) ??
-    product.variants[0] ??
+    availableVariants.find((variant) => variant.id === selectedVariantId) ??
+    availableVariants[0] ??
     null;
 
   const galleryImages = useMemo(
@@ -62,11 +67,9 @@ export default function ProductDetailClient({
     setActiveImage(galleryImages[0] ?? IMAGE_FALLBACK);
   }, [galleryImages]);
 
-  const displayPrice =
-    selectedVariant?.promotionalPrice ??
-    selectedVariant?.price ??
-    product.promotionalPrice ??
-    product.price;
+  const displayPrice = getDisplayPrice(product, selectedVariant);
+  const transferPrice = getTransferPrice(displayPrice);
+  const installmentPrice = getInstallmentPrice(displayPrice);
   const collectionLabel =
     product.categories[product.categories.length - 1] ?? product.brand;
   const subtitle = product.brand;
@@ -160,46 +163,42 @@ export default function ProductDetailClient({
             >
               {formatPrice(displayPrice)}
             </p>
+            <p className="mt-2 text-sm text-[#b8b0a4]">
+              {formatPrice(transferPrice)} por transferencia
+            </p>
+            <p className="mt-1 text-xs text-[#6a6560]">
+              6 cuotas sin interés de {formatPrice(installmentPrice)}
+            </p>
 
             <div className="my-6 h-px bg-white/8" />
 
-            {product.variants.length > 1 && (
+            {availableVariants.length > 1 && (
               <div className="mb-6">
                 <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#4a4540]">
                   Color / variante
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {product.variants.map((variant, index) => {
+                  {availableVariants.map((variant, index) => {
                     const variantPrice =
                       variant.promotionalPrice ?? variant.price;
                     return (
                       <button
                         key={`${variant.id ?? "null"}-${index}`}
-                        onClick={() =>
-                          !variant.available
-                            ? null
-                            : setSelectedVariantId(variant.id)
-                        }
-                        disabled={!variant.available}
+                        onClick={() => setSelectedVariantId(variant.id)}
                         className="rounded-full border px-4 py-2 text-[10px] tracking-[0.14em] transition-all duration-200"
                         style={{
                           borderColor:
                             selectedVariantId === variant.id
                               ? ACCENT
                               : "#2a2520",
-                          color: !variant.available
-                            ? "#2a2520"
-                            : selectedVariantId === variant.id
+                          color: selectedVariantId === variant.id
                               ? ACCENT
                               : "#6a6560",
                           background:
                             selectedVariantId === variant.id
                               ? `${ACCENT}14`
                               : "transparent",
-                          cursor: variant.available ? "pointer" : "not-allowed",
-                          textDecoration: !variant.available
-                            ? "line-through"
-                            : "none",
+                          cursor: "pointer",
                         }}
                       >
                         {getVariantLabel(variant, index)}
