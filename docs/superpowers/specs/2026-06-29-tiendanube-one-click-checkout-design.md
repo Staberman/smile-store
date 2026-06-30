@@ -25,9 +25,15 @@ ficha nativa ni formulario previo.
    `smiletienda.mitiendanube.com`.
 3. App Proxy valida la firma y entrega una pantalla de transicion minima,
    accesible y con identidad Smile.
-4. La aplicacion Nube SDK lee los IDs validados y envia `cart:add`.
-5. Al recibir `cart:add:success`, navega a la ruta de checkout de la tienda.
-6. Ante `cart:add:fail`, muestra un mensaje claro y permite volver a la ficha
+4. La aplicacion Nube SDK resuelve el intento firmado, elimina con
+   `cart:remove` cualquier articulo residual de la sesion y envia `cart:add`
+   solo cuando el carrito queda vacio.
+5. Al recibir `cart:add:success`, comprueba que la variante esperada sea el
+   unico articulo y navega a la etapa `checkout` del App Proxy.
+6. Esa etapa autoenvia, dentro del dominio Tiendanube, el formulario nativo
+   `go_to_checkout`; asi conserva la sesion y obtiene la URL dinamica real del
+   checkout sin mostrar el carrito.
+7. Ante `cart:add:fail`, muestra un mensaje claro y permite volver a la ficha
    de Smile.
 
 ## Experiencia
@@ -54,7 +60,8 @@ ficha nativa ni formulario previo.
 - Boton Smile: construye la solicitud de compra para la variante seleccionada.
 - Route Handler Next.js: valida stock y emite el enlace firmado.
 - App Proxy: recibe y valida la solicitud dentro del dominio Tiendanube.
-- Aplicacion Nube SDK: agrega la variante y navega al checkout.
+- Aplicacion Nube SDK: limpia la sesion, agrega la variante y navega al
+  checkout.
 - Pantalla de error: vuelve a Smile sin exponer detalles internos.
 
 ## Validacion
