@@ -12,34 +12,31 @@ const SECRET = "test-secret-with-at-least-32-characters";
 const APP_SECRET = "test-app-secret-with-at-least-32-characters";
 const STORE_ID = "3759046";
 const ALLOWED_ORIGIN = "https://smiletienda.mitiendanube.com";
+const INTENT_TTL_SECONDS = 600;
 
 function loadCatalogFixtures() {
   const catalog = JSON.parse(readFileSync(CATALOG_PATH, "utf8"));
-  const inStockProduct = catalog.find(
+  const mixedProduct = catalog.find(
     (product) =>
       product.tiendanubeProductId !== null &&
       product.variants.some(
         (variant) =>
           variant.id !== null && variant.available && variant.stock > 0,
-      ),
-  );
-  const outOfStockProduct = catalog.find(
-    (product) =>
-      product.tiendanubeProductId !== null &&
+      ) &&
       product.variants.some(
         (variant) =>
           variant.id !== null && (!variant.available || variant.stock <= 0),
       ),
   );
 
-  if (!inStockProduct || !outOfStockProduct) {
+  if (!mixedProduct) {
     throw new Error("Unable to find catalog fixtures for checkout tests.");
   }
 
-  const inStockVariant = inStockProduct.variants.find(
+  const inStockVariant = mixedProduct.variants.find(
     (variant) => variant.id !== null && variant.available && variant.stock > 0,
   );
-  const outOfStockVariant = outOfStockProduct.variants.find(
+  const outOfStockVariant = mixedProduct.variants.find(
     (variant) => variant.id !== null && (!variant.available || variant.stock <= 0),
   );
 
@@ -49,17 +46,33 @@ function loadCatalogFixtures() {
 
   return {
     inStock: {
-      slug: inStockProduct.slug,
-      productId: inStockProduct.tiendanubeProductId,
+      slug: mixedProduct.slug,
+      productId: mixedProduct.tiendanubeProductId,
       variantId: String(inStockVariant.id),
-      returnPath: `/tienda/productos/${inStockProduct.slug}`,
+      returnPath: `/tienda/productos/${mixedProduct.slug}`,
     },
     outOfStock: {
-      slug: outOfStockProduct.slug,
-      productId: outOfStockProduct.tiendanubeProductId,
+      slug: mixedProduct.slug,
+      productId: mixedProduct.tiendanubeProductId,
       variantId: String(outOfStockVariant.id),
     },
   };
+}
+
+function buildIntentFixture({ productId, variantId, returnPath }) {
+  return {
+    productId,
+    variantId,
+    returnPath,
+    exp: Math.floor(Date.now() / 1000) + INTENT_TTL_SECONDS,
+  };
+}
+
+function createFreshIntent(productId, variantId, returnPath) {
+  return createPurchaseIntent(
+    buildIntentFixture({ productId, variantId, returnPath }),
+    SECRET,
+  );
 }
 
 function makeSignature(secret, storeId, customerId, requestId) {
@@ -113,19 +126,31 @@ async function waitForServer(baseUrl, child) {
   throw lastError ?? new Error("Timed out waiting for Next dev server.");
 }
 
-async function withNextDev(extraEnv, run) {
+async function withNextDev(extraEnv = {}, run) {
   const port = await getFreePort();
   const env = {
     ...process.env,
     NEXT_TELEMETRY_DISABLED: "1",
   };
 
-  if (extraEnv.PURCHASE_INTENT_SECRET !== undefined) {
-    env.PURCHASE_INTENT_SECRET = extraEnv.PURCHASE_INTENT_SECRET;
+  if (Object.hasOwn(extraEnv, "PURCHASE_INTENT_SECRET")) {
+    if (extraEnv.PURCHASE_INTENT_SECRET === undefined) {
+      delete env.PURCHASE_INTENT_SECRET;
+    } else {
+      env.PURCHASE_INTENT_SECRET = extraEnv.PURCHASE_INTENT_SECRET;
+    }
+  } else {
+    delete env.PURCHASE_INTENT_SECRET;
   }
 
-  if (extraEnv.TIENDANUBE_APP_SECRET !== undefined) {
-    env.TIENDANUBE_APP_SECRET = extraEnv.TIENDANUBE_APP_SECRET;
+  if (Object.hasOwn(extraEnv, "TIENDANUBE_APP_SECRET")) {
+    if (extraEnv.TIENDANUBE_APP_SECRET === undefined) {
+      delete env.TIENDANUBE_APP_SECRET;
+    } else {
+      env.TIENDANUBE_APP_SECRET = extraEnv.TIENDANUBE_APP_SECRET;
+    }
+  } else {
+    delete env.TIENDANUBE_APP_SECRET;
   }
 
   const child = spawn(
@@ -137,6 +162,12 @@ async function withNextDev(extraEnv, run) {
       stdio: ["ignore", "pipe", "pipe"],
     },
   );
+  const childExit = new Promise((resolve, reject) => {
+    child.once("error", reject);
+    child.once("exit", (code, signal) => {
+      resolve({ code, signal });
+    });
+  });
 
   let stderr = "";
   child.stderr.on("data", (chunk) => {
@@ -148,22 +179,29 @@ async function withNextDev(extraEnv, run) {
     await waitForServer(baseUrl, child);
     return await run(baseUrl);
   } finally {
-    child.kill("SIGTERM");
-    await new Promise((resolve) => child.once("exit", resolve));
+    if (child.exitCode === null && child.signalCode === null) {
+      child.kill("SIGTERM");
+    }
+    await childExit;
     if (child.exitCode !== 0 && child.exitCode !== null && stderr) {
       process.stderr.write(stderr);
     }
   }
 }
 
-function proxyHeaders({ customerId, requestId, secret = APP_SECRET }) {
+function proxyHeaders({
+  customerId,
+  requestId,
+  secret = APP_SECRET,
+  storeId = STORE_ID,
+} = {}) {
   return {
-    "x-store-id": STORE_ID,
+    "x-store-id": storeId,
     ...(customerId === undefined ? {} : { "x-customer-id": customerId }),
     ...(requestId === undefined ? {} : { "x-request-id": requestId }),
     "x-linkedstore-hmac-sha256": makeSignature(
       secret,
-      STORE_ID,
+      storeId,
       customerId ?? "",
       requestId ?? "",
     ),
@@ -257,14 +295,10 @@ test("POST /api/checkout/tiendanube rejects out-of-stock variants", async () => 
 
 test("GET /api/checkout/tiendanube/resolve enforces origin, secret, and intent validity", async () => {
   const fixtures = loadCatalogFixtures();
-  const intent = createPurchaseIntent(
-    {
-      productId: fixtures.inStock.productId,
-      variantId: Number(fixtures.inStock.variantId),
-      returnPath: fixtures.inStock.returnPath,
-      exp: 2_000_000_000,
-    },
-    SECRET,
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
   );
 
   await withNextDev(
@@ -273,6 +307,19 @@ test("GET /api/checkout/tiendanube/resolve enforces origin, secret, and intent v
       TIENDANUBE_APP_SECRET: APP_SECRET,
     },
     async (baseUrl) => {
+      const forbiddenOriginResponse = await fetch(
+        `${baseUrl}/api/checkout/tiendanube/resolve?intent=${encodeURIComponent(intent)}`,
+        {
+          headers: { origin: "https://evil.test" },
+        },
+      );
+      assert.equal(forbiddenOriginResponse.status, 403);
+      assert.equal(
+        forbiddenOriginResponse.headers.get("access-control-allow-origin"),
+        null,
+      );
+      assert.equal(forbiddenOriginResponse.headers.get("cache-control"), "no-store");
+
       const missingIntentResponse = await fetch(
         `${baseUrl}/api/checkout/tiendanube/resolve`,
         {
@@ -314,9 +361,7 @@ test("GET /api/checkout/tiendanube/resolve enforces origin, secret, and intent v
 
 test("GET /api/checkout/tiendanube/resolve returns 500 when the intent secret is missing", async () => {
   await withNextDev(
-    {
-      TIENDANUBE_APP_SECRET: APP_SECRET,
-    },
+    { TIENDANUBE_APP_SECRET: APP_SECRET },
     async (baseUrl) => {
       const response = await fetch(
         `${baseUrl}/api/checkout/tiendanube/resolve?intent=abc`,
@@ -330,16 +375,34 @@ test("GET /api/checkout/tiendanube/resolve returns 500 when the intent secret is
   );
 });
 
+test("POST /api/checkout/tiendanube returns 500 when the child omits PURCHASE_INTENT_SECRET", async () => {
+  const fixtures = loadCatalogFixtures();
+
+  await withNextDev(
+    { TIENDANUBE_APP_SECRET: APP_SECRET },
+    async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/api/checkout/tiendanube`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          slug: fixtures.inStock.slug,
+          variantId: fixtures.inStock.variantId,
+        }),
+      });
+
+      assert.equal(response.status, 500);
+    },
+  );
+});
+
 test("GET /api/tiendanube/proxy/start honors HMAC, optional customer id, and HTML headers", async () => {
   const fixtures = loadCatalogFixtures();
-  const intent = createPurchaseIntent(
-    {
-      productId: fixtures.inStock.productId,
-      variantId: Number(fixtures.inStock.variantId),
-      returnPath: fixtures.inStock.returnPath,
-      exp: 2_000_000_000,
-    },
-    SECRET,
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
   );
 
   await withNextDev(
@@ -368,16 +431,100 @@ test("GET /api/tiendanube/proxy/start honors HMAC, optional customer id, and HTM
   );
 });
 
+test("GET /api/tiendanube/proxy/start returns 403 when the child omits TIENDANUBE_APP_SECRET", async () => {
+  const fixtures = loadCatalogFixtures();
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
+  );
+
+  await withNextDev(
+    { PURCHASE_INTENT_SECRET: SECRET },
+    async (baseUrl) => {
+      const response = await fetch(
+        `${baseUrl}/api/tiendanube/proxy/start?intent=${encodeURIComponent(intent)}`,
+        {
+          headers: proxyHeaders({
+            requestId: "req-1",
+          }),
+        },
+      );
+
+      assert.equal(response.status, 403);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+    },
+  );
+});
+
+test("GET /api/tiendanube/proxy/start rejects an invalid HMAC", async () => {
+  const fixtures = loadCatalogFixtures();
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
+  );
+
+  await withNextDev(
+    {
+      PURCHASE_INTENT_SECRET: SECRET,
+      TIENDANUBE_APP_SECRET: APP_SECRET,
+    },
+    async (baseUrl) => {
+      const response = await fetch(
+        `${baseUrl}/api/tiendanube/proxy/start?intent=${encodeURIComponent(intent)}`,
+        {
+          headers: proxyHeaders({
+            requestId: "req-1",
+            secret: "wrong-app-secret-with-at-least-32-characters",
+          }),
+        },
+      );
+
+      assert.equal(response.status, 403);
+      assert.equal(response.headers.get("access-control-allow-origin"), null);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+    },
+  );
+});
+
+test("GET /api/tiendanube/proxy/start rejects an incorrect store id", async () => {
+  const fixtures = loadCatalogFixtures();
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
+  );
+
+  await withNextDev(
+    {
+      PURCHASE_INTENT_SECRET: SECRET,
+      TIENDANUBE_APP_SECRET: APP_SECRET,
+    },
+    async (baseUrl) => {
+      const response = await fetch(
+        `${baseUrl}/api/tiendanube/proxy/start?intent=${encodeURIComponent(intent)}`,
+        {
+          headers: proxyHeaders({
+            requestId: "req-1",
+            storeId: "0000000",
+          }),
+        },
+      );
+
+      assert.equal(response.status, 403);
+      assert.equal(response.headers.get("access-control-allow-origin"), null);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+    },
+  );
+});
+
 test("GET /api/tiendanube/proxy/checkout submits the checkout form", async () => {
   const fixtures = loadCatalogFixtures();
-  const intent = createPurchaseIntent(
-    {
-      productId: fixtures.inStock.productId,
-      variantId: Number(fixtures.inStock.variantId),
-      returnPath: fixtures.inStock.returnPath,
-      exp: 2_000_000_000,
-    },
-    SECRET,
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
   );
 
   await withNextDev(
@@ -408,14 +555,10 @@ test("GET /api/tiendanube/proxy/checkout submits the checkout form", async () =>
 });
 
 test("GET /api/tiendanube/proxy/error escapes the return path", async () => {
-  const intent = createPurchaseIntent(
-    {
-      productId: 299935919,
-      variantId: 1338048150,
-      returnPath: '/tienda/productos/fake" autofocus onfocus="alert(1)',
-      exp: 2_000_000_000,
-    },
-    SECRET,
+  const intent = createFreshIntent(
+    299935919,
+    1338048150,
+    '/tienda/productos/fake" autofocus onfocus="alert(1)',
   );
 
   await withNextDev(
@@ -445,14 +588,10 @@ test("GET /api/tiendanube/proxy/error escapes the return path", async () => {
 
 test("GET /api/tiendanube/proxy/start rejects a missing X-Request-Id header", async () => {
   const fixtures = loadCatalogFixtures();
-  const intent = createPurchaseIntent(
-    {
-      productId: fixtures.inStock.productId,
-      variantId: Number(fixtures.inStock.variantId),
-      returnPath: fixtures.inStock.returnPath,
-      exp: 2_000_000_000,
-    },
-    SECRET,
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
   );
 
   await withNextDev(
@@ -478,14 +617,10 @@ test("GET /api/tiendanube/proxy/start rejects a missing X-Request-Id header", as
 
 test("GET /api/tiendanube/proxy/checkout rejects multi-segment stages", async () => {
   const fixtures = loadCatalogFixtures();
-  const intent = createPurchaseIntent(
-    {
-      productId: fixtures.inStock.productId,
-      variantId: Number(fixtures.inStock.variantId),
-      returnPath: fixtures.inStock.returnPath,
-      exp: 2_000_000_000,
-    },
-    SECRET,
+  const intent = createFreshIntent(
+    fixtures.inStock.productId,
+    Number(fixtures.inStock.variantId),
+    fixtures.inStock.returnPath,
   );
 
   await withNextDev(
