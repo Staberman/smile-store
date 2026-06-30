@@ -19,10 +19,17 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
   }
 
-  const intent = request.nextUrl.searchParams.get("intent");
   const secret = process.env.PURCHASE_INTENT_SECRET;
+  if (!secret) {
+    return NextResponse.json(
+      { error: "Missing purchase intent secret." },
+      { status: 500, headers: corsHeaders() },
+    );
+  }
 
-  if (!intent || !secret) {
+  const intent = request.nextUrl.searchParams.get("intent");
+
+  if (!intent) {
     return NextResponse.json(
       { error: "Invalid purchase intent." },
       { status: 400, headers: corsHeaders() },

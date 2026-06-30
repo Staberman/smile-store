@@ -20,7 +20,17 @@ function serverError(message: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const formData = await request.formData();
+  let formData: FormData;
+
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json(
+      { error: "Unsupported form payload." },
+      { status: 415 },
+    );
+  }
+
   const slug = readFormString(formData, "slug");
   const variantId = readFormString(formData, "variantId");
 

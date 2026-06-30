@@ -18,6 +18,15 @@ function htmlResponse(body: string, status = 200) {
   });
 }
 
+function noStoreResponse(body: string, status: number) {
+  return new Response(body, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -35,15 +44,21 @@ function verifyProxyRequest(request: NextRequest) {
   const secret = process.env.TIENDANUBE_APP_SECRET;
   const storeId = request.headers.get("x-store-id");
   const customerId = request.headers.get("x-customer-id") ?? "";
-  const requestId = request.headers.get("x-request-id") ?? "";
+  const requestIdHeader = request.headers.get("x-request-id");
   const signature = request.headers.get("x-linkedstore-hmac-sha256");
 
-  if (!secret || storeId !== EXPECTED_STORE_ID || !signature || !isValidHexSignature(signature)) {
+  if (
+    !secret ||
+    storeId !== EXPECTED_STORE_ID ||
+    !requestIdHeader ||
+    !signature ||
+    !isValidHexSignature(signature)
+  ) {
     return false;
   }
 
   const expected = createHmac("sha256", secret)
-    .update(`${storeId}${customerId}${requestId}`)
+    .update(`${storeId}${customerId}${requestIdHeader}`)
     .digest();
   const received = Buffer.from(signature, "hex");
 
@@ -54,7 +69,11 @@ function verifyProxyRequest(request: NextRequest) {
 }
 
 function getStage(params: { stage?: string[] }) {
-  return params.stage?.[0] ?? "";
+  if (!params.stage || params.stage.length !== 1) {
+    return null;
+  }
+
+  return params.stage[0] ?? null;
 }
 
 function getValidatedIntent(request: NextRequest) {
@@ -77,10 +96,14 @@ export async function GET(
   { params }: { params: { stage?: string[] } },
 ) {
   if (!verifyProxyRequest(request)) {
-    return new Response("Forbidden", { status: 403 });
+    return noStoreResponse("Forbidden", 403);
   }
 
   const stage = getStage(params);
+
+  if (!stage) {
+    return noStoreResponse("Not found", 404);
+  }
 
   if (stage === "start") {
     return htmlResponse("<main><p>Preparando tu compra...</p></main>");
@@ -122,5 +145,5 @@ export async function GET(
 </html>`);
   }
 
-  return new Response("Not found", { status: 404 });
+  return noStoreResponse("Not found", 404);
 }
