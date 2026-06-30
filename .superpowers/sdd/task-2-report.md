@@ -1,64 +1,56 @@
-Status: DONE_WITH_CONCERNS
+# Task 2 Report
 
-Commit hash(es):
-- `0a04bf8` - `feat: import tiendanube catalog data`
+Estado: DONE
 
-Files changed:
-- scripts/tiendanube/import-catalog.mjs
-- data/tiendanube-catalog.json
-- data/tiendanube-import-summary.json
-- .superpowers/sdd/task-2-report.md
+Archivos:
+- `/Users/lautaroantunez/dev/smile-store/.worktrees/codex-tiendanube-catalog-migration/lib/checkout/purchase-intent.mjs`
+- `/Users/lautaroantunez/dev/smile-store/.worktrees/codex-tiendanube-catalog-migration/lib/checkout/purchase-intent.d.ts`
+- `/Users/lautaroantunez/dev/smile-store/.worktrees/codex-tiendanube-catalog-migration/scripts/tiendanube/purchase-intent.test.mjs`
 
-Tests/commands run with exact command and result:
-- `node --test scripts/tiendanube/catalog-utils.test.mjs` -> PASS (7 tests passed, 0 failed)
-- `node --check scripts/tiendanube/import-catalog.mjs` -> PASS
-- `node scripts/tiendanube/import-catalog.mjs` -> PASS (`Imported 178 visible products`, `Scrape errors: 0`)
-- `node -e 'const s=require("./data/tiendanube-import-summary.json"); console.log(JSON.stringify({visibleProductsImported:s.visibleProductsImported,productsWithPageData:s.productsWithPageData,productsWithScrapeErrors:s.productsWithScrapeErrors,scrapeErrors:s.scrapeErrors.length,productsWithVariants:s.productsWithVariants,productsWithoutImages:s.productsWithoutImages.length}, null, 2));'` -> PASS (`178 imported`, `178 with page data`, `0 scrape errors`, `178 with variants`, `0 without images`)
-- `node - <<'NODE' ... protocol/image verification ... NODE` -> PASS (`nonHttpsProductImages: 0`, `nonHttpsVariantImages: 0`)
-- `node - <<'NODE' ... variant id verification ... NODE` -> PASS (`noVariantIds: 0`, `emptyVariants: 0`)
-- `node - <<'NODE' ... source quality check ... NODE` -> PASS WITH CONCERNS (`emptyDescriptions: 25`, `blankBrands: 46`)
+Commit:
+- `0ee6c8f` `feat: sign Tiendanube purchase intents`
 
-Import summary numbers:
-- CSV rows read: 444
-- Visible products imported: 178
-- Products with page data: 178
-- Products with scrape errors: 0
-- Products with variants: 178
-- Products without images: 0
+Evidencia RED:
+- Comando: `node --test scripts/tiendanube/purchase-intent.test.mjs`
+- Resultado: falla con `ERR_MODULE_NOT_FOUND` al importar `../../lib/checkout/purchase-intent.mjs`, confirmando que la prueba apuntaba al módulo faltante.
 
-Self-review notes:
-- Used `new TextDecoder("windows-1252").decode(buffer)` for CSV decoding per project constraint.
-- Kept the importer scoped to the owned files and reused Task 1 helpers for prices, category parsing, protocol normalization, HTML-to-text conversion, and JSON assignment extraction.
-- Added local parsing in the importer for `LS.product` because Tiendanube emits it as a JS object literal rather than strict JSON.
-- Extracted gallery images from public markup so products keep full image sets, not just one image per variant.
-- Preserved out-of-stock variants and marked them unavailable instead of dropping them.
-- Removed malformed embedded base64 description images and normalized protocol-relative/image URLs to HTTPS.
+Comandos GREEN:
+- `node --test scripts/tiendanube/purchase-intent.test.mjs`
+- Resultado: 2 pruebas pasaron, 0 fallas.
+- `npm run test:catalog`
+- Resultado: 23 pruebas pasaron, 0 fallas.
 
-Concerns, if any:
-- 25 imported products ended up with empty `descriptionText` after stripping malformed embedded base64 image payloads from the source CSV descriptions.
-- 46 imported products still have blank `brand` because both the CSV export and the public Tiendanube page expose no brand value for them.
+Self-review:
+- El token se construye como `base64url(JSON) + "." + HMAC-SHA256`, como pide el brief.
+- La verificación usa `timingSafeEqual` y corta tokens mayores a 2 KB antes de procesar firma o payload.
+- `createPurchaseIntent` rechaza secretos cortos y `returnPath` fuera de `/tienda/`.
+- La API pública en `.d.ts` coincide con el contrato esperado.
 
----
+Preocupaciones:
+- Ninguna relevante para esta tarea.
 
-Status: FIXED
+## Correcciones de revision
 
-Review findings addressed:
-- Added `resolveBrand()` / `inferBrandFromTokens()` so brand resolution now prefers CSV `Marca`, then `pageData.product.brand`, then recognized category/name tokens.
-- Added direct token coverage for the requested inferable brands: Tommy Hilfiger, Invicta, OMEGA x Swatch, Ray Ban, Prada, Gucci, Saint Laurent, Louis Vuitton, Versace, Christian Dior, Balenciaga, Cartier, Fendi, Dolce&Gabbana, Celine Paris, and Off-White.
-- Narrowed Ray Ban fallback with model-family tokens used by the blank-brand products in this catalog.
-- Normalized variant promotional price handling so `0`, `null`, and `undefined` no longer suppress CSV `Precio promocional`; missing promo now serializes as `null`.
-- Regenerated `data/tiendanube-catalog.json` and `data/tiendanube-import-summary.json` from the importer after the logic changes.
+Estado: DONE
 
-Commands run:
-- `node --check scripts/tiendanube/import-catalog.mjs` -> PASS
-- `node scripts/tiendanube/import-catalog.mjs` -> PASS (`Imported 178 visible products`, `Scrape errors: 0`)
-- `node - <<'NODE' ... post-fix counts ... NODE` -> PASS (`products: 178`, `blankBrands: 0`, `zeroVariantPromo: 0`)
+Evidencia RED:
+- Comando: `node --test scripts/tiendanube/purchase-intent.test.mjs`
+- Resultado: 2 pruebas pasaron y 2 fallaron con `Missing expected exception`.
+- Fallas esperadas: `rejects purchase intents larger than 2 KB when creating` y `rejects non-canonical base64url segments`.
 
-Post-fix counts:
-- Visible products imported: 178
-- Blank brands: 0
-- Variants with `promotionalPrice === 0`: 0
-- Variants with `promotionalPrice === null`: 165
+Comandos GREEN:
+- `node --test scripts/tiendanube/purchase-intent.test.mjs`
+- Resultado: 4 pruebas pasaron, 0 fallas.
+- `npm run test:catalog`
+- Resultado: 25 pruebas pasaron, 0 fallas.
+- `git diff --check`
+- Resultado: sin errores.
 
-Concerns, if any:
-- 25 imported products still end up with empty `descriptionText` after stripping malformed embedded base64 image payloads from the source CSV descriptions; this fix did not change description sourcing.
+Self-review:
+- `createPurchaseIntent` mide el token final codificado y rechaza cualquier resultado mayor a 2048 bytes.
+- Ambos segmentos se validan contra el alfabeto base64url sin padding y mediante una recodificacion exacta, lo que tambien rechaza representaciones con bits finales no canonicos.
+- Las pruebas cubren firmas con `=` y `!`, y un payload con `!` firmado de nuevo para comprobar que la validacion estricta no depende de una firma invalida.
+- La comparacion criptografica conserva `timingSafeEqual`.
+
+Preocupaciones:
+- Ninguna relevante.

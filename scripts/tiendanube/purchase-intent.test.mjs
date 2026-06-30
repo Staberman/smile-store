@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
 import test from "node:test";
 import {
   createPurchaseIntent,
@@ -24,5 +25,38 @@ test("rejects tampered, expired, and external return paths", () => {
   assert.throws(() => verifyPurchaseIntent(token, secret, 2_001), /expired/i);
   assert.throws(() =>
     createPurchaseIntent({ ...payload, returnPath: "https://evil.test" }, secret),
+  );
+});
+
+test("rejects purchase intents larger than 2 KB when creating", () => {
+  assert.throws(() =>
+    createPurchaseIntent(
+      { ...payload, returnPath: `/tienda/${"a".repeat(2_048)}` },
+      secret,
+    ),
+  );
+});
+
+test("rejects non-canonical base64url segments", () => {
+  const token = createPurchaseIntent(payload, secret);
+  const [payloadSegment, signatureSegment] = token.split(".");
+
+  assert.throws(() =>
+    verifyPurchaseIntent(`${payloadSegment}.${signatureSegment}=`, secret, 1_999),
+  );
+  assert.throws(() =>
+    verifyPurchaseIntent(`${payloadSegment}.${signatureSegment}!`, secret, 1_999),
+  );
+
+  const nonCanonicalPayloadSegment = `${payloadSegment}!`;
+  const resignedSignature = createHmac("sha256", secret)
+    .update(nonCanonicalPayloadSegment)
+    .digest("base64url");
+  assert.throws(() =>
+    verifyPurchaseIntent(
+      `${nonCanonicalPayloadSegment}.${resignedSignature}`,
+      secret,
+      1_999,
+    ),
   );
 });
