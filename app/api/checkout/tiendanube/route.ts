@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createDraftCheckout } from "@/lib/checkout/draft-checkout.mjs";
 import { createPurchaseIntent } from "@/lib/checkout/purchase-intent.mjs";
 import { getProductBySlug } from "@/lib/catalog";
 
@@ -15,8 +16,11 @@ function badRequest(message: string) {
   return NextResponse.json({ error: message }, { status: 400 });
 }
 
-function serverError(message: string) {
-  return NextResponse.json({ error: message }, { status: 500 });
+function serverError(message: string, status = 500) {
+  return NextResponse.json(
+    { error: message },
+    { status, headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -55,14 +59,33 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Variant is out of stock." }, { status: 409 });
   }
 
-  const secret = process.env.PURCHASE_INTENT_SECRET;
-  if (!secret) {
-    return serverError("Missing purchase intent secret.");
-  }
-
   const numericVariantId = Number(variant.id);
   if (!Number.isInteger(numericVariantId) || numericVariantId <= 0) {
     return badRequest("Variant identifier is invalid.");
+  }
+
+  if (process.env.TIENDANUBE_CHECKOUT_MODE !== "proxy") {
+    const accessToken = process.env.TIENDANUBE_ACCESS_TOKEN;
+    const storeId = process.env.TIENDANUBE_STORE_ID;
+    if (!accessToken || !storeId) {
+      return serverError("Missing Tiendanube checkout configuration.");
+    }
+
+    try {
+      const checkoutUrl = await createDraftCheckout({
+        accessToken,
+        storeId,
+        variantId: numericVariantId,
+      });
+      return NextResponse.redirect(checkoutUrl, { status: 303 });
+    } catch {
+      return serverError("Unable to create Tiendanube checkout.", 502);
+    }
+  }
+
+  const secret = process.env.PURCHASE_INTENT_SECRET;
+  if (!secret) {
+    return serverError("Missing purchase intent secret.");
   }
 
   const intent = createPurchaseIntent(

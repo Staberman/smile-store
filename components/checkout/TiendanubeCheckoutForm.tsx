@@ -18,7 +18,6 @@ export default function TiendanubeCheckoutForm({
   label = "Comprar ahora",
   className = "",
 }: Props) {
-  const options = variant?.options ?? [];
   const canBuy =
     !disabled &&
     product.tiendanubeProductId !== null &&
@@ -29,24 +28,11 @@ export default function TiendanubeCheckoutForm({
   return (
     <form
       method="post"
-      action="https://smiletienda.mitiendanube.com/comprar/"
+      action="/api/checkout/tiendanube"
       className={className}
     >
-      <input
-        type="hidden"
-        name="add_to_cart"
-        value={product.tiendanubeProductId ?? ""}
-      />
-      <input type="hidden" name="quantity" value="1" />
-      <input type="hidden" name="go_to_checkout" value="1" />
-      {options.map((option, index) => (
-        <input
-          key={`${option}-${index}`}
-          type="hidden"
-          name={`variation[${index}]`}
-          value={option}
-        />
-      ))}
+      <input type="hidden" name="slug" value={product.slug} />
+      <input type="hidden" name="variantId" value={variant?.id ?? ""} />
       <button
         type="submit"
         disabled={!canBuy}

@@ -131,6 +131,7 @@ async function withNextDev(extraEnv = {}, run) {
   const env = {
     ...process.env,
     NEXT_TELEMETRY_DISABLED: "1",
+    TIENDANUBE_CHECKOUT_MODE: "proxy",
   };
 
   if (Object.hasOwn(extraEnv, "PURCHASE_INTENT_SECRET")) {
