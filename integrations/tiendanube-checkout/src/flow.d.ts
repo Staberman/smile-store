@@ -4,6 +4,13 @@ export type CartItemReference = {
   quantity: number;
 };
 
+export type CartAddEventState = {
+  cart: {
+    items: CartItemReference[];
+  };
+  eventPayload?: unknown;
+};
+
 export type CheckoutBridge = {
   resolveIntent(intent: string): Promise<{
     productId: number;
@@ -13,8 +20,8 @@ export type CheckoutBridge = {
   clearCart(): Promise<void>;
   on(
     event: "cart:add:success" | "cart:add:fail",
-    handler: (items: CartItemReference[]) => void,
-  ): void;
+    handler: (state: CartAddEventState) => void,
+  ): () => void;
   sendAdd(item: CartItemReference & { quantity: 1 }): void;
   navigate(path: string): void;
 };
@@ -42,6 +49,7 @@ export type CartEventSDK = {
 export function startCheckoutFlow(
   location: CheckoutLocation,
   bridge: CheckoutBridge,
+  timeoutMs?: number,
 ): Promise<void>;
 
 export function removeAllCartItems(

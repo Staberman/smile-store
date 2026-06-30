@@ -5,11 +5,44 @@ import {
   startCheckoutFlow,
 } from "./flow.mjs";
 
+function createListenerRegistry() {
+  const listeners = new Map();
+  const offCalls = [];
+
+  return {
+    listeners,
+    offCalls,
+    on(event, handler) {
+      const next = [...(listeners.get(event) ?? []), handler];
+      listeners.set(event, next);
+      return () => {
+        offCalls.push([event, handler]);
+        const remaining = (listeners.get(event) ?? []).filter(
+          (candidate) => candidate !== handler,
+        );
+        if (remaining.length === 0) {
+          listeners.delete(event);
+        } else {
+          listeners.set(event, remaining);
+        }
+      };
+    },
+    emit(event, payload) {
+      for (const handler of listeners.get(event) ?? []) {
+        handler(payload);
+      }
+    },
+    count(event) {
+      return listeners.get(event)?.length ?? 0;
+    },
+  };
+}
+
 function createBridge({
   resolved = { productId: 321, variantId: 123, quantity: 1 },
   clearError,
 } = {}) {
-  const listeners = new Map();
+  const registry = createListenerRegistry();
   const calls = [];
   const sentEvents = [];
   const navigations = [];
@@ -17,8 +50,11 @@ function createBridge({
   return {
     calls,
     sentEvents,
-    listeners,
+    listeners: registry.listeners,
+    offCalls: registry.offCalls,
     navigations,
+    emit: registry.emit,
+    listenerCount: registry.count,
     bridge: {
       async resolveIntent(intent) {
         calls.push(["resolve", intent]);
@@ -30,7 +66,7 @@ function createBridge({
       },
       on(event, handler) {
         calls.push(["on", event]);
-        listeners.set(event, handler);
+        return registry.on(event, handler);
       },
       sendAdd(item) {
         calls.push(["add", item]);
@@ -85,26 +121,51 @@ test("navigates to checkout only after matching cart:add:success", async () => {
   await startCheckoutFlow(startLocation("intent-success"), fake.bridge);
   assert.deepEqual(fake.navigations, []);
 
-  fake.listeners.get("cart:add:success")([
-    { product_id: 321, variant_id: 123, quantity: 1 },
-  ]);
+  fake.emit("cart:add:success", {
+    cart: {
+      items: [{ product_id: 321, variant_id: 123, quantity: 1 }],
+    },
+    eventPayload: { product_id: 321, variant_id: 123, quantity: 1 },
+  });
 
   assert.deepEqual(fake.navigations, [
     "/apps/smile-comprar/checkout?intent=intent-success",
   ]);
 });
 
-test("fails when the resulting cart is not exactly the selected variant", async () => {
+test("ignores foreign cart:add:success events and cleans up after the match", async () => {
   const fake = createBridge();
 
   await startCheckoutFlow(startLocation("intent-mismatch"), fake.bridge);
-  fake.listeners.get("cart:add:success")([
-    { product_id: 321, variant_id: 123, quantity: 1 },
-    { product_id: 999, variant_id: 888, quantity: 1 },
-  ]);
+  fake.emit("cart:add:success", {
+    cart: {
+      items: [{ product_id: 999, variant_id: 888, quantity: 1 }],
+    },
+    eventPayload: { product_id: 999, variant_id: 888, quantity: 1 },
+  });
+
+  assert.deepEqual(fake.navigations, []);
+
+  fake.emit("cart:add:success", {
+    cart: {
+      items: [{ product_id: 321, variant_id: 123, quantity: 1 }],
+    },
+    eventPayload: { product_id: 321, variant_id: 123, quantity: 1 },
+  });
 
   assert.deepEqual(fake.navigations, [
-    "/apps/smile-comprar/error?intent=intent-mismatch",
+    "/apps/smile-comprar/checkout?intent=intent-mismatch",
+  ]);
+  assert.equal(fake.offCalls.length, 2);
+  assert.equal(fake.listenerCount("cart:add:success"), 0);
+
+  fake.emit("cart:add:fail", {
+    cart: { items: [] },
+    eventPayload: null,
+  });
+
+  assert.deepEqual(fake.navigations, [
+    "/apps/smile-comprar/checkout?intent=intent-mismatch",
   ]);
 });
 
@@ -112,11 +173,28 @@ test("navigates to error after cart:add:fail", async () => {
   const fake = createBridge();
 
   await startCheckoutFlow(startLocation("intent-add-fail"), fake.bridge);
-  fake.listeners.get("cart:add:fail")([]);
+  fake.emit("cart:add:fail", {
+    cart: { items: [] },
+    eventPayload: null,
+  });
 
   assert.deepEqual(fake.navigations, [
     "/apps/smile-comprar/error?intent=intent-add-fail",
   ]);
+  assert.equal(fake.offCalls.length, 2);
+});
+
+test("navigates to error after cart:add timeout and cleans up listeners", async () => {
+  const fake = createBridge();
+
+  await startCheckoutFlow(startLocation("intent-timeout"), fake.bridge, 10);
+
+  await new Promise((resolve) => setTimeout(resolve, 15));
+
+  assert.deepEqual(fake.navigations, [
+    "/apps/smile-comprar/error?intent=intent-timeout",
+  ]);
+  assert.equal(fake.offCalls.length, 2);
 });
 
 test("navigates to error when clearing the cart fails", async () => {
@@ -127,6 +205,41 @@ test("navigates to error when clearing the cart fails", async () => {
   assert.deepEqual(fake.sentEvents, []);
   assert.deepEqual(fake.navigations, [
     "/apps/smile-comprar/error?intent=intent-remove-fail",
+  ]);
+});
+
+test("allows retry after a failure before cart:add is sent", async () => {
+  const fake = createBridge();
+  let clearAttempts = 0;
+  fake.bridge.clearCart = async () => {
+    clearAttempts += 1;
+    if (clearAttempts === 1) throw new Error("temporary_remove_failure");
+  };
+  const location = startLocation("intent-pre-add-retry");
+
+  await startCheckoutFlow(location, fake.bridge);
+  await startCheckoutFlow(location, fake.bridge);
+
+  assert.equal(clearAttempts, 2);
+  assert.equal(fake.sentEvents.length, 1);
+});
+
+test("navigates to error when a matching add leaves extra cart items", async () => {
+  const fake = createBridge();
+
+  await startCheckoutFlow(startLocation("intent-extra-item"), fake.bridge);
+  fake.emit("cart:add:success", {
+    cart: {
+      items: [
+        { product_id: 321, variant_id: 123, quantity: 1 },
+        { product_id: 999, variant_id: 888, quantity: 1 },
+      ],
+    },
+    eventPayload: { product_id: 321, variant_id: 123, quantity: 1 },
+  });
+
+  assert.deepEqual(fake.navigations, [
+    "/apps/smile-comprar/error?intent=intent-extra-item",
   ]);
 });
 
@@ -155,16 +268,22 @@ test("does not send cart:add twice for the same intent", async () => {
 });
 
 test("removeAllCartItems resolves only when the cart is empty and removes listeners", async () => {
-  const listeners = new Map();
+  const registry = createListenerRegistry();
   const removed = [];
-  const offCalls = [];
   const nube = {
     on(event, handler) {
-      listeners.set(event, handler);
+      return registry.on(event, handler);
     },
     off(event, handler) {
-      offCalls.push([event, handler]);
-      listeners.delete(event);
+      registry.offCalls.push([event, handler]);
+      const remaining = (registry.listeners.get(event) ?? []).filter(
+        (candidate) => candidate !== handler,
+      );
+      if (remaining.length === 0) {
+        registry.listeners.delete(event);
+      } else {
+        registry.listeners.set(event, remaining);
+      }
     },
     send(event, modifier) {
       removed.push({ event, state: modifier() });
@@ -173,9 +292,9 @@ test("removeAllCartItems resolves only when the cart is empty and removes listen
   const items = [{ product_id: 321, variant_id: 123, quantity: 2 }];
 
   const pending = removeAllCartItems(nube, items, 100);
-  listeners.get("cart:remove:success")({ cart: { items } });
-  assert.equal(offCalls.length, 0);
-  listeners.get("cart:remove:success")({ cart: { items: [] } });
+  registry.emit("cart:remove:success", { cart: { items } });
+  assert.equal(registry.offCalls.length, 0);
+  registry.emit("cart:remove:success", { cart: { items: [] } });
   await pending;
 
   assert.deepEqual(removed, [
@@ -188,19 +307,25 @@ test("removeAllCartItems resolves only when the cart is empty and removes listen
       },
     },
   ]);
-  assert.equal(offCalls.length, 2);
+  assert.equal(registry.offCalls.length, 2);
 });
 
 test("removeAllCartItems rejects cart:remove:fail and removes listeners", async () => {
-  const listeners = new Map();
-  const offCalls = [];
+  const registry = createListenerRegistry();
   const nube = {
     on(event, handler) {
-      listeners.set(event, handler);
+      return registry.on(event, handler);
     },
     off(event, handler) {
-      offCalls.push([event, handler]);
-      listeners.delete(event);
+      registry.offCalls.push([event, handler]);
+      const remaining = (registry.listeners.get(event) ?? []).filter(
+        (candidate) => candidate !== handler,
+      );
+      if (remaining.length === 0) {
+        registry.listeners.delete(event);
+      } else {
+        registry.listeners.set(event, remaining);
+      }
     },
     send() {},
   };
@@ -210,22 +335,28 @@ test("removeAllCartItems rejects cart:remove:fail and removes listeners", async 
     [{ product_id: 321, variant_id: 123, quantity: 1 }],
     100,
   );
-  listeners.get("cart:remove:fail")({ cart: { items: [] } });
+  registry.emit("cart:remove:fail", { cart: { items: [] } });
 
   await assert.rejects(pending, /cart_remove_failed/);
-  assert.equal(offCalls.length, 2);
+  assert.equal(registry.offCalls.length, 2);
 });
 
 test("removeAllCartItems rejects after its timeout and removes listeners", async () => {
-  const listeners = new Map();
-  const offCalls = [];
+  const registry = createListenerRegistry();
   const nube = {
     on(event, handler) {
-      listeners.set(event, handler);
+      return registry.on(event, handler);
     },
     off(event, handler) {
-      offCalls.push([event, handler]);
-      listeners.delete(event);
+      registry.offCalls.push([event, handler]);
+      const remaining = (registry.listeners.get(event) ?? []).filter(
+        (candidate) => candidate !== handler,
+      );
+      if (remaining.length === 0) {
+        registry.listeners.delete(event);
+      } else {
+        registry.listeners.set(event, remaining);
+      }
     },
     send() {},
   };
@@ -238,5 +369,5 @@ test("removeAllCartItems rejects after its timeout and removes listeners", async
     ),
     /cart_remove_timeout/,
   );
-  assert.equal(offCalls.length, 2);
+  assert.equal(registry.offCalls.length, 2);
 });

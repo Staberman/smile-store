@@ -1,4 +1,8 @@
-import type { NubeApp, NubeSDK } from "@tiendanube/nube-sdk-types";
+import type {
+  EventListenerMap,
+  NubeApp,
+  NubeSDK,
+} from "@tiendanube/nube-sdk-types";
 import type { CheckoutBridge } from "./flow";
 import {
   removeAllCartItems,
@@ -60,11 +64,20 @@ function runApp(nube: NubeSDK, fetchImpl: FetchImplementation) {
     },
     on: (event, handler) => {
       if (event === "cart:add:success") {
-        nube.on("cart:add:success", ({ cart }) => handler(cart.items));
-        return;
+        const listener: EventListenerMap["cart:add:success"] = ({
+          cart,
+          eventPayload,
+        }) => handler({ cart: { items: cart.items }, eventPayload });
+        nube.on("cart:add:success", listener);
+        return () => nube.off("cart:add:success", listener);
       }
 
-      nube.on("cart:add:fail", ({ cart }) => handler(cart.items));
+      const listener: EventListenerMap["cart:add:fail"] = ({
+        cart,
+        eventPayload,
+      }) => handler({ cart: { items: cart.items }, eventPayload });
+      nube.on("cart:add:fail", listener);
+      return () => nube.off("cart:add:fail", listener);
     },
     sendAdd: (item) => {
       nube.send("cart:add", () => ({ cart: { items: [item] } }));

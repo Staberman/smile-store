@@ -1,4 +1,5 @@
-const startedIntents = new Set();
+const inFlightIntents = new Set();
+const sentIntents = new Set();
 const START_PATH = "/apps/smile-comprar/start";
 
 function destination(stage, intent) {
@@ -25,7 +26,22 @@ function isExpectedCart(items, expected) {
   );
 }
 
-export async function startCheckoutFlow(location, bridge) {
+function payloadMatches(payload, expected) {
+  const items = Array.isArray(payload) ? payload : [payload];
+  return items.some(
+    (item) =>
+      item &&
+      typeof item === "object" &&
+      item.product_id === expected.product_id &&
+      item.variant_id === expected.variant_id,
+  );
+}
+
+export async function startCheckoutFlow(
+  location,
+  bridge,
+  timeoutMs = 8_000,
+) {
   let pathname;
 
   try {
@@ -38,16 +54,33 @@ export async function startCheckoutFlow(location, bridge) {
   }
 
   const intent = location.queries.intent;
-  if (pathname !== START_PATH || !intent || startedIntents.has(intent)) {
+  if (
+    pathname !== START_PATH ||
+    !intent ||
+    inFlightIntents.has(intent) ||
+    sentIntents.has(intent)
+  ) {
     return;
   }
 
-  startedIntents.add(intent);
+  inFlightIntents.add(intent);
   let settled = false;
+  let addSent = false;
+  let timer;
+  let offSuccess = () => {};
+  let offFail = () => {};
+
+  const cleanup = () => {
+    if (timer) clearTimeout(timer);
+    offSuccess();
+    offFail();
+    inFlightIntents.delete(intent);
+  };
 
   const navigateOnce = (stage) => {
     if (settled) return;
     settled = true;
+    cleanup();
     bridge.navigate(destination(stage, intent));
   };
 
@@ -63,14 +96,33 @@ export async function startCheckoutFlow(location, bridge) {
       quantity: 1,
     };
 
-    bridge.on("cart:add:success", (items) => {
-      navigateOnce(isExpectedCart(items, item) ? "checkout" : "error");
+    offSuccess = bridge.on("cart:add:success", (state) => {
+      if (!addSent || !payloadMatches(state.eventPayload, item)) return;
+      navigateOnce(
+        isExpectedCart(state.cart.items, item) ? "checkout" : "error",
+      );
     });
-    bridge.on("cart:add:fail", () => navigateOnce("error"));
+    offFail = bridge.on("cart:add:fail", () => {
+      if (addSent) navigateOnce("error");
+    });
 
     await bridge.clearCart();
-    if (!settled) bridge.sendAdd(item);
+    if (settled) return;
+
+    timer = setTimeout(() => navigateOnce("error"), timeoutMs);
+    timer.unref?.();
+    addSent = true;
+    sentIntents.add(intent);
+
+    try {
+      bridge.sendAdd(item);
+    } catch (error) {
+      addSent = false;
+      sentIntents.delete(intent);
+      throw error;
+    }
   } catch {
+    if (!addSent) sentIntents.delete(intent);
     navigateOnce("error");
   }
 }

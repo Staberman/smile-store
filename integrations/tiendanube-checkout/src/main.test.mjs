@@ -2,13 +2,41 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createApp } from "./main.ts";
 
-function createNube({ cartItems = [], intent }) {
+function createListenerRegistry() {
   const listeners = new Map();
+
+  return {
+    listeners,
+    on(event, handler) {
+      const next = [...(listeners.get(event) ?? []), handler];
+      listeners.set(event, next);
+      return () => {
+        const remaining = (listeners.get(event) ?? []).filter(
+          (candidate) => candidate !== handler,
+        );
+        if (remaining.length === 0) {
+          listeners.delete(event);
+        } else {
+          listeners.set(event, remaining);
+        }
+      };
+    },
+    emit(event, payload) {
+      for (const handler of listeners.get(event) ?? []) {
+        handler(payload);
+      }
+    },
+  };
+}
+
+function createNube({ cartItems = [], intent }) {
+  const registry = createListenerRegistry();
   const sent = [];
   const navigations = [];
 
   return {
-    listeners,
+    listeners: registry.listeners,
+    emit: registry.emit,
     navigations,
     sent,
     nube: {
@@ -29,10 +57,17 @@ function createNube({ cartItems = [], intent }) {
         };
       },
       on(event, handler) {
-        listeners.set(event, handler);
+        return registry.on(event, handler);
       },
       off(event, handler) {
-        if (listeners.get(event) === handler) listeners.delete(event);
+        const remaining = (registry.listeners.get(event) ?? []).filter(
+          (candidate) => candidate !== handler,
+        );
+        if (remaining.length === 0) {
+          registry.listeners.delete(event);
+        } else {
+          registry.listeners.set(event, remaining);
+        }
       },
       send(event, modifier) {
         sent.push({ event, state: modifier() });
@@ -65,10 +100,11 @@ test("App resolves the intent, sends cart:add, and navigates after success", asy
     },
   ]);
 
-  fake.listeners.get("cart:add:success")({
+  fake.emit("cart:add:success", {
     cart: {
       items: [{ product_id: 321, variant_id: 123, quantity: 1 }],
     },
+    eventPayload: { product_id: 321, variant_id: 123, quantity: 1 },
   });
 
   assert.deepEqual(fake.navigations, [
@@ -90,7 +126,7 @@ test("App sends cart:remove before cart:add when the session has old items", asy
   await flush();
 
   assert.equal(fake.sent[0].event, "cart:remove");
-  fake.listeners.get("cart:remove:success")({ cart: { items: [] } });
+  fake.emit("cart:remove:success", { cart: { items: [] } });
   await flush();
 
   assert.equal(fake.sent[1].event, "cart:add");
