@@ -33,21 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Product not available." }, { status: 404 });
   }
 
-  const html = `<!doctype html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Redirigiendo...</title></head>
-<body>
-  <form id="f" method="post" action="${TIENDANUBE_STORE}/comprar/">
-    <input type="hidden" name="add_to_cart" value="${product.tiendanubeProductId}">
-    <input type="hidden" name="quantity" value="1">
-    <input type="hidden" name="go_to_checkout" value="1">
-  </form>
-  <script>document.getElementById("f").submit()</script>
-</body>
-</html>`;
+  const productUrl = `${TIENDANUBE_STORE}/productos/${slug}/`;
 
-  return new Response(html, {
-    status: 200,
-    headers: { "Content-Type": "text/html; charset=utf-8" },
-  });
+  return NextResponse.redirect(productUrl, { status: 303 });
 }
