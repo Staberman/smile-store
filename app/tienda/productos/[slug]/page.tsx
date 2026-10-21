@@ -9,7 +9,7 @@ import {
   getRecommendedProducts,
   hasPurchasableStock,
 } from "@/lib/catalog";
-import { getProductSeo } from "@/lib/product-meta";
+import { getProductDescription, getProductSeo } from "@/lib/product-meta";
 import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import { getProductTrail } from "@/lib/collections";
@@ -78,7 +78,7 @@ export default function ProductPage({ params }: Props) {
         "@type": "Product",
         "@id": `${productLink}#product`,
         name: seo.displayName,
-        description: product.descriptionText,
+        description: getProductDescription(product),
         image: seo.images.map(absoluteUrl),
         brand: {
           "@type": "Brand",

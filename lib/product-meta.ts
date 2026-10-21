@@ -6,6 +6,7 @@ import {
   fitDescription,
   isGenericSeoText,
   listPhrase,
+  normalizeEyewearTerms,
   plainName,
   productDisplayName,
   productPageTitle,
@@ -113,6 +114,15 @@ function describe(product: CatalogProduct, displayName: string, kind: ProductKin
     ],
     extras: ["Checkout seguro de Tiendanube.", "Atención personalizada por WhatsApp."],
   });
+}
+
+/**
+ * Product description as the site shows and emits it (product page, Product
+ * JSON-LD, search index). Applied at read time: the hourly Tiendanube sync
+ * rewrites data/tiendanube-catalog.json, so the stored copy is left as is.
+ */
+export function getProductDescription(product: Pick<CatalogProduct, "descriptionText">): string {
+  return normalizeEyewearTerms(product.descriptionText);
 }
 
 export function getProductSeo(product: CatalogProduct): ProductSeo {

@@ -1,11 +1,12 @@
 import type { CatalogProduct, CatalogVariant } from "./catalog";
 import { toStorefrontProductUrl } from "./checkout/storefront";
+import { getProductDescription } from "./product-meta";
 
 // Slim product DTOs for client components. Everything passed from a server
 // component to a client component is serialized into the page's RSC payload,
 // so client components receive these instead of full catalog products (which
 // carry descriptionHtml, SEO copy and import metadata they never render).
-// This module only imports types: it must stay free of the catalog data.
+// This module only imports catalog types: it must stay free of the catalog data.
 
 /** Variant fields the storefront UI reads: selection label, price, stock, image. */
 export type ProductSummaryVariant = Pick<
@@ -85,7 +86,7 @@ function getGenders(tags: string[]): ProductGender[] {
 export function getExtendedSearchText(product: CatalogProduct): string {
   return [
     ...product.tags,
-    product.descriptionText,
+    getProductDescription(product),
     product.seoTitle,
     product.seoDescription,
   ].join(" ");
@@ -127,7 +128,7 @@ export function toProductDetail(
     name: display.name ?? product.name,
     brand: display.brand ?? product.brand,
     categories: product.categories,
-    descriptionText: product.descriptionText,
+    descriptionText: getProductDescription(product),
     price: product.price,
     promotionalPrice: product.promotionalPrice,
     images: display.images ?? product.images,

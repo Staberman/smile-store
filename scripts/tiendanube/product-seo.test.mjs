@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import test from "node:test";
 import {
   MAX_TITLE_LENGTH,
@@ -64,6 +66,51 @@ test("Tiendanube default SEO copy is treated as generic", () => {
     false,
   );
   assert.equal(normalizeEyewearTerms("Gafas de sol Fendi"), "Anteojos de sol Fendi");
+});
+
+test("eyewear terms read 'anteojos' in any casing and number", () => {
+  assert.equal(normalizeEyewearTerms("gafas de sol"), "anteojos de sol");
+  assert.equal(normalizeEyewearTerms("GAFAS DE SOL"), "ANTEOJOS DE SOL");
+  assert.equal(normalizeEyewearTerms("Gafas"), "Anteojos");
+  assert.equal(normalizeEyewearTerms("una gafa deportiva"), "un anteojo deportivo");
+  assert.equal(normalizeEyewearTerms("Gafa"), "Anteojo");
+});
+
+test("words that agree with 'gafas' switch to the masculine", () => {
+  assert.equal(
+    normalizeEyewearTerms("Encuentra tus gafas de sol favoritas en Argentina."),
+    "Encuentra tus anteojos de sol favoritos en Argentina.",
+  );
+  assert.equal(
+    normalizeEyewearTerms("Con un diseño audaz, estas gafas de sol unisex combinan"),
+    "Con un diseño audaz, estos anteojos de sol unisex combinan",
+  );
+  assert.equal(normalizeEyewearTerms("Las Gafas CA002 representan"), "Los Anteojos CA002 representan");
+  assert.equal(normalizeEyewearTerms("todas las gafas polarizadas"), "todos los anteojos polarizados");
+  assert.equal(normalizeEyewearTerms("GAFAS DE SOL POLARIZADAS"), "ANTEOJOS DE SOL POLARIZADOS");
+  // A model code glued to the noun is split off.
+  assert.equal(normalizeEyewearTerms("Las GafasCD016 representan"), "Los Anteojos CD016 representan");
+});
+
+test("eyewear normalization leaves unrelated words alone", () => {
+  const text = "gafapasta, Agafay y garrafas; las gafas para todos; la nada; ideales.";
+  assert.equal(
+    normalizeEyewearTerms(text),
+    "gafapasta, Agafay y garrafas; los anteojos para todos; la nada; ideales.",
+  );
+  assert.equal(normalizeEyewearTerms("Los anteojos de sol Ray-Ban"), "Los anteojos de sol Ray-Ban");
+  const once = normalizeEyewearTerms("Encuentra tus gafas favoritas");
+  assert.equal(normalizeEyewearTerms(once), once);
+});
+
+test("no catalog description says 'gafas' once normalized", () => {
+  const catalog = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "data/tiendanube-catalog.json"), "utf8"),
+  );
+  const leftovers = catalog
+    .filter((product) => /gafa/i.test(normalizeEyewearTerms(product.descriptionText)))
+    .map((product) => product.slug);
+  assert.deepEqual(leftovers, []);
 });
 
 test("descriptions land in the 140-155 character range when possible", () => {
