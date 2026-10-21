@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { TextDecoder } from "node:util";
+import { fallbackDescription } from "../../lib/product-copy.mjs";
+import { productDisplayName } from "../../lib/product-seo.mjs";
 import {
   extractAssignedJson,
   htmlToText,
@@ -471,30 +473,15 @@ function normalizeProductName(rawName, slug, brand, warnings) {
   return name;
 }
 
-function buildFallbackDescription({ name, brand, categories }) {
-  const model = extractModelFromName(name, brand);
-  const categoryText = categories.join(" ").toLowerCase();
-  const isWatch = categoryText.includes("reloj");
-  const isSunglasses = categoryText.includes("lentes");
-  const modelText = model ? ` modelo ${model}` : "";
-
-  if (brand === "Tommy Hilfiger" && isWatch) {
-    const isWomens = categoryText.includes("dama");
-    const isMens = categoryText.includes("caballero");
-    const audience = isWomens
-      ? "pensado para dama, con terminaciones prolijas y diseño atemporal"
-      : isMens
-        ? "pensado para caballero, con caja robusta y estética urbana contemporánea"
-        : "de estilo urbano y elegante para uso diario";
-    return `${name} es un reloj Tommy Hilfiger${modelText} disponible en Smile Argentina, ${audience}. Compra directa con stock verificado y checkout seguro de Tiendanube.`;
-  }
-
-  if (brand === "Ray Ban" && isSunglasses) {
-    return `${name} es un modelo Ray-Ban${modelText} de lentes de sol disponible en Smile Argentina. Diseño icónico, selección importada y compra directa por checkout seguro de Tiendanube.`;
-  }
-
-  const category = isWatch ? "reloj" : isSunglasses ? "lentes de sol" : "producto";
-  return `${name} es un ${category}${modelText} de ${brand || "marca seleccionada"} disponible en Smile Argentina, con stock actualizado y compra directa por checkout seguro de Tiendanube.`;
+// Same copy the storefront shows for products without a description
+// (lib/product-copy.mjs). The storefront rebuilds it at read time with the
+// canonical brand spelling, store section and payment terms, so this stored
+// text is a best effort from the CSV data and never goes stale on the site.
+function buildFallbackDescription({ name, brand, categories, tags, variants }) {
+  return fallbackDescription(
+    { name, categories, tags, variants },
+    { brand, name: productDisplayName(name, { label: brand }) },
+  );
 }
 
 function normalizeProduct(row, pageData) {
@@ -529,6 +516,7 @@ function normalizeProduct(row, pageData) {
   const brand = resolveBrand(row, pageData, category);
   const categories = inferCategoryPath(row, pageData, category, brand);
   const name = normalizeProductName(row.Nombre, slug, brand, warnings);
+  const tags = cleanCatalogTags([...category.tags, ...csvTags, ...pageTags]);
   const descriptionText = htmlToText(descriptionHtml);
   if (category.path.length === 0) {
     warnings.push(`Categoría inferida: ${categories.join(" > ")}`);
@@ -545,9 +533,10 @@ function normalizeProduct(row, pageData) {
     name,
     brand,
     categories,
-    tags: cleanCatalogTags([...category.tags, ...csvTags, ...pageTags]),
+    tags,
     descriptionHtml,
-    descriptionText: descriptionText || buildFallbackDescription({ name, brand, categories }),
+    descriptionText:
+      descriptionText || buildFallbackDescription({ name, brand, categories, tags, variants }),
     price: representativeVariant?.price ?? parseTiendanubePrice(row.Precio),
     promotionalPrice:
       representativeVariant?.promotionalPrice ?? parseTiendanubePrice(row["Precio promocional"]),

@@ -2,8 +2,24 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { descriptionLines, splitDescription } from "../../lib/product-copy.mjs";
+import {
+  descriptionLines,
+  fallbackDescription,
+  productAudience,
+  productKind,
+  splitDescription,
+} from "../../lib/product-copy.mjs";
 import { normalizeEyewearTerms } from "../../lib/product-seo.mjs";
+
+const PAYMENT = {
+  installments: "6 cuotas sin interés",
+  transferDiscount: "20% off por transferencia",
+  checkout: "checkout seguro de Tiendanube",
+};
+// Specs, warranty and shipping terms the fallback must never state.
+const INVENTED_CLAIMS =
+  /acero|cuarzo|autom[aá]tic|movimiento|cristal|zafiro|sumergible|resistente|\batm\b|\d+\s?mm\b|garant[ií]a|env[ií]os?|entrega|policarbonato|acetato|uv\s?400/i;
+const wordCount = (text) => text.split(/\s+/).filter(Boolean).length;
 
 const catalog = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), "data/tiendanube-catalog.json"), "utf8"),
@@ -103,6 +119,95 @@ test("spec values read 'anteojos' and repeated lines show once", () => {
     { name: "Formato", value: "Anteojos de sol rectangulares" },
     { name: "Peso", value: "Liviano" },
   ]);
+});
+
+test("fallback copy for a watch is built from catalog facts only", () => {
+  const watch = {
+    name: "Reloj Tommy Hilfiger 1782779",
+    categories: ["RELOJES", "TOMMY HILFIGER DAMA"],
+    tags: [],
+    variants: [{ sku: "", options: [] }],
+  };
+  const text = fallbackDescription(watch, {
+    brand: "Tommy Hilfiger",
+    name: "Reloj Tommy Hilfiger 1782779",
+    collection: ["Relojes", "Tommy Hilfiger"],
+    payment: PAYMENT,
+  });
+
+  assert.equal(
+    text,
+    "El Tommy Hilfiger 1782779 es un reloj para dama. " +
+      "Tommy Hilfiger es una marca estadounidense fundada en 1985. " +
+      "Su número de modelo es 1782779. " +
+      "En Smile lo encontrás en la sección Tommy Hilfiger, dentro de Relojes. " +
+      "Podés pagarlo en 6 cuotas sin interés o con 20% off por transferencia, a través del checkout seguro de Tiendanube. " +
+      "Si querés confirmar medidas, materiales u otros detalles antes de comprar, consultanos por WhatsApp.",
+  );
+  assert.ok(wordCount(text) >= 60 && wordCount(text) <= 90, `${wordCount(text)} words`);
+  assert.doesNotMatch(text, INVENTED_CLAIMS);
+});
+
+test("fallback copy varies with the product's own data", () => {
+  const sunglasses = {
+    name: "Hexagonal Evolve 3548",
+    categories: ["LENTES DE SOL"],
+    tags: ["Unisex"],
+    variants: [
+      { sku: "", options: ["Dorado/Azul liso"] },
+      { sku: "", options: ["Negro/Verde"] },
+    ],
+  };
+  const text = fallbackDescription(sunglasses, {
+    brand: "Ray-Ban",
+    name: "Ray-Ban Hexagonal Evolve 3548",
+    collection: ["Ray-Ban"],
+  });
+  assert.match(text, /^Los Ray-Ban Hexagonal Evolve 3548 son anteojos de sol unisex\./);
+  assert.match(text, /Su número de modelo es RB3548\./);
+  assert.match(text, /En Smile los encontrás en la sección Ray-Ban\./);
+  assert.match(text, /Se publican en las variantes Dorado\/Azul liso y Negro\/Verde\./);
+  assert.doesNotMatch(text, /Podés pagar/);
+
+  // No brand fact on record, no model code, no section: those sentences go.
+  const other = fallbackDescription(
+    { name: "Reloj Invicta Speedway", categories: ["RELOJES", "INVICTA"], tags: ["hombre"], variants: [] },
+    { brand: "Invicta", name: "Reloj Invicta Speedway" },
+  );
+  assert.equal(
+    other,
+    "El Invicta Speedway es un reloj para caballero. " +
+      "Si querés confirmar medidas, materiales u otros detalles antes de comprar, consultanos por WhatsApp.",
+  );
+});
+
+test("product kind and audience come from categories and tags", () => {
+  assert.equal(productKind({ categories: ["RELOJES", "INVICTA"] }), "watch");
+  assert.equal(productKind({ categories: ["LENTES DE SOL", "RAY BAN"] }), "sunglasses");
+  assert.equal(productKind({ categories: ["SIN CATEGORIA"] }), null);
+  assert.equal(productAudience({ categories: ["RELOJES", "TOMMY HILFIGER CABALLERO"], tags: [] }), "men");
+  assert.equal(productAudience({ categories: ["LENTES DE SOL"], tags: ["Mujer", "Hombre"] }), "unisex");
+  assert.equal(productAudience({ categories: ["LENTES DE SOL"], tags: [] }), null);
+});
+
+test("catalog products without a description get 60-90 words of factual copy", () => {
+  const withoutCopy = catalog.filter((product) => descriptionLines(product.descriptionHtml).length === 0);
+  assert.ok(withoutCopy.length > 0);
+
+  const texts = withoutCopy.map((product) => {
+    const brand = product.brand === "Ray Ban" ? "Ray-Ban" : product.brand;
+    const text = fallbackDescription(product, {
+      brand,
+      name: product.name.startsWith("Reloj") ? product.name : `${brand} ${product.name}`,
+      collection: [brand],
+      payment: PAYMENT,
+    });
+    const words = wordCount(text);
+    assert.ok(words >= 60 && words <= 90, `${product.slug}: ${words} words`);
+    assert.doesNotMatch(text, INVENTED_CLAIMS, product.slug);
+    return text;
+  });
+  assert.equal(new Set(texts).size, texts.length, "each product reads differently");
 });
 
 test("catalog descriptions lose no copy and show no spec twice", () => {

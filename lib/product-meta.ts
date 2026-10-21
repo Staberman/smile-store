@@ -1,6 +1,15 @@
 import { canonicalBrand } from "@/lib/brand-directory";
 import type { CatalogProduct } from "@/lib/catalog";
-import { descriptionLines, splitDescription, type ProductSpec } from "@/lib/product-copy.mjs";
+import { getProductTrail } from "@/lib/collections";
+import {
+  audiencePhrase,
+  descriptionLines,
+  fallbackDescription,
+  productAudience,
+  productKind,
+  splitDescription,
+  type ProductSpec,
+} from "@/lib/product-copy.mjs";
 import { displayProductName } from "@/lib/product-name";
 import {
   dedupeImages,
@@ -8,13 +17,11 @@ import {
   fitDescription,
   isGenericSeoText,
   listPhrase,
-  normalizeEyewearTerms,
   plainName,
   productPageTitle,
   type ProductKind,
 } from "@/lib/product-seo.mjs";
-import { INSTALLMENTS_PHRASE, TRANSFER_DISCOUNT_PHRASE } from "@/lib/store-facts";
-import { isWatch } from "@/lib/storefront.mjs";
+import { CHECKOUT_PHRASE, INSTALLMENTS_PHRASE, TRANSFER_DISCOUNT_PHRASE } from "@/lib/store-facts";
 
 export type ProductSeo = {
   /** Canonical brand label ("Ray-Ban", never "RAY BAN"). */
@@ -31,33 +38,6 @@ export type ProductSeo = {
   /** Product images without repeated renditions of the same photo. */
   images: string[];
 };
-
-type Audience = "unisex" | "women" | "men" | null;
-
-function getKind(product: CatalogProduct): ProductKind {
-  if (isWatch(product)) return "watch";
-  const topCategory = (product.categories[0] ?? "").toLowerCase();
-  return topCategory.includes("lentes") || topCategory.includes("anteojos") ? "sunglasses" : null;
-}
-
-function getAudience(product: CatalogProduct): Audience {
-  const tags = new Set(product.tags.map((tag) => tag.toLowerCase().trim()));
-  const categories = product.categories.join(" ").toLowerCase();
-  const women = tags.has("mujer") || categories.includes("dama");
-  const men = tags.has("hombre") || categories.includes("caballero");
-  if (tags.has("unisex") || (women && men)) return "unisex";
-  if (women) return "women";
-  if (men) return "men";
-  return null;
-}
-
-function audiencePhrase(audience: Audience, kind: ProductKind): string {
-  if (audience === "unisex") return " unisex";
-  // Watches follow the store's own categories ("dama" / "caballero").
-  if (audience === "women") return kind === "watch" ? " para dama" : " para mujer";
-  if (audience === "men") return kind === "watch" ? " para caballero" : " para hombre";
-  return "";
-}
 
 /** Product facts stated in the store's own copy (not its generic defaults). */
 function featurePhrase(product: CatalogProduct, kind: ProductKind): string {
@@ -88,7 +68,7 @@ function featurePhrase(product: CatalogProduct, kind: ProductKind): string {
 
 function describe(product: CatalogProduct, displayName: string, kind: ProductKind): string {
   const name = plainName(displayName);
-  const audience = audiencePhrase(getAudience(product), kind);
+  const audience = audiencePhrase(productAudience(product), kind);
   const features = featurePhrase(product, kind);
 
   const leads =
@@ -125,19 +105,38 @@ export type ProductCopy = {
 };
 
 /**
+ * Copy for a product without a Tiendanube description, from catalog facts
+ * only: display name, brand, model code, collection, gender and variants.
+ */
+function getFallbackDescription(product: CatalogProduct): string {
+  const collection = getProductTrail(product)
+    .filter((crumb) => crumb.href !== "/")
+    .map((crumb) => crumb.name);
+  return fallbackDescription(product, {
+    brand: canonicalBrand(product.brand),
+    name: displayProductName(product.name, product.brand),
+    collection,
+    payment: {
+      installments: INSTALLMENTS_PHRASE,
+      transferDiscount: TRANSFER_DISCOUNT_PHRASE,
+      checkout: CHECKOUT_PHRASE,
+    },
+  });
+}
+
+/**
  * Product description as the site shows and emits it (product page, Product
  * JSON-LD, search index): read from the description HTML, which keeps its
  * line breaks, with spec lines split out and eyewear terms normalized.
+ * Products whose HTML has no text get the catalog-facts fallback, also over
+ * the older fallback text stored by the importer.
  * Applied at read time: the hourly Tiendanube sync rewrites
  * data/tiendanube-catalog.json, so the stored copy is left as is.
  */
-export function getProductCopy(
-  product: Pick<CatalogProduct, "descriptionHtml" | "descriptionText">,
-): ProductCopy {
+export function getProductCopy(product: CatalogProduct): ProductCopy {
   const lines = descriptionLines(product.descriptionHtml);
   if (lines.length > 0) return splitDescription(lines);
-  const text = normalizeEyewearTerms(product.descriptionText).trim();
-  return { paragraphs: text ? [text] : [], specs: [] };
+  return { paragraphs: [getFallbackDescription(product)], specs: [] };
 }
 
 function specsText(specs: ProductSpec[]): string {
@@ -148,24 +147,20 @@ function specsText(specs: ProductSpec[]): string {
  * Plain-text description for Product JSON-LD: the prose, or the specs when the
  * description has nothing else (they also go to Product.additionalProperty).
  */
-export function getProductDescription(
-  product: Pick<CatalogProduct, "descriptionHtml" | "descriptionText">,
-): string {
+export function getProductDescription(product: CatalogProduct): string {
   const { paragraphs, specs } = getProductCopy(product);
   return paragraphs.join(" ") || specsText(specs);
 }
 
 /** Description prose and specs, for product search. */
-export function getProductSearchText(
-  product: Pick<CatalogProduct, "descriptionHtml" | "descriptionText">,
-): string {
+export function getProductSearchText(product: CatalogProduct): string {
   const { paragraphs, specs } = getProductCopy(product);
   return [...paragraphs, specsText(specs)].join(" ").trim();
 }
 
 export function getProductSeo(product: CatalogProduct): ProductSeo {
   const brand = canonicalBrand(product.brand);
-  const kind = getKind(product);
+  const kind = productKind(product);
   const displayName = displayProductName(product.name, product.brand);
 
   return {
