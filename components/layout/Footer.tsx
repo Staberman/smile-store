@@ -1,29 +1,34 @@
 import Image from "next/image";
 
-const nav = [
+type FooterLink = { label: string; href: string; target?: "_blank" };
+type FooterColumn = { heading: string; links: FooterLink[] };
+
+// Every link points to an indexable destination. Each column is one entry here,
+// so new groups (e.g. legal/policy pages) are added as another column.
+const nav: FooterColumn[] = [
   {
     heading: "Colecciones",
     links: [
+      { label: "Lentes de sol", href: "/#catalogo" },
       { label: "Relojes", href: "/tienda/relojes" },
-      { label: "Lentes", href: "/" },
-      { label: "Ver todo", href: "/" },
+      { label: "Marcas premium", href: "/tienda/marcas/premium" },
+      { label: "Scuderia Ferrari", href: "/tienda/marcas/ray-ban/ferrari" },
     ],
   },
   {
     heading: "Marcas",
     links: [
+      { label: "Ray-Ban", href: "/tienda/marcas/ray-ban" },
       { label: "Invicta", href: "/tienda/marcas/invicta" },
       { label: "Tommy Hilfiger", href: "/tienda/marcas/tommy-hilfiger" },
-      { label: "Ray-Ban", href: "/tienda/marcas/ray-ban" },
+      { label: "OMEGA x Swatch", href: "/tienda/relojes/omega-swatch" },
     ],
   },
   {
     heading: "Información",
     links: [
-      { label: "Todos los productos", href: "/" },
       { label: "Guía de estilo", href: "/guia-de-estilo" },
       { label: "Contacto", href: "/contacto" },
-      { label: "Checkout seguro", href: "/" },
     ],
   },
 ];
@@ -61,12 +66,8 @@ export default function Footer() {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      target={(link as { target?: string }).target}
-                      rel={
-                        (link as { target?: string }).target === "_blank"
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
+                      target={link.target}
+                      rel={link.target === "_blank" ? "noopener noreferrer" : undefined}
                       className="cursor-pointer text-sm text-white/55 transition hover:text-white"
                     >
                       {link.label}

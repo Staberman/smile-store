@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
@@ -22,6 +24,7 @@ const rayBanSchema = collectionSchema(
   "/tienda/marcas/ray-ban",
   "Colección Ray-Ban",
   rayBanProducts,
+  COLLECTION_TRAILS["ray-ban"],
 );
 
 const rayBanSummaries = toProductSummaries(rayBanProducts);
@@ -30,6 +33,7 @@ export default function RayBanPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={rayBanSchema} />
+      <Breadcrumbs trail={COLLECTION_TRAILS["ray-ban"]} />
       <BrandCarousel
         products={rayBanSummaries}
         brand="Ray-Ban"

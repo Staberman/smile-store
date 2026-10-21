@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import Header from "@/components/layout/Header";
 import JsonLd from "@/components/seo/JsonLd";
-import { absoluteUrl } from "@/lib/seo";
+import { HOME_CRUMB } from "@/lib/collections";
+import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
 
 const PAGE_PATH = "/guia-de-estilo";
 const PAGE_TITLE = "Cómo elegir tus lentes según la forma de tu rostro";
+const BREADCRUMBS = [HOME_CRUMB, { name: "Guía de estilo", href: PAGE_PATH }];
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -90,23 +93,7 @@ const pageSchema = {
         { "@type": "Thing", name: "Relojes" },
       ],
     },
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Inicio",
-          item: absoluteUrl("/"),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Guía de estilo",
-          item: absoluteUrl(PAGE_PATH),
-        },
-      ],
-    },
+    breadcrumbSchema(BREADCRUMBS),
   ],
 };
 
@@ -119,6 +106,7 @@ export default function GuiaDeEstiloPage() {
       {/* Hero */}
       <section className="px-6 pb-16 pt-36 md:px-12 md:pb-20 md:pt-44">
         <div className="mx-auto max-w-5xl">
+          <Breadcrumbs trail={BREADCRUMBS} className="mb-8" />
           <p className="text-[10px] uppercase tracking-[0.42em] text-[#c9a96e]">
             Smile · Guía de estilo
           </p>

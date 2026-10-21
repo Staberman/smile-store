@@ -11,8 +11,10 @@ import {
 import { formatPrice } from "@/lib/format";
 import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
+import { getProductTrail } from "@/lib/collections";
 import {
   absoluteUrl,
+  breadcrumbSchema,
   productUrl,
   SITE_NAME,
   truncateMetaDescription,
@@ -80,46 +82,21 @@ export default function ProductPage({ params }: Props) {
   const complements = getComplementaryProducts(product, allProducts, 4);
 
   const normalizedBrand = product.brand.trim().toLowerCase();
-  const categoryText = product.categories.join(" ").toLowerCase();
   const isRayBan =
     normalizedBrand === "ray ban" ||
     normalizedBrand === "ray-ban" ||
     normalizedBrand === "rayban";
-  const isFerrari =
-    categoryText.includes("ferrari") || product.name.toLowerCase().includes("ferrari");
-  const premiumBrandSlugs: Record<string, string> = {
-    balenciaga: "balenciaga",
-    cartier: "cartier",
-    "celine paris": "celine",
-    "christian dior": "christian-dior",
-    "dolce&gabbana": "dolce-gabbana",
-    fendi: "fendi",
-    gucci: "gucci",
-    "louis vuitton": "louis-vuitton",
-    prada: "prada",
-    "saint laurent": "saint-laurent",
-    versace: "versace",
-  };
-
-  const brandHref = isRayBan
-    ? isFerrari
-      ? "/tienda/marcas/ray-ban/ferrari"
-      : "/tienda/marcas/ray-ban"
-    : normalizedBrand === "invicta"
-      ? "/tienda/marcas/invicta"
-      : normalizedBrand === "tommy hilfiger"
-        ? "/tienda/marcas/tommy-hilfiger"
-        : normalizedBrand === "omega x swatch"
-          ? "/tienda/relojes/omega-swatch"
-          : premiumBrandSlugs[normalizedBrand]
-            ? `/tienda/marcas/premium/${premiumBrandSlugs[normalizedBrand]}`
-            : "/";
-
   const brandLabel = isRayBan
     ? "Ray-Ban"
     : normalizedBrand === "omega x swatch"
       ? "OMEGA x Swatch"
       : product.brand;
+  // Collection trail plus the product itself: drives both the visible
+  // breadcrumbs and the BreadcrumbList below.
+  const breadcrumbs = [
+    ...getProductTrail(product),
+    { name: product.name, href: `/tienda/productos/${product.slug}` },
+  ];
   const currentPrice = product.promotionalPrice ?? product.price;
   const hasValidPrice = typeof currentPrice === "number" && currentPrice > 0;
   const buildDate = new Date();
@@ -162,22 +139,7 @@ export default function ProductPage({ params }: Props) {
             }
           : {}),
       },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { name: "Inicio", item: absoluteUrl("/") },
-          // Brands without their own collection page fall back to "/";
-          // skip that level so the breadcrumb does not repeat the homepage.
-          ...(brandHref === "/"
-            ? []
-            : [{ name: brandLabel, item: absoluteUrl(brandHref) }]),
-          { name: product.name, item: productUrl(product) },
-        ].map((crumb, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          ...crumb,
-        })),
-      },
+      breadcrumbSchema(breadcrumbs),
     ],
   };
 
@@ -186,8 +148,7 @@ export default function ProductPage({ params }: Props) {
       <JsonLd data={productSchema} />
       <ProductDetailClient
         product={toProductDetail(product)}
-        brandHref={brandHref}
-        brandLabel={brandLabel}
+        breadcrumbs={breadcrumbs}
         recommendations={toProductSummaries(recommendations)}
         complements={toProductSummaries(complements)}
         outOfStock={outOfStock}

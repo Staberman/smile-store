@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Scuderia Ferrari Collection | Ray-Ban",
@@ -25,6 +26,7 @@ const ferrariSchema = collectionSchema(
   "/tienda/marcas/ray-ban/ferrari",
   "Scuderia Ferrari Collection",
   ferrariProducts,
+  COLLECTION_TRAILS.ferrari,
 );
 
 const ferrariSummaries = toProductSummaries(ferrariProducts);
@@ -45,22 +47,12 @@ export default function FerrariPage() {
           }}
         />
 
-        {/* Breadcrumb */}
         <div className="mx-auto max-w-7xl">
-          <nav className="mb-10 flex items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-[#4a4540]">
-            <Link href="/" className="transition hover:text-[#f0ece4]">
-              Inicio
-            </Link>
-            <span>/</span>
-            <Link
-              href="/tienda/marcas/ray-ban"
-              className="transition hover:text-[#f0ece4]"
-            >
-              Ray-Ban
-            </Link>
-            <span>/</span>
-            <span style={{ color: ferrariRed }}>Ferrari Collection</span>
-          </nav>
+          <Breadcrumbs
+            trail={COLLECTION_TRAILS.ferrari}
+            className="mb-10"
+            currentColor={ferrariRed}
+          />
 
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
@@ -78,7 +70,7 @@ export default function FerrariPage() {
                 </p>
               </div>
               <h1 className="font-display text-[2.8rem] font-light italic leading-[1.05] md:text-[3.8rem]">
-                Ray-Ban
+                Ray-Ban{" "}
                 <br />
                 <span style={{ color: ACCENT }}>Ferrari</span>
               </h1>

@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
 const celineProducts = allProducts.filter((product) => product.brand === "Celine Paris");
+const breadcrumbs = premiumBrandTrail("celine");
 const celineSchema = collectionSchema(
   "/tienda/marcas/premium/celine",
   "Colección Celine Paris",
   celineProducts,
+  breadcrumbs,
 );
 
 export const metadata: Metadata = {
@@ -30,6 +34,7 @@ export default function CelinePage() {
   return (
     <main className="bg-[#0a0a0a]">
       {celineProducts.length > 0 && <JsonLd data={celineSchema} />}
+      <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={celineSummaries} brand="Celine Paris" showNav={false} />
       <ProductGrid products={celineSummaries} brandLabel="Colección Celine Paris" />
       <CollectionLinks current="premium" />

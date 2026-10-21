@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { CatalogProduct } from "@/lib/catalog";
+import type { Crumb } from "@/lib/collections";
 
 export const SITE_URL = "https://smiletiendaimp.com.ar";
 export const SITE_NAME = "Smile";
@@ -49,30 +50,33 @@ export function productAvailability(product: CatalogProduct): string {
     : "https://schema.org/OutOfStock";
 }
 
-export function collectionSchema(path: string, name: string, products: CatalogProduct[]) {
+export function breadcrumbSchema(trail: Crumb[]) {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: absoluteUrl(crumb.href),
+    })),
+  };
+}
+
+/**
+ * CollectionPage + ItemList for a hub. Pass the same `trail` the page renders
+ * in its visible breadcrumbs; it defaults to "Inicio > name".
+ */
+export function collectionSchema(
+  path: string,
+  name: string,
+  products: CatalogProduct[],
+  trail: Crumb[] = [
+    { name: "Inicio", href: "/" },
+    { name, href: path },
+  ],
+) {
   // The homepage has no parent level, so a breadcrumb would only repeat "/".
-  const breadcrumb =
-    path === "/"
-      ? []
-      : [
-          {
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Inicio",
-                item: absoluteUrl("/"),
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name,
-                item: absoluteUrl(path),
-              },
-            ],
-          },
-        ];
+  const breadcrumb = path === "/" ? [] : [breadcrumbSchema(trail)];
 
   return {
     "@context": "https://schema.org",

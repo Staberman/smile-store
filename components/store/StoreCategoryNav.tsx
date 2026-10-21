@@ -2,22 +2,63 @@
 
 import Link from "next/link";
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DEFAULT_STORE_VIEW } from "./storeView";
 
-const GROUPS = [
+type NavItem = {
+  label: string;
+  /** Catalog view this item matches on "/" (?view=, legacy inbound links). */
+  view: string;
+  /** Indexable destination. Items without one are in-page filters on "/". */
+  href?: string;
+  /** Routes, other than "/", where the item is the current section. */
+  isCurrentRoute?: (pathname: string) => boolean;
+};
+
+const isUnder = (pathname: string, route: string) =>
+  pathname === route || pathname.startsWith(`${route}/`);
+
+const OFFERS_HREF = "/?view=offers#catalogo";
+
+const GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Lentes",
     items: [
-      { label: "Lentes de sol", view: "lentes" },
-      { label: "Ray-Ban", view: "ray-ban" },
-      { label: "Scuderia Ferrari", view: "ferrari" },
-      { label: "Marcas premium", view: "premium" },
+      // The homepage catalog defaults to the "lentes" view.
+      { label: "Lentes de sol", view: "lentes", href: "/#catalogo" },
+      {
+        label: "Ray-Ban",
+        view: "ray-ban",
+        href: "/tienda/marcas/ray-ban",
+        isCurrentRoute: (pathname) => pathname === "/tienda/marcas/ray-ban",
+      },
+      {
+        label: "Scuderia Ferrari",
+        view: "ferrari",
+        href: "/tienda/marcas/ray-ban/ferrari",
+        isCurrentRoute: (pathname) => pathname === "/tienda/marcas/ray-ban/ferrari",
+      },
+      {
+        label: "Marcas premium",
+        view: "premium",
+        href: "/tienda/marcas/premium",
+        isCurrentRoute: (pathname) => isUnder(pathname, "/tienda/marcas/premium"),
+      },
     ],
   },
   {
     label: "Relojes",
-    items: [{ label: "Relojes", view: "relojes" }],
+    items: [
+      {
+        label: "Relojes",
+        view: "relojes",
+        href: "/tienda/relojes",
+        isCurrentRoute: (pathname) =>
+          isUnder(pathname, "/tienda/relojes") ||
+          isUnder(pathname, "/tienda/marcas/invicta") ||
+          isUnder(pathname, "/tienda/marcas/tommy-hilfiger"),
+      },
+    ],
   },
   {
     label: "Descubrir",
@@ -25,16 +66,33 @@ const GROUPS = [
       // "Más vendidos" (view=best-sellers) queda oculto: depende de
       // data/tiendanube-sales-ranking.json, que está vacío y nada lo genera,
       // así que la vista renderiza una página en blanco. El filtro en
-      // TiendaCatalog/storefront.mjs se deja intacto para reactivarlo cuando
+      // TiendaCatalog/lib/catalog.ts se deja intacto para reactivarlo cuando
       // exista un generador de ranking.
       // { label: "Más vendidos", view: "best-sellers" },
+      //
+      // Ofertas has no hub page: it filters the homepage catalog, so it is a
+      // button rather than a crawlable ?view= URL.
       { label: "Ofertas", view: "offers" },
     ],
   },
-] as const;
+];
 
-/** Category links for a given active view. Pure, so it can be server-rendered. */
-function StoreCategoryLinks({ activeView }: { activeView: string }) {
+const ITEM_CLASS =
+  "relative flex min-h-11 snap-start items-center whitespace-nowrap text-[9px] uppercase tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#c9a96e] md:text-[10px]";
+
+function isActive(item: NavItem, pathname: string, view: string | null): boolean {
+  if (pathname === "/") return item.view === (view ?? DEFAULT_STORE_VIEW);
+  return item.isCurrentRoute?.(pathname) ?? false;
+}
+
+/**
+ * Category links for a pathname and homepage view. `view` is null when the
+ * URL has none (or while it cannot be read, e.g. in the static HTML).
+ */
+function StoreCategoryLinks({ pathname, view }: { pathname: string; view: string | null }) {
+  const router = useRouter();
+  const onHome = pathname === "/";
+
   return (
     <nav aria-label="Categorías de la tienda" className="min-w-0 flex-1">
       <div className="scrollbar-none flex snap-x snap-mandatory items-center gap-5 overflow-x-auto px-1 py-2 md:justify-center md:gap-7 md:overflow-visible">
@@ -48,20 +106,47 @@ function StoreCategoryLinks({ activeView }: { activeView: string }) {
               <span className="h-5 w-px shrink-0 bg-[#c9a96e]/25" aria-hidden="true" />
             )}
             {group.items.map((item) => {
-              const active = activeView === item.view;
-              return (
-                <Link
-                  key={item.view}
-                  href={`/?view=${item.view}#catalogo`}
-                  scroll={false}
-                  className="relative flex min-h-11 snap-start items-center whitespace-nowrap text-[9px] uppercase tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#c9a96e] md:text-[10px]"
-                  style={{ color: active ? "#e2c989" : "#8b8580" }}
-                  aria-current={active ? "page" : undefined}
-                >
+              const active = isActive(item, pathname, view);
+              const style = { color: active ? "#e2c989" : "#8b8580" };
+              const content = (
+                <>
                   {item.label}
                   {active && (
                     <span className="absolute inset-x-0 bottom-1 h-px bg-[#c9a96e]" />
                   )}
+                </>
+              );
+
+              if (!item.href) {
+                return (
+                  <button
+                    key={item.view}
+                    type="button"
+                    // On "/" switch the view in place, as the catalog filters do.
+                    onClick={() => router.push(OFFERS_HREF, { scroll: !onHome })}
+                    className={`${ITEM_CLASS} cursor-pointer`}
+                    style={style}
+                    aria-pressed={active}
+                  >
+                    {content}
+                  </button>
+                );
+              }
+
+              // "/#catalogo" from "/" switches the view in place.
+              const inPage = onHome && item.href.startsWith("/#");
+              return (
+                <Link
+                  key={item.view}
+                  href={item.href}
+                  // Rendered on every page: skip prefetching every hub payload.
+                  prefetch={false}
+                  scroll={!inPage}
+                  className={ITEM_CLASS}
+                  style={style}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {content}
                 </Link>
               );
             })}
@@ -73,16 +158,20 @@ function StoreCategoryLinks({ activeView }: { activeView: string }) {
 }
 
 function StoreCategoryLinksFromUrl() {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  return (
-    <StoreCategoryLinks activeView={searchParams.get("view") ?? DEFAULT_STORE_VIEW} />
-  );
+  return <StoreCategoryLinks pathname={pathname} view={searchParams.get("view")} />;
+}
+
+function StoreCategoryLinksFallback() {
+  return <StoreCategoryLinks pathname={usePathname()} view={null} />;
 }
 
 export default function StoreCategoryNav() {
   return (
-    // The fallback keeps the category links in the static HTML for crawlers.
-    <Suspense fallback={<StoreCategoryLinks activeView={DEFAULT_STORE_VIEW} />}>
+    // The fallback keeps the category links in the static HTML for crawlers;
+    // it knows the route but not the ?view= of the homepage.
+    <Suspense fallback={<StoreCategoryLinksFallback />}>
       <StoreCategoryLinksFromUrl />
     </Suspense>
   );

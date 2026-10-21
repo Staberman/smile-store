@@ -5,9 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import TiendanubeCheckoutForm from "@/components/checkout/TiendanubeCheckoutForm";
 import TrustHighlights from "@/components/brand/TrustHighlights";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { useRecentlyViewed } from "@/lib/browser-lists";
+import type { Crumb } from "@/lib/collections";
 import { formatPrice } from "@/lib/format";
 import type {
   ProductDetail,
@@ -26,8 +28,8 @@ import { productUrl } from "@/lib/seo";
 
 interface Props {
   product: ProductDetail;
-  brandHref: string;
-  brandLabel: string;
+  /** Home → collection → this product; mirrors the BreadcrumbList JSON-LD. */
+  breadcrumbs: Crumb[];
   recommendations: ProductSummary[];
   complements: ProductSummary[];
   outOfStock?: boolean;
@@ -46,8 +48,7 @@ function getVariantLabel(variant: ProductSummaryVariant, index: number): string 
 
 export default function ProductDetailClient({
   product,
-  brandHref,
-  brandLabel,
+  breadcrumbs,
   recommendations,
   complements,
   outOfStock = false,
@@ -131,6 +132,9 @@ export default function ProductDetailClient({
   const collectionLabel =
     product.categories[product.categories.length - 1] ?? product.brand;
   const subtitle = product.brand;
+  // The product's collection (the crumb before the product itself).
+  const backCrumb = breadcrumbs[breadcrumbs.length - 2] ?? breadcrumbs[0];
+  const backLabel = backCrumb.href === "/" ? "la tienda" : backCrumb.name;
   const lowStock = stockUrgencyLabel(product);
 
   // Absolute, canonical product URL for sharing. productUrl() already yields an
@@ -182,30 +186,7 @@ export default function ProductDetailClient({
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
-      <nav
-        aria-label="Migas de pan"
-        className="border-b border-white/6 px-6 py-5 md:px-12"
-      >
-        <ol className="mx-auto flex max-w-7xl items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-[#4a4540]">
-          <li className="flex items-center gap-2">
-            <Link href="/" className="transition hover:text-[#f0ece4]">
-              Inicio
-            </Link>
-            <span aria-hidden="true">/</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <Link href={brandHref} className="transition hover:text-[#f0ece4]">
-              {brandLabel}
-            </Link>
-            <span aria-hidden="true">/</span>
-          </li>
-          <li>
-            <span className="text-[#6a6560]" aria-current="page">
-              {product.name}
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumbs trail={breadcrumbs} />
 
       <div className="mx-auto max-w-7xl px-6 py-12 md:px-12 md:py-20">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
@@ -475,7 +456,7 @@ export default function ProductDetailClient({
 
             <div className="mt-8">
               <Link
-                href={brandHref}
+                href={backCrumb.href}
                 className="inline-flex cursor-pointer items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-[#4a4540] transition-colors hover:text-[#f0ece4]"
               >
                 <svg
@@ -489,7 +470,7 @@ export default function ProductDetailClient({
                   <line x1="19" y1="12" x2="5" y2="12" />
                   <polyline points="12 19 5 12 12 5" />
                 </svg>
-                Volver a {brandLabel}
+                Volver a {backLabel}
               </Link>
             </div>
           </div>

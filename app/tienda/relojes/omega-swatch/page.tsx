@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
@@ -23,6 +25,7 @@ const omegaSwatchSchema = collectionSchema(
   "/tienda/relojes/omega-swatch",
   "Omega × Swatch MoonSwatch",
   omegaSwatchProducts,
+  COLLECTION_TRAILS["omega-swatch"],
 );
 
 const omegaSwatchSummaries = toProductSummaries(omegaSwatchProducts);
@@ -31,6 +34,7 @@ export default function OmegaSwatchPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={omegaSwatchSchema} />
+      <Breadcrumbs trail={COLLECTION_TRAILS["omega-swatch"]} />
       <BrandCarousel products={omegaSwatchSummaries} brand="Omega × Swatch" showNav={false} />
 
       {/* Collab callout */}

@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import ProductGrid from "@/components/brand/ProductGrid";
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
+import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { COLLECTION_TRAILS } from "@/lib/collections";
+import { toProductSummaries } from "@/lib/product-summary";
+import { collectionSchema } from "@/lib/seo";
+import { filterStorefrontProducts } from "@/lib/storefront.mjs";
 
 export const metadata: Metadata = {
   title: "Marcas Premium",
@@ -97,9 +104,21 @@ const availableBrands = BRANDS.filter((brand) => {
   return allProducts.some((product) => product.brand === catalogBrand);
 });
 
+// Purchasable products of every premium maison (category "Marcas premium").
+const premiumProducts = filterStorefrontProducts(allProducts, "premium");
+const premiumSchema = collectionSchema(
+  "/tienda/marcas/premium",
+  "Marcas Premium",
+  premiumProducts,
+  COLLECTION_TRAILS.premium,
+);
+const premiumSummaries = toProductSummaries(premiumProducts);
+
 export default function MarcasPremiumPage() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
+      <JsonLd data={premiumSchema} />
+      <Breadcrumbs trail={COLLECTION_TRAILS.premium} />
       {/* Hero */}
       <section className="relative border-b border-white/6 px-6 pb-20 pt-16 md:px-12">
         <div className="mx-auto max-w-7xl">
@@ -160,6 +179,12 @@ export default function MarcasPremiumPage() {
           </div>
         </div>
       </section>
+
+      <ProductGrid
+        products={premiumSummaries}
+        brandLabel="Lentes de marcas premium"
+        filterBy="brand"
+      />
 
       <CollectionLinks current="premium" />
     </main>
