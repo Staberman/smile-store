@@ -25,6 +25,11 @@ interface Props {
   params: { slug: string };
 }
 
+// Every product page is prerendered from the build-time catalog. Unknown slugs
+// get the static 404 page; rendering them on demand produced a client-only
+// error shell instead of server-rendered 404 HTML.
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   // Include out-of-stock slugs so their pages are statically rendered and 200.
   return allProductsIncludingOutOfStock.map((product) => ({ slug: product.slug }));

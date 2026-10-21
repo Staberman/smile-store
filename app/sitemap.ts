@@ -2,6 +2,11 @@ import type { MetadataRoute } from "next";
 import { allProducts, allProductsIncludingOutOfStock } from "@/lib/catalog";
 import { absoluteUrl, productUrl } from "@/lib/seo";
 
+// Date of the last content change to the static routes below. Hardcoded on
+// purpose: a build-time `new Date()` would report every deploy as a content
+// change. Update it when these pages change.
+const STATIC_ROUTES_LAST_MODIFIED = "2026-10-21";
+
 const staticRoutes = [
   "/",
   "/contacto",
@@ -34,20 +39,19 @@ const availablePremiumBrandRoutes = premiumBrandRoutes
   .map(([, route]) => route);
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
   const indexableRoutes = [...staticRoutes, ...availablePremiumBrandRoutes];
 
   return [
     ...indexableRoutes.map((route) => ({
       url: absoluteUrl(route),
-      lastModified: now,
+      lastModified: STATIC_ROUTES_LAST_MODIFIED,
       changeFrequency: route === "/" ? "daily" as const : "weekly" as const,
       priority: route === "/" ? 1 : 0.7,
     })),
     // Include out-of-stock products so their direct URLs stay indexable.
+    // No lastModified: the catalog data has no per-product update date.
     ...allProductsIncludingOutOfStock.map((product) => ({
       url: productUrl(product),
-      lastModified: now,
       changeFrequency: "daily" as const,
       priority: 0.8,
     })),

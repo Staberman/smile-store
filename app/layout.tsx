@@ -29,9 +29,8 @@ export const metadata: Metadata = {
   },
   description:
     "Tienda online de relojes, lentes y accesorios premium en Argentina. Descubre modelos seleccionados de Invicta, Ray-Ban y Tommy Hilfiger.",
-  alternates: {
-    canonical: "/",
-  },
+  // No site-wide canonical: every indexable page declares its own, and
+  // noindex pages (favoritos, probar-ar, 404) must not point to the homepage.
   openGraph: {
     ...SITE_OPEN_GRAPH,
     url: SITE_URL,

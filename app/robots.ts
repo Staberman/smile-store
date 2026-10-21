@@ -7,10 +7,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        disallow: "/api/",
       },
       {
+        // Named groups replace the "*" group for these crawlers, so they
+        // repeat its rules.
         userAgent: [
           "GPTBot",
+          "OAI-SearchBot",
           "ChatGPT-User",
           "PerplexityBot",
           "ClaudeBot",
@@ -19,9 +23,9 @@ export default function robots(): MetadataRoute.Robots {
           "Bingbot",
         ],
         allow: "/",
+        disallow: "/api/",
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
   };
 }
