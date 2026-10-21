@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: `%s${TITLE_SUFFIX}`,
   },
   description:
-    "Tienda online de relojes, lentes y accesorios premium en Argentina. Descubre modelos seleccionados de Invicta, Ray-Ban y Tommy Hilfiger.",
+    "Tienda online de anteojos de sol, relojes y accesorios premium en Argentina. Descubrí modelos de Ray-Ban, Invicta, Tommy Hilfiger y marcas premium.",
   // No site-wide canonical: every indexable page declares its own, and
   // noindex pages (favoritos, probar-ar, 404) must not point to the homepage.
   openGraph: {

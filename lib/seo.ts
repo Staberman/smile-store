@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { CatalogProduct } from "@/lib/catalog";
 import type { Crumb } from "@/lib/collections";
+import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 
 export const SITE_URL = "https://smiletiendaimp.com.ar";
 export const SITE_NAME = "Smile";
@@ -28,6 +29,53 @@ export const SITE_TWITTER = {
   card: "summary_large_image",
   images: [SITE_SOCIAL_IMAGE.url],
 } satisfies NonNullable<Metadata["twitter"]>;
+
+type SocialImage = { url: string; width?: number; height?: number; alt: string };
+
+/**
+ * Metadata for an indexable page: title, description, self-canonical and the
+ * page's own OpenGraph/Twitter card (title, description, url, image), on top
+ * of the site defaults. `title` excludes the " | Smile" suffix the root
+ * layout's template appends; social titles include it.
+ */
+export function pageMetadata({
+  title,
+  description,
+  path,
+  image,
+  type = "website",
+}: {
+  title: string;
+  description: string;
+  /** Site-relative path, resolved against metadataBase. */
+  path: string;
+  /** Defaults to the site's social image. */
+  image?: SocialImage;
+  type?: "website" | "article";
+}): Metadata {
+  const socialTitle = `${title}${TITLE_SUFFIX}`;
+  const images = image ? [image] : SITE_OPEN_GRAPH.images;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      ...SITE_OPEN_GRAPH,
+      type,
+      url: path,
+      title: socialTitle,
+      description,
+      images,
+    },
+    twitter: {
+      ...SITE_TWITTER,
+      title: socialTitle,
+      description,
+      images: images.map((entry) => entry.url),
+    },
+  };
+}
 
 export function absoluteUrl(path: string): string {
   if (path.startsWith("http")) return path;

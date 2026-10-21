@@ -1,21 +1,25 @@
-import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import HubHeader from "@/components/brand/HubHeader";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { categoryLineHighlight, hubDescription, hubIntro } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
-import { collectionSchema } from "@/lib/seo";
+import { collectionSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Ray-Ban",
-  description:
-    "Descubre la colección completa de lentes Ray-Ban en Smile. Aviador, Wayfarer, Clubmaster, Round y la exclusiva Scuderia Ferrari Collection.",
-  alternates: { canonical: "/tienda/marcas/ray-ban" },
-};
+export const metadata = pageMetadata({
+  title: "Anteojos de sol Ray-Ban en Argentina",
+  description: hubDescription([
+    "Anteojos de sol Ray-Ban originales en Argentina: Aviador, Wayfarer, Clubmaster, Round, Erika y la Scuderia Ferrari Collection.",
+    "Anteojos de sol Ray-Ban originales en Argentina: Aviador, Wayfarer, Clubmaster, Round y Erika.",
+    "Anteojos de sol Ray-Ban originales en Argentina.",
+  ]),
+  path: "/tienda/marcas/ray-ban",
+});
 
 const isRayBanProduct = (product: CatalogProduct) => {
   const values = [product.brand, ...product.categories];
@@ -31,12 +35,23 @@ const rayBanSchema = collectionSchema(
 );
 
 const rayBanSummaries = toProductSummaries(rayBanProducts);
+const intro = hubIntro({
+  subject: "anteojos de sol Ray-Ban",
+  products: rayBanProducts,
+  outOfStock: rayBanOutOfStock,
+  highlight: categoryLineHighlight(rayBanProducts, [
+    "ray ban",
+    "scuderia ferrari",
+    "ray ban scuderia ferrari collection",
+  ]),
+});
 
 export default function RayBanPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={rayBanSchema} />
       <Breadcrumbs trail={COLLECTION_TRAILS["ray-ban"]} />
+      <HubHeader eyebrow="Colección Ray-Ban" title="Anteojos de sol Ray-Ban" intro={intro} />
       <BrandCarousel
         products={rayBanSummaries}
         brand="Ray-Ban"

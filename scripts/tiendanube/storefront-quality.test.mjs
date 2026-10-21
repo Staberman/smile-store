@@ -24,15 +24,19 @@ const collectionRoutes = [
   ["app/tienda/marcas/premium/versace/page.tsx", "/tienda/marcas/premium/versace"],
   ["app/tienda/marcas/ray-ban/page.tsx", "/tienda/marcas/ray-ban"],
   ["app/tienda/marcas/ray-ban/ferrari/page.tsx", "/tienda/marcas/ray-ban/ferrari"],
+  ["app/tienda/marcas/tommy-hilfiger/page.tsx", "/tienda/marcas/tommy-hilfiger"],
+  ["app/tienda/relojes/page.tsx", "/tienda/relojes"],
   ["app/tienda/relojes/omega-swatch/page.tsx", "/tienda/relojes/omega-swatch"],
 ];
 
 test("every collection page declares its own canonical URL", () => {
   for (const [relativePath, canonical] of collectionRoutes) {
     const source = fs.readFileSync(path.join(projectRoot, relativePath), "utf8");
+    // Either a literal `alternates.canonical` or the `path` given to
+    // pageMetadata(), which sets the canonical and og:url from it.
     assert.match(
       source,
-      new RegExp(`canonical:\\s*["']${canonical.replaceAll("/", "\\/")}["']`),
+      new RegExp(`(?:canonical|path):\\s*["']${canonical.replaceAll("/", "\\/")}["']`),
       `${relativePath} must declare ${canonical}`,
     );
   }
@@ -95,9 +99,13 @@ test("checkout posts to the draft-checkout API and skips the storefront cart", (
   assert.doesNotMatch(source, /name="go_to_checkout"/);
 });
 
-test("collection carousel exposes one semantic page heading", () => {
+test("collection hubs render one visible H1 and the carousel none", () => {
   const carouselSource = fs.readFileSync(
     path.join(projectRoot, "components/brand/BrandCarousel.tsx"),
+    "utf8",
+  );
+  const hubHeaderSource = fs.readFileSync(
+    path.join(projectRoot, "components/brand/HubHeader.tsx"),
     "utf8",
   );
   // The store catalog is served from the homepage ("/").
@@ -106,9 +114,16 @@ test("collection carousel exposes one semantic page heading", () => {
     "utf8",
   );
 
-  assert.match(carouselSource, /semanticHeading\?: boolean/);
-  assert.match(carouselSource, /<h1[^>]*className="sr-only"[^>]*>/);
+  assert.doesNotMatch(carouselSource, /<h1/);
+  assert.match(hubHeaderSource, /<h1[^>]*>/);
+  assert.doesNotMatch(hubHeaderSource, /<h1[^>]*sr-only/);
   assert.match(storePageSource, /<h1[^>]*className="sr-only"[^>]*>/);
+
+  for (const [relativePath] of collectionRoutes) {
+    const source = fs.readFileSync(path.join(projectRoot, relativePath), "utf8");
+    const headings = (source.match(/<HubHeader\b/g) ?? []).length + (source.match(/<h1\b/g) ?? []).length;
+    assert.equal(headings, 1, `${relativePath} must render exactly one H1`);
+  }
 });
 
 test("SEO outputs convert local product images to absolute URLs", () => {

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
@@ -7,16 +6,21 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { brandHighlight, hubDescription, hubIntro } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
-import { collectionSchema } from "@/lib/seo";
+import { collectionSchema, pageMetadata } from "@/lib/seo";
 import { filterStorefrontProducts } from "@/lib/storefront.mjs";
 
-export const metadata: Metadata = {
-  title: "Marcas Premium",
-  description:
-    "Prada, Dior, Versace, Gucci, Balenciaga, Louis Vuitton, Saint Laurent, Fendi, Cartier, Dolce&Gabbana y Celine — lentes de sol premium en Smile.",
-  alternates: { canonical: "/tienda/marcas/premium" },
-};
+export const metadata = pageMetadata({
+  title: "Marcas premium de anteojos de sol",
+  description: hubDescription([
+    "Anteojos de sol de marcas premium en Argentina: Prada, Christian Dior, Versace, Gucci, Louis Vuitton, Saint Laurent, Cartier y más.",
+    "Anteojos de sol de marcas premium en Argentina: Prada, Christian Dior, Versace, Gucci, Louis Vuitton y más.",
+    "Anteojos de sol de marcas premium en Argentina: Prada, Dior, Versace, Gucci, Louis Vuitton y más.",
+    "Anteojos de sol de marcas premium en Argentina.",
+  ]),
+  path: "/tienda/marcas/premium",
+});
 
 const ACCENT = "#c9a96e";
 
@@ -115,6 +119,12 @@ const premiumSchema = collectionSchema(
   COLLECTION_TRAILS.premium,
 );
 const premiumSummaries = toProductSummaries(premiumProducts);
+const intro = hubIntro({
+  subject: "anteojos de sol de marcas premium",
+  products: premiumProducts,
+  outOfStock: premiumOutOfStock,
+  highlight: brandHighlight(premiumProducts),
+});
 
 export default function MarcasPremiumPage() {
   return (
@@ -128,9 +138,10 @@ export default function MarcasPremiumPage() {
             Sub-colección premium
           </p>
           <h1 className="font-display mt-4 text-[2.8rem] font-light italic leading-[1.05] md:text-[4rem]">
-            Marcas Premium
+            Anteojos de sol de marcas premium
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-[1.9] text-[#4a4540]">
+          <p className="mt-4 max-w-2xl text-sm leading-[1.9] text-[#8b8580]">{intro}</p>
+          <p className="mt-3 max-w-xl text-sm leading-[1.9] text-[#4a4540]">
             Las grandes maisons del eyewear de lujo, reunidas en una sola experiencia.
             Piezas importadas con cristal mineral UV400, acetato premium y el sello de cada casa.
           </p>

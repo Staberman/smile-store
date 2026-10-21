@@ -1,21 +1,25 @@
-import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import HubHeader from "@/components/brand/HubHeader";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { hubDescription, hubIntro, modelHighlight } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
-import { collectionSchema } from "@/lib/seo";
+import { collectionSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Omega × Swatch MoonSwatch",
-  description:
-    "La colaboración histórica entre Omega y Swatch. MoonSwatch Bioceramic — Mission to the Moon, Mars, Earth y más. Disponible en Smile.",
-  alternates: { canonical: "/tienda/relojes/omega-swatch" },
-};
+export const metadata = pageMetadata({
+  title: "Relojes OMEGA x Swatch MoonSwatch en Argentina",
+  description: hubDescription([
+    "Relojes OMEGA x Swatch MoonSwatch originales en Argentina, con caja de Bioceramic: Mission to the Moon, Mission to Mars y más.",
+    "Relojes OMEGA x Swatch MoonSwatch originales en Argentina, con caja de Bioceramic.",
+    "Relojes OMEGA x Swatch MoonSwatch originales en Argentina.",
+  ]),
+  path: "/tienda/relojes/omega-swatch",
+});
 
 const ACCENT = "#c9a96e";
 
@@ -30,12 +34,23 @@ const omegaSwatchSchema = collectionSchema(
 );
 
 const omegaSwatchSummaries = toProductSummaries(omegaSwatchProducts);
+const intro = hubIntro({
+  subject: "relojes OMEGA x Swatch",
+  products: omegaSwatchProducts,
+  outOfStock: omegaSwatchOutOfStock,
+  highlight: modelHighlight(omegaSwatchProducts),
+});
 
 export default function OmegaSwatchPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={omegaSwatchSchema} />
       <Breadcrumbs trail={COLLECTION_TRAILS["omega-swatch"]} />
+      <HubHeader
+        eyebrow="Relojes"
+        title="Relojes OMEGA x Swatch MoonSwatch"
+        intro={intro}
+      />
       <BrandCarousel products={omegaSwatchSummaries} brand="Omega × Swatch" showNav={false} />
 
       {/* Collab callout */}

@@ -3,24 +3,14 @@ import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import JsonLd from "@/components/seo/JsonLd";
-import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/seo";
+import { absoluteUrl, pageMetadata, SITE_NAME, SITE_URL } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contacto",
   description:
-    "Contacto oficial de Smile para consultas sobre relojes, lentes, stock, pagos y envios en Argentina.",
-  alternates: {
-    canonical: "/contacto",
-  },
-  openGraph: {
-    type: "website",
-    locale: "es_AR",
-    url: "/contacto",
-    title: "Contacto | Smile",
-    description:
-      "Contacto oficial de Smile para consultas sobre relojes, lentes, stock, pagos y envios en Argentina.",
-  },
-};
+    "Contacto de Smile, tienda de anteojos de sol y relojes en Rosario, Santa Fe. Consultas por stock, medios de pago, envíos y seguimiento de compras.",
+  path: "/contacto",
+});
 
 const contactSchema = {
   "@context": "https://schema.org",

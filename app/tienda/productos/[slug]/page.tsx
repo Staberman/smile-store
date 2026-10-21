@@ -15,10 +15,10 @@ import { getProductTrail } from "@/lib/collections";
 import {
   absoluteUrl,
   breadcrumbSchema,
+  pageMetadata,
   productUrl,
   SITE_NAME,
 } from "@/lib/seo";
-import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import ProductDetailClient from "./ProductDetailClient";
 
 interface Props {
@@ -43,38 +43,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // model, type), not from Tiendanube's SEO fields, which are often store-wide
   // defaults, lack the brand or run past 60 characters.
   const seo = getProductSeo(product);
-  const canonical = productUrl(product);
-  const image = product.images[0] ? absoluteUrl(product.images[0]) : undefined;
+  const image = product.images[0];
 
-  return {
+  return pageMetadata({
     title: seo.title,
     description: seo.description,
-    alternates: {
-      canonical,
-    },
-    openGraph: {
-      type: "website",
-      locale: "es_AR",
-      siteName: SITE_NAME,
-      title: `${seo.title}${TITLE_SUFFIX}`,
-      description: seo.description,
-      url: canonical,
-      images: image
-        ? [
-            {
-              url: image,
-              alt: seo.displayName,
-            },
-          ]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${seo.title}${TITLE_SUFFIX}`,
-      description: seo.description,
-      images: image ? [image] : undefined,
-    },
-  };
+    path: `/tienda/productos/${product.slug}`,
+    image: image ? { url: absoluteUrl(image), alt: seo.displayName } : undefined,
+  });
 }
 
 export default function ProductPage({ params }: Props) {

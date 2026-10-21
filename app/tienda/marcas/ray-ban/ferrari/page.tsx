@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
@@ -6,15 +5,18 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { hubDescription, hubIntro, nameLineHighlight } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
-import { collectionSchema } from "@/lib/seo";
+import { collectionSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Scuderia Ferrari Collection | Ray-Ban",
-  description:
-    "La colaboración entre Ray-Ban y Scuderia Ferrari. Lentes de sol exclusivos con diseño inspirado en la Fórmula 1. Disponibles en Smile Argentina.",
-  alternates: { canonical: "/tienda/marcas/ray-ban/ferrari" },
-};
+export const metadata = pageMetadata({
+  title: "Anteojos Ray-Ban Scuderia Ferrari en Argentina",
+  description: hubDescription([
+    "Anteojos de sol Ray-Ban Scuderia Ferrari Collection originales en Argentina, con diseño inspirado en la Fórmula 1.",
+    "Anteojos de sol Ray-Ban Scuderia Ferrari Collection originales en Argentina.",
+  ]),
+  path: "/tienda/marcas/ray-ban/ferrari",
+});
 
 const ACCENT = "#c9a96e";
 const ferrariRed = "#dc0000";
@@ -33,6 +35,12 @@ const ferrariSchema = collectionSchema(
 );
 
 const ferrariSummaries = toProductSummaries(ferrariProducts);
+const intro = hubIntro({
+  subject: "anteojos de sol Ray-Ban Scuderia Ferrari",
+  products: ferrariProducts,
+  outOfStock: ferrariOutOfStock,
+  highlight: nameLineHighlight(ferrariProducts, /scuderia\s+ferrari(\s+coll?ett?ion)?/i),
+});
 
 export default function FerrariPage() {
   return (
@@ -73,11 +81,13 @@ export default function FerrariPage() {
                 </p>
               </div>
               <h1 className="font-display text-[2.8rem] font-light italic leading-[1.05] md:text-[3.8rem]">
-                Ray-Ban{" "}
-                <br />
-                <span style={{ color: ACCENT }}>Ferrari</span>
+                Anteojos de sol Ray-Ban{" "}
+                <span style={{ color: ACCENT }}>Scuderia Ferrari</span>
               </h1>
-              <p className="mt-4 max-w-lg text-sm leading-[1.9] text-[#4a4540]">
+              <p className="mt-4 max-w-xl text-sm leading-[1.9] text-[#8b8580]">
+                {intro}
+              </p>
+              <p className="mt-3 max-w-lg text-sm leading-[1.9] text-[#4a4540]">
                 La colaboración entre dos íconos del diseño y la velocidad. Cada
                 pieza lleva la identidad visual de la Scuderia Ferrari —
                 tecnología de Fórmula 1 fusionada con el estilo inconfundible de

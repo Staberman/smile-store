@@ -47,7 +47,6 @@ export default function TiendaCatalog({
         products={visibleProducts}
         brand={label}
         showNav={false}
-        semanticHeading={false}
       />
 
       <TrustHighlights />

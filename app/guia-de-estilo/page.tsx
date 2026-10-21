@@ -1,32 +1,24 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import Header from "@/components/layout/Header";
 import JsonLd from "@/components/seo/JsonLd";
 import { HOME_CRUMB } from "@/lib/collections";
-import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 const PAGE_PATH = "/guia-de-estilo";
 const PAGE_TITLE = "Cómo elegir tus lentes según la forma de tu rostro";
 const BREADCRUMBS = [HOME_CRUMB, { name: "Guía de estilo", href: PAGE_PATH }];
 
-export const metadata: Metadata = {
+const PAGE_DESCRIPTION =
+  "Cómo elegir anteojos de sol según la forma de tu rostro (ovalado, redondo, cuadrado, corazón o alargado) y qué tamaño de reloj le queda mejor a tu muñeca.";
+
+export const metadata = pageMetadata({
   title: PAGE_TITLE,
-  description:
-    "Guía de estilo para saber cómo elegir lentes de sol según la forma de tu rostro: qué anteojos favorecen a un rostro ovalado, redondo, cuadrado, corazón o alargado, y cómo elegir el tamaño de tu reloj.",
-  alternates: {
-    canonical: PAGE_PATH,
-  },
-  openGraph: {
-    type: "article",
-    locale: "es_AR",
-    url: PAGE_PATH,
-    title: `${PAGE_TITLE} | Smile`,
-    description:
-      "Cómo elegir lentes de sol según la forma de rostro y cómo elegir el tamaño de tu reloj. Guía de estilo de Smile.",
-  },
-};
+  description: PAGE_DESCRIPTION,
+  path: PAGE_PATH,
+  type: "article",
+});
 
 const faceShapes = [
   {

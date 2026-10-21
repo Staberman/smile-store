@@ -13,7 +13,6 @@ interface Props {
   brand: string;
   accentColor?: string; // CSS hex, default gold
   showNav?: boolean; // show internal nav bar (default true)
-  semanticHeading?: boolean;
 }
 
 const ACCENT = "#c9a96e";
@@ -83,7 +82,6 @@ export default function BrandCarousel({
   products,
   brand,
   showNav = true,
-  semanticHeading = true,
 }: Props) {
   const featured = buildSlides(products);
   const [current, setCurrent] = useState(0);
@@ -124,11 +122,8 @@ export default function BrandCarousel({
     }, 80);
   }
 
-  if (slideCount === 0) {
-    return semanticHeading ? (
-      <h1 className="sr-only">{brand} en Smile Argentina</h1>
-    ) : null;
-  }
+  // Pages render their own H1 (hubs: HubHeader); the carousel is decorative.
+  if (slideCount === 0) return null;
 
   const bgGradient = BG_GRADIENTS[currentIndex % BG_GRADIENTS.length];
   const subtitle = slide.categories[slide.categories.length - 1] ?? canonicalBrand(slide.brand);
@@ -136,10 +131,6 @@ export default function BrandCarousel({
 
   return (
     <section className="relative h-[720px] w-full overflow-hidden bg-[#0a0a0a] md:h-screen md:min-h-[680px]">
-      {semanticHeading && (
-        <h1 className="sr-only">{brand} en Smile Argentina</h1>
-      )}
-
       {/* Grain overlay */}
       <div
         className="pointer-events-none absolute inset-0 z-[9000] opacity-[0.035]"
