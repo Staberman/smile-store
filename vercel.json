@@ -1,0 +1,20 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.smiletiendaimp.com.ar" }],
+      "destination": "https://smiletiendaimp.com.ar/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/productos/:slug",
+      "destination": "/tienda/productos/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/lentes-de-sol",
+      "destination": "/tienda",
+      "permanent": true
+    }
+  ]
+}
