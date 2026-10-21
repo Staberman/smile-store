@@ -5,7 +5,7 @@ import StoreCategoryNav from "@/components/store/StoreCategoryNav";
 
 /**
  * Store chrome shared by the homepage ("/") and every /tienda/* route:
- * fixed header with logo, category navigation and store link, plus footer.
+ * sticky header with logo, category navigation and store link, plus footer.
  */
 export default function StoreShell({
   children,
@@ -14,7 +14,10 @@ export default function StoreShell({
 }) {
   return (
     <>
-      <header className="fixed left-0 top-0 z-30 w-full border-b border-white/8 bg-black/88 backdrop-blur-md">
+      {/* Sticky rather than fixed: the header's height depends on the logo and
+          the category row, so a hardcoded content offset hid the top ~40px of
+          every page (breadcrumbs included) behind it. */}
+      <header className="sticky top-0 z-30 w-full border-b border-white/8 bg-black/88 backdrop-blur-md">
         <div className="mx-auto max-w-[92rem] px-4 md:px-6">
           <div className="flex min-h-[72px] items-center justify-between gap-5 md:min-h-[82px]">
             <Link href="/" className="flex shrink-0 items-center" aria-label="Smile inicio">
@@ -48,7 +51,7 @@ export default function StoreShell({
         </div>
       </header>
 
-      <div className="pt-[117px] md:pt-[82px]">{children}</div>
+      {children}
       <Footer />
     </>
   );
