@@ -479,7 +479,14 @@ function buildFallbackDescription({ name, brand, categories }) {
   const modelText = model ? ` modelo ${model}` : "";
 
   if (brand === "Tommy Hilfiger" && isWatch) {
-    return `${name} es un reloj Tommy Hilfiger${modelText} disponible en Smile Argentina. Una pieza de estilo urbano y elegante para uso diario, con compra directa por checkout seguro de Tiendanube.`;
+    const isWomens = categoryText.includes("dama");
+    const isMens = categoryText.includes("caballero");
+    const audience = isWomens
+      ? "pensado para dama, con terminaciones prolijas y diseno atemporal"
+      : isMens
+        ? "pensado para caballero, con caja robusta y estetica urbana contemporanea"
+        : "de estilo urbano y elegante para uso diario";
+    return `${name} es un reloj Tommy Hilfiger${modelText} disponible en Smile Argentina, ${audience}. Compra directa con stock verificado y checkout seguro de Tiendanube.`;
   }
 
   if (brand === "Ray Ban" && isSunglasses) {
