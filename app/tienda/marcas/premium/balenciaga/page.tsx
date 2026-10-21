@@ -4,6 +4,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -15,12 +16,14 @@ export const metadata: Metadata = {
 const balenciagaProducts = allProducts.filter((product) => product.brand === "Balenciaga");
 const balenciagaSchema = collectionSchema("/tienda/marcas/premium/balenciaga", "Colección Balenciaga", balenciagaProducts);
 
+const balenciagaSummaries = toProductSummaries(balenciagaProducts);
+
 export default function BalenciagaPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={balenciagaSchema} />
-      <BrandCarousel products={balenciagaProducts} brand="Balenciaga" showNav={false} />
-      <ProductGrid products={balenciagaProducts} brandLabel="Colección Balenciaga" />
+      <BrandCarousel products={balenciagaSummaries} brand="Balenciaga" showNav={false} />
+      <ProductGrid products={balenciagaSummaries} brandLabel="Colección Balenciaga" />
       <CollectionLinks current="premium" />
     </main>
   );

@@ -4,6 +4,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -15,12 +16,14 @@ export const metadata: Metadata = {
 const pradaProducts = allProducts.filter((product) => product.brand === "Prada");
 const pradaSchema = collectionSchema("/tienda/marcas/premium/prada", "Colección Prada", pradaProducts);
 
+const pradaSummaries = toProductSummaries(pradaProducts);
+
 export default function PradaPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={pradaSchema} />
-      <BrandCarousel products={pradaProducts} brand="Prada" showNav={false} />
-      <ProductGrid products={pradaProducts} brandLabel="Colección Prada" />
+      <BrandCarousel products={pradaSummaries} brand="Prada" showNav={false} />
+      <ProductGrid products={pradaSummaries} brandLabel="Colección Prada" />
       <CollectionLinks current="premium" />
     </main>
   );

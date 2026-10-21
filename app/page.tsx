@@ -4,7 +4,8 @@ import RecentlyViewed from "@/components/product/RecentlyViewed";
 import JsonLd from "@/components/seo/JsonLd";
 import StoreShell from "@/components/store/StoreShell";
 import TiendaClient from "@/components/store/TiendaClient";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, getBestSellers } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { SITE_OPEN_GRAPH, SITE_TWITTER, collectionSchema } from "@/lib/seo";
 
 const HOME_TITLE = "Anteojos de sol y relojes originales en Argentina";
@@ -33,13 +34,17 @@ export const metadata: Metadata = {
 };
 
 const homeCollectionSchema = collectionSchema("/", HOME_TITLE, allProducts);
+// The client catalog filters these per ?view=, so it gets every purchasable
+// product, as slim summaries.
+const storeProducts = toProductSummaries(allProducts);
+const bestSellerSlugs = getBestSellers().map((product) => product.slug);
 
 export default function Home() {
   return (
     <StoreShell>
       <JsonLd data={homeCollectionSchema} />
       <h1 className="sr-only">{HOME_TITLE}</h1>
-      <TiendaClient />
+      <TiendaClient products={storeProducts} bestSellerSlugs={bestSellerSlugs} />
       <RecentlyViewed />
       <FaqSection />
     </StoreShell>

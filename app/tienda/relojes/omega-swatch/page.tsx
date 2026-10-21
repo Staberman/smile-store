@@ -4,6 +4,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -24,11 +25,13 @@ const omegaSwatchSchema = collectionSchema(
   omegaSwatchProducts,
 );
 
+const omegaSwatchSummaries = toProductSummaries(omegaSwatchProducts);
+
 export default function OmegaSwatchPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={omegaSwatchSchema} />
-      <BrandCarousel products={omegaSwatchProducts} brand="Omega × Swatch" showNav={false} />
+      <BrandCarousel products={omegaSwatchSummaries} brand="Omega × Swatch" showNav={false} />
 
       {/* Collab callout */}
       <section className="border-b border-white/6 bg-[#0a0a0a] px-6 py-16 text-[#f0ece4] md:px-12">
@@ -68,7 +71,7 @@ export default function OmegaSwatchPage() {
         </div>
       </section>
 
-      <ProductGrid products={omegaSwatchProducts} brandLabel="Omega × Swatch MoonSwatch" />
+      <ProductGrid products={omegaSwatchSummaries} brandLabel="Omega × Swatch MoonSwatch" />
       <CollectionLinks current="omega-swatch" />
     </main>
   );

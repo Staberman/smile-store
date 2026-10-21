@@ -8,8 +8,12 @@ import TrustHighlights from "@/components/brand/TrustHighlights";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { useRecentlyViewed } from "@/lib/browser-lists";
-import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
-import { formatPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/format";
+import type {
+  ProductDetail,
+  ProductSummary,
+  ProductSummaryVariant,
+} from "@/lib/product-summary";
 import {
   getAvailableVariants,
   getDisplayPrice,
@@ -21,11 +25,11 @@ import {
 import { productUrl } from "@/lib/seo";
 
 interface Props {
-  product: CatalogProduct;
+  product: ProductDetail;
   brandHref: string;
   brandLabel: string;
-  recommendations: CatalogProduct[];
-  complements: CatalogProduct[];
+  recommendations: ProductSummary[];
+  complements: ProductSummary[];
   outOfStock?: boolean;
 }
 
@@ -33,7 +37,7 @@ const ACCENT = "#c9a96e";
 const IMAGE_FALLBACK =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='600' height='600' fill='%23181410'/%3E%3C/svg%3E";
 
-function getVariantLabel(variant: CatalogVariant, index: number): string {
+function getVariantLabel(variant: ProductSummaryVariant, index: number): string {
   const optionLabel = variant.options.filter(Boolean).join(" / ");
   if (optionLabel) return optionLabel;
   if (variant.id !== null) return `Variante ${index + 1}`;
@@ -504,7 +508,7 @@ export default function ProductDetailClient({
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {complements.map((complementProduct) => (
                 <RecommendationCard
-                  key={complementProduct.id}
+                  key={complementProduct.slug}
                   product={complementProduct}
                 />
               ))}
@@ -529,7 +533,7 @@ export default function ProductDetailClient({
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {recommendations.map((recommendedProduct) => (
                 <RecommendationCard
-                  key={recommendedProduct.id}
+                  key={recommendedProduct.slug}
                   product={recommendedProduct}
                 />
               ))}
@@ -585,10 +589,10 @@ export default function ProductDetailClient({
   );
 }
 
-function RecommendationCard({ product }: { product: CatalogProduct }) {
+function RecommendationCard({ product }: { product: ProductSummary }) {
   const [failed, setFailed] = useState(false);
   const image =
-    product.images[0] ?? product.variants.find((variant) => variant.image)?.image;
+    product.image ?? product.variants.find((variant) => variant.image)?.image;
   const price = product.promotionalPrice ?? product.price;
   const collectionLabel =
     product.categories[product.categories.length - 1] ?? product.brand;

@@ -4,11 +4,12 @@ import JsonLd from "@/components/seo/JsonLd";
 import {
   allProducts,
   allProductsIncludingOutOfStock,
-  formatPrice,
   getProductBySlug,
   getRecommendedProducts,
   hasPurchasableStock,
 } from "@/lib/catalog";
+import { formatPrice } from "@/lib/format";
+import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import {
   absoluteUrl,
@@ -184,11 +185,11 @@ export default function ProductPage({ params }: Props) {
     <>
       <JsonLd data={productSchema} />
       <ProductDetailClient
-        product={product}
+        product={toProductDetail(product)}
         brandHref={brandHref}
         brandLabel={brandLabel}
-        recommendations={recommendations}
-        complements={complements}
+        recommendations={toProductSummaries(recommendations)}
+        complements={toProductSummaries(complements)}
         outOfStock={outOfStock}
       />
     </>

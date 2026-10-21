@@ -4,6 +4,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -15,12 +16,14 @@ export const metadata: Metadata = {
 const versaceProducts = allProducts.filter((product) => product.brand === "Versace");
 const versaceSchema = collectionSchema("/tienda/marcas/premium/versace", "Colección Versace", versaceProducts);
 
+const versaceSummaries = toProductSummaries(versaceProducts);
+
 export default function VersacePage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={versaceSchema} />
-      <BrandCarousel products={versaceProducts} brand="Versace" showNav={false} />
-      <ProductGrid products={versaceProducts} brandLabel="Colección Versace" />
+      <BrandCarousel products={versaceSummaries} brand="Versace" showNav={false} />
+      <ProductGrid products={versaceSummaries} brandLabel="Colección Versace" />
       <CollectionLinks current="premium" />
     </main>
   );

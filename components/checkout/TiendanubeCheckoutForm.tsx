@@ -4,8 +4,8 @@ import { useState } from "react";
 import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
 
 type Props = {
-  product: CatalogProduct;
-  variant: CatalogVariant | null;
+  product: Pick<CatalogProduct, "tiendanubeProductId">;
+  variant: Pick<CatalogVariant, "id" | "available" | "stock"> | null;
   disabled?: boolean;
   label?: string;
   className?: string;

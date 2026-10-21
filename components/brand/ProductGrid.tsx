@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import type { CatalogProduct } from "@/lib/catalog";
-import { formatPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/format";
+import type { ProductSummary } from "@/lib/product-summary";
 import ProductMedia from "@/components/product/ProductMedia";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import {
@@ -18,10 +18,10 @@ import {
 import { canonicalBrand } from "@/lib/brand-directory";
 
 interface Props {
-  products: CatalogProduct[];
+  products: ProductSummary[];
   brandLabel: string;
   filterBy?: "collection" | "brand";
-  searchProducts?: CatalogProduct[];
+  searchProducts?: ProductSummary[];
   /** Opt-in faceted filters (Tipo/Marca/Género/Precio). Off by default so
    *  single-brand pages keep their lean toolbar untouched. */
   enableFacets?: boolean;
@@ -53,22 +53,21 @@ type FacetSelections = {
 
 type PriceBucket = { id: string; label: string; min: number; max: number };
 
-function getFacetPrice(product: CatalogProduct): number | null {
+function getFacetPrice(product: ProductSummary): number | null {
   return product.promotionalPrice ?? product.price ?? null;
 }
 
-function getTipo(product: CatalogProduct): "lentes" | "relojes" {
+function getTipo(product: ProductSummary): "lentes" | "relojes" {
   return isWatch(product) ? "relojes" : "lentes";
 }
 
-function getProductGeneros(product: CatalogProduct): string[] {
-  const tags = new Set(product.tags.map(normalizeSearch));
-  return GENERO_ORDER.filter((genero) => tags.has(genero));
+function getProductGeneros(product: ProductSummary): string[] {
+  return GENERO_ORDER.filter((genero) => product.genders.includes(genero));
 }
 
 // Buckets derived from the ACTUAL price spread of the given set — never
 // hardcoded — split into ~4 nice ARS ranges, keeping only ranges with products.
-function buildPriceBuckets(products: CatalogProduct[]): PriceBucket[] {
+function buildPriceBuckets(products: ProductSummary[]): PriceBucket[] {
   const prices = products
     .map(getFacetPrice)
     .filter((value): value is number => value !== null && Number.isFinite(value));
@@ -128,15 +127,15 @@ type FilterOption = {
   count: number;
 };
 
-function getCollectionKey(product: CatalogProduct): string {
+function getCollectionKey(product: ProductSummary): string {
   return product.categories[product.categories.length - 1] ?? "Sin categoría";
 }
 
-function getSortPrice(product: CatalogProduct): number {
+function getSortPrice(product: ProductSummary): number {
   return product.promotionalPrice ?? product.price ?? Number.POSITIVE_INFINITY;
 }
 
-function getVariantLabel(product: CatalogProduct, variantId: number | null): string {
+function getVariantLabel(product: ProductSummary, variantId: number | null): string {
   const variant = product.variants.find((item) => item.id === variantId);
   if (!variant) return "Única opción";
   const optionLabel = variant.options.filter(Boolean).join(" / ");
@@ -155,17 +154,56 @@ function normalizeSearch(value: string): string {
     .trim();
 }
 
-function getSearchText(product: CatalogProduct, label: string): string {
+// Search text the card summaries leave out (tags, description, SEO copy), keyed
+// by slug. Grids fetch it once, on the first search interaction.
+type SearchIndex = Record<string, string>;
+
+let searchIndexRequest: Promise<SearchIndex | null> | null = null;
+
+function loadSearchIndex(): Promise<SearchIndex | null> {
+  searchIndexRequest ??= fetch("/api/search-index")
+    .then((response) => {
+      if (!response.ok) throw new Error(`search index: HTTP ${response.status}`);
+      return response.json() as Promise<SearchIndex>;
+    })
+    .catch(() => {
+      // Retry on the next search interaction; until then search still covers
+      // name, brand and categories.
+      searchIndexRequest = null;
+      return null;
+    });
+  return searchIndexRequest;
+}
+
+function useSearchIndex(enabled: boolean): SearchIndex | null {
+  const [index, setIndex] = useState<SearchIndex | null>(null);
+
+  useEffect(() => {
+    if (!enabled || index) return;
+    let cancelled = false;
+    loadSearchIndex().then((data) => {
+      if (!cancelled && data) setIndex(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, index]);
+
+  return index;
+}
+
+function getSearchText(
+  product: ProductSummary,
+  label: string,
+  searchIndex: SearchIndex | null,
+): string {
   return normalizeSearch(
     [
       product.name,
       product.brand,
       label,
       ...product.categories,
-      ...product.tags,
-      product.descriptionText,
-      product.seoTitle,
-      product.seoDescription,
+      searchIndex?.[product.slug] ?? "",
     ].join(" ")
   );
 }
@@ -177,10 +215,11 @@ function getPriorityFilters(options: FilterOption[]): FilterOption[] {
 }
 
 function getSearchSuggestions(
-  products: CatalogProduct[],
+  products: ProductSummary[],
   query: string,
   getLabel: (key: string) => string,
-  getKey: (product: CatalogProduct) => string
+  getKey: (product: ProductSummary) => string,
+  searchIndex: SearchIndex | null
 ): string[] {
   const normalizedQuery = normalizeSearch(query);
   if (normalizedQuery.length < 2) return [];
@@ -188,7 +227,7 @@ function getSearchSuggestions(
   return products
     .map((product) => {
       const label = getLabel(getKey(product));
-      const haystack = getSearchText(product, label);
+      const haystack = getSearchText(product, label, searchIndex);
       const normalizedName = normalizeSearch(product.name);
       const normalizedBrand = normalizeSearch(product.brand);
       const score = normalizedName.startsWith(normalizedQuery)
@@ -216,7 +255,7 @@ export default function ProductGrid({
   animateEntrance = true,
 }: Props) {
   const searchableProducts = searchProducts ?? products;
-  const getKey = (product: CatalogProduct) =>
+  const getKey = (product: ProductSummary) =>
     filterBy === "brand" ? product.brand : getCollectionKey(product);
   const getLabel = (key: string) => filterBy === "brand" ? (BRAND_NAMES[key] ?? key) : key;
 
@@ -247,8 +286,15 @@ export default function ProductGrid({
   }));
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  const searchIndex = useSearchIndex(showSuggestions || search.length > 0);
   const normalizedSearch = normalizeSearch(search);
-  const suggestions = getSearchSuggestions(searchableProducts, search, getLabel, getKey);
+  const suggestions = getSearchSuggestions(
+    searchableProducts,
+    search,
+    getLabel,
+    getKey,
+    searchIndex,
+  );
   const baseProducts = normalizedSearch.length > 0 ? searchableProducts : products;
 
   // Products after the existing ?view= / search / category-chip narrowing.
@@ -262,11 +308,11 @@ export default function ProductGrid({
           normalizedSearch.length > 0 || active === "Todos" || productKey === active;
         const matchesSearch =
           normalizedSearch.length === 0 ||
-          getSearchText(product, getLabel(productKey)).includes(normalizedSearch);
+          getSearchText(product, getLabel(productKey), searchIndex).includes(normalizedSearch);
         return matchesFilter && matchesSearch;
       }),
     // getKey/getLabel are stable for a given filterBy render; deps kept explicit.
-    [baseProducts, normalizedSearch, active, filterBy],
+    [baseProducts, normalizedSearch, active, filterBy, searchIndex],
   );
 
   const priceBuckets = useMemo(
@@ -635,7 +681,7 @@ export default function ProductGrid({
           <AnimatePresence initial={animateEntrance}>
             {filtered.map((product) => (
               <motion.div
-                key={product.id}
+                key={product.slug}
                 layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -671,7 +717,7 @@ export default function ProductGrid({
   );
 }
 
-function ProductCard({ product, collectionLabel }: { product: CatalogProduct; collectionLabel: string }) {
+function ProductCard({ product, collectionLabel }: { product: ProductSummary; collectionLabel: string }) {
   const availableVariants = getAvailableVariants(product);
   const [hovered, setHovered] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
@@ -684,7 +730,7 @@ function ProductCard({ product, collectionLabel }: { product: CatalogProduct; co
     product.variants[0] ??
     null;
 
-  const image = selectedVariant?.image ?? product.images[0];
+  const image = selectedVariant?.image ?? product.image;
   const price = getDisplayPrice(product, selectedVariant);
   const transferPrice = getTransferPrice(price);
   const installmentPrice = getInstallmentPrice(price);

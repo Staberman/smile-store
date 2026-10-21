@@ -2,9 +2,8 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import BrandLogoStrip from "@/components/brand/BrandLogoStrip";
 import TrustHighlights from "@/components/brand/TrustHighlights";
-import { allProducts } from "@/lib/catalog";
+import type { ProductSummary } from "@/lib/product-summary";
 import { filterStorefrontProducts } from "@/lib/storefront.mjs";
-import salesRanking from "@/data/tiendanube-sales-ranking.json";
 import { DEFAULT_STORE_VIEW } from "./storeView";
 
 const VIEW_LABELS: Record<string, string> = {
@@ -17,34 +16,27 @@ const VIEW_LABELS: Record<string, string> = {
   offers: "Ofertas",
 };
 
-const SALES_RANKING = salesRanking as {
-  ranking: Array<{ productId: number; units: number }>;
-};
-
 /**
  * Store catalog for a given view. Pure: it does not read the URL, so it can
  * be server-rendered (e.g. as a Suspense fallback) for crawlers without JS.
+ * `products` is the purchasable catalog as slim summaries; the best-sellers
+ * order is computed on the server, where the sales ranking lives.
  */
 export default function TiendaCatalog({
   view,
+  products,
+  bestSellerSlugs,
   animateEntrance = true,
 }: {
   view: string;
+  products: ProductSummary[];
+  bestSellerSlugs: string[];
   animateEntrance?: boolean;
 }) {
-  const ranking = new Map(
-    SALES_RANKING.ranking.map((item) => [String(item.productId), item.units]),
-  );
   const visibleProducts =
     view === "best-sellers"
-      ? [...allProducts]
-          .filter((product) => ranking.has(String(product.tiendanubeProductId)))
-          .sort(
-            (a, b) =>
-              (ranking.get(String(b.tiendanubeProductId)) ?? 0) -
-              (ranking.get(String(a.tiendanubeProductId)) ?? 0),
-          )
-      : filterStorefrontProducts(allProducts, view);
+      ? getBestSellers(products, bestSellerSlugs)
+      : filterStorefrontProducts(products, view);
   const label = VIEW_LABELS[view] ?? VIEW_LABELS[DEFAULT_STORE_VIEW];
 
   return (
@@ -59,7 +51,7 @@ export default function TiendaCatalog({
       />
 
       <TrustHighlights />
-      <BrandLogoStrip products={allProducts} />
+      <BrandLogoStrip products={products} />
 
       <div id="catalogo">
         <ProductGrid
@@ -67,11 +59,16 @@ export default function TiendaCatalog({
           products={visibleProducts}
           brandLabel={label}
           filterBy={view === "premium" ? "brand" : "collection"}
-          searchProducts={allProducts}
+          searchProducts={products}
           enableFacets
           animateEntrance={animateEntrance}
         />
       </div>
     </main>
   );
+}
+
+function getBestSellers(products: ProductSummary[], slugs: string[]): ProductSummary[] {
+  const bySlug = new Map(products.map((product) => [product.slug, product]));
+  return slugs.flatMap((slug) => bySlug.get(slug) ?? []);
 }

@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import type { CatalogProduct } from "@/lib/catalog";
 import { isWatch } from "@/lib/storefront.mjs";
 
 const FALLBACK =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='600' height='600' fill='%23181410'/%3E%3Ctext x='300' y='300' text-anchor='middle' fill='%23c9a96e' font-family='Arial' font-size='44'%3ESMILE%3C/text%3E%3C/svg%3E";
 
 type Props = {
-  product: CatalogProduct;
+  product: { name: string; categories: string[] };
   src: string | null | undefined;
   hovered?: boolean;
 };

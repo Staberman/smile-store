@@ -1,4 +1,4 @@
-import type { CatalogProduct, CatalogVariant } from "./catalog";
+import type { CatalogProduct } from "./catalog";
 
 export type StorefrontView =
   | "lentes"
@@ -9,23 +9,50 @@ export type StorefrontView =
   | "best-sellers"
   | "offers";
 
-export function getAvailableVariants(product: CatalogProduct): CatalogVariant[];
-export function availableStock(product: CatalogProduct): number;
-export function stockUrgencyLabel(product: CatalogProduct): string | null;
+// Structural shapes: these helpers run on full catalog products (server) and
+// on slim product summaries (client), so they only require the fields they read.
+type PriceFields = {
+  price: number | null;
+  promotionalPrice: number | null;
+};
+
+type StockVariant = PriceFields & {
+  id: number | null;
+  stock: number;
+  available: boolean;
+};
+
+type ProductWithVariants<V extends StockVariant = StockVariant> = {
+  variants: V[];
+};
+
+type FilterableProduct = PriceFields & {
+  name: string;
+  brand: string;
+  categories: string[];
+  // Product summaries omit tags; no view depends on them today.
+  tags?: string[];
+};
+
+export function getAvailableVariants<V extends StockVariant>(
+  product: ProductWithVariants<V>,
+): V[];
+export function availableStock(product: ProductWithVariants): number;
+export function stockUrgencyLabel(product: ProductWithVariants): string | null;
 export function getDisplayPrice(
-  product: CatalogProduct,
-  variant?: CatalogVariant | null,
+  product: PriceFields,
+  variant?: PriceFields | null,
 ): number | null;
 export function getTransferPrice(price: number | null | undefined): number | null;
 export function getInstallmentPrice(price: number | null | undefined): number | null;
-export function isOffer(product: CatalogProduct): boolean;
-export function isWatch(product: CatalogProduct): boolean;
+export function isOffer(product: PriceFields): boolean;
+export function isWatch(product: { categories?: string[] }): boolean;
 export function getComplementaryProducts(
   product: CatalogProduct,
   products: CatalogProduct[],
   limit?: number,
 ): CatalogProduct[];
-export function filterStorefrontProducts(
-  products: CatalogProduct[],
+export function filterStorefrontProducts<P extends FilterableProduct>(
+  products: P[],
   view: StorefrontView | string,
-): CatalogProduct[];
+): P[];

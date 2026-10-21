@@ -3,6 +3,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 import Link from "next/link";
 
@@ -25,6 +26,8 @@ const ferrariSchema = collectionSchema(
   "Scuderia Ferrari Collection",
   ferrariProducts,
 );
+
+const ferrariSummaries = toProductSummaries(ferrariProducts);
 
 export default function FerrariPage() {
   return (
@@ -114,7 +117,7 @@ export default function FerrariPage() {
 
       {/* Product grid */}
       <ProductGrid
-        products={ferrariProducts}
+        products={ferrariSummaries}
         brandLabel="Ferrari Collection"
       />
 

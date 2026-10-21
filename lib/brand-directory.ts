@@ -58,7 +58,7 @@ export function canonicalBrand(rawBrand: string): string {
 }
 
 export function getAvailableBrandEntries(
-  products: CatalogProduct[],
+  products: Pick<CatalogProduct, "brand" | "categories">[],
   group: "lentes" | "relojes",
 ): BrandDirectoryEntry[] {
   const productBrands = products

@@ -1,4 +1,5 @@
 import catalog from "@/data/tiendanube-catalog.json";
+import salesRankingData from "@/data/tiendanube-sales-ranking.json";
 
 export type CatalogVariant = {
   id: number | null;
@@ -64,13 +65,22 @@ export const allProductsIncludingOutOfStock = importedProducts;
 // Purchasable-only set used by every listing/grid, brand and collection page.
 export const allProducts = importedProducts.filter(hasPurchasableStock);
 
-export function formatPrice(value: number | null | undefined): string {
-  if (value === null || value === undefined) return "Consultar";
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(value);
+const salesRanking = (
+  salesRankingData as { ranking: Array<{ productId: number; units: number }> }
+).ranking;
+
+// Purchasable products present in the sales ranking, best sellers first.
+export function getBestSellers(): CatalogProduct[] {
+  const unitsByProductId = new Map(
+    salesRanking.map((item) => [String(item.productId), item.units]),
+  );
+  return allProducts
+    .filter((product) => unitsByProductId.has(String(product.tiendanubeProductId)))
+    .sort(
+      (a, b) =>
+        (unitsByProductId.get(String(b.tiendanubeProductId)) ?? 0) -
+        (unitsByProductId.get(String(a.tiendanubeProductId)) ?? 0),
+    );
 }
 
 export function getProductBySlug(slug: string): CatalogProduct | undefined {

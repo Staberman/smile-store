@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { CatalogProduct } from "@/lib/catalog";
 import { getAvailableBrandEntries } from "@/lib/brand-directory";
+import type { ProductSummary } from "@/lib/product-summary";
 
-export default function BrandLogoStrip({ products }: { products: CatalogProduct[] }) {
+export default function BrandLogoStrip({ products }: { products: ProductSummary[] }) {
   const groups = [
     { id: "lentes" as const, label: "Marcas de lentes" },
     { id: "relojes" as const, label: "Marcas de relojes" },

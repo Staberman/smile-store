@@ -5,6 +5,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import TrustHighlights from "@/components/brand/TrustHighlights";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -19,13 +20,15 @@ export const metadata: Metadata = {
 const watchProducts = allProducts.filter((product) => product.categories[0] === "RELOJES");
 const watchSchema = collectionSchema("/tienda/relojes", "Relojes premium", watchProducts);
 
+const watchSummaries = toProductSummaries(watchProducts);
+
 export default function RelojesPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={watchSchema} />
-      <BrandCarousel products={watchProducts} brand="Relojes" showNav={false} />
+      <BrandCarousel products={watchSummaries} brand="Relojes" showNav={false} />
       <TrustHighlights />
-      <ProductGrid products={watchProducts} brandLabel="Relojes premium" filterBy="brand" />
+      <ProductGrid products={watchSummaries} brandLabel="Relojes premium" filterBy="brand" />
       <CollectionLinks current="relojes" />
     </main>
   );

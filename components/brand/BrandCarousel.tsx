@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import type { CatalogProduct } from "@/lib/catalog";
-import { formatPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/format";
+import type { ProductSummary } from "@/lib/product-summary";
 import { isWatch } from "@/lib/storefront.mjs";
 
 interface Props {
-  products: CatalogProduct[];
+  products: ProductSummary[];
   brand: string;
   accentColor?: string; // CSS hex, default gold
   showNav?: boolean; // show internal nav bar (default true)
@@ -24,50 +24,50 @@ const BG_GRADIENTS = [
   "radial-gradient(ellipse at 44% 48%, #14100a 0%, #0a0a0a 72%)",
 ];
 
-function hasAvailableVariant(product: CatalogProduct) {
+function hasAvailableVariant(product: ProductSummary) {
   return product.variants.some(
     (variant) => variant.available && variant.stock > 0,
   );
 }
 
-function getCarouselImage(product: CatalogProduct): string | null {
-  return product.images[0] ?? product.variants.find((variant) => variant.image)?.image ?? null;
+function getCarouselImage(product: ProductSummary): string | null {
+  return product.image ?? product.variants.find((variant) => variant.image)?.image ?? null;
 }
 
-function hasCarouselImage(product: CatalogProduct) {
+function hasCarouselImage(product: ProductSummary) {
   return Boolean(getCarouselImage(product));
 }
 
-function buildSlides(products: CatalogProduct[]) {
+function buildSlides(products: ProductSummary[]) {
   const preferred = products.filter(
     (product) => hasAvailableVariant(product) && hasCarouselImage(product),
   );
   const imageProducts = products.filter(hasCarouselImage);
   const source = preferred.length > 0 ? preferred : imageProducts.length > 0 ? imageProducts : products;
-  const slides: CatalogProduct[] = [];
+  const slides: ProductSummary[] = [];
   const seen = new Set<string>();
 
   for (const product of source) {
     if (slides.length >= 5) break;
     slides.push(product);
-    seen.add(product.id);
+    seen.add(product.slug);
   }
 
   if (preferred.length > 0 && slides.length < 5) {
     for (const product of products) {
       if (slides.length >= 5) break;
-      if (seen.has(product.id)) continue;
+      if (seen.has(product.slug)) continue;
       slides.push(product);
-      seen.add(product.id);
+      seen.add(product.slug);
     }
   }
 
   if (imageProducts.length > 0 && slides.length < 5) {
     for (const product of imageProducts) {
       if (slides.length >= 5) break;
-      if (seen.has(product.id)) continue;
+      if (seen.has(product.slug)) continue;
       slides.push(product);
-      seen.add(product.id);
+      seen.add(product.slug);
     }
   }
 
@@ -198,7 +198,7 @@ export default function BrandCarousel({
 
           return (
             <div
-              key={prod.id}
+              key={prod.slug}
               className="absolute inset-0 flex items-center justify-center"
               style={{ pointerEvents: isActive ? "auto" : "none" }}
             >

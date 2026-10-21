@@ -33,7 +33,7 @@ export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-export function productUrl(product: CatalogProduct): string {
+export function productUrl(product: Pick<CatalogProduct, "slug">): string {
   return absoluteUrl(`/tienda/productos/${product.slug}`);
 }
 
