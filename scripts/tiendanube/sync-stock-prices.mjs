@@ -31,7 +31,7 @@ async function fetchProducts({ storeId, accessToken }) {
 
     const response = await fetch(nextUrl, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authentication: `bearer ${accessToken}`,
         "User-Agent":
           process.env.TIENDANUBE_USER_AGENT?.trim() ||
           "Smile Stock Sync (smiletiendaimp.com.ar)",
