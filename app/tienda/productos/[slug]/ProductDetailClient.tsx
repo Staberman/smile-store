@@ -185,8 +185,11 @@ export default function ProductDetailClient({
       <Breadcrumbs trail={breadcrumbs} />
 
       <div className="mx-auto max-w-7xl px-6 py-12 md:px-12 md:py-20">
+        {/* min-w-0: grid items default to min-width:auto, so the gallery's
+            horizontal scroller (one full-width slide per image) would size the
+            column, and the mobile page, to the width of every slide combined. */}
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
-          <div className="flex flex-col gap-4">
+          <div className="flex min-w-0 flex-col gap-4">
             <div className="relative overflow-hidden rounded-2xl bg-[#111]">
               <div
                 ref={galleryRef}
@@ -267,7 +270,7 @@ export default function ProductDetailClient({
             )}
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             <p className="text-[9px] uppercase tracking-[0.44em] text-[#4a4540]">
               {collectionLabel}
             </p>
