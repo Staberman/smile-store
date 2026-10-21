@@ -1,10 +1,16 @@
 import Image from "next/image";
+import {
+  CONSUMER_DEFENSE_URL,
+  ORDER_CANCELLATION_URL,
+  STORE_LOCATION,
+} from "@/lib/store-facts";
 
 type FooterLink = { label: string; href: string; target?: "_blank" };
 type FooterColumn = { heading: string; links: FooterLink[] };
 
-// Every link points to an indexable destination. Each column is one entry here,
-// so new groups (e.g. legal/policy pages) are added as another column.
+// Every link points to an indexable destination or, under "Ayuda", to the
+// consumer-protection forms required for online sales in Argentina. Each
+// column is one entry here.
 const nav: FooterColumn[] = [
   {
     heading: "Colecciones",
@@ -31,13 +37,21 @@ const nav: FooterColumn[] = [
       { label: "Contacto", href: "/contacto" },
     ],
   },
+  {
+    heading: "Ayuda",
+    links: [
+      // The store's Tiendanube order-cancellation form ("botón de arrepentimiento").
+      { label: "Botón de arrepentimiento", href: ORDER_CANCELLATION_URL, target: "_blank" },
+      { label: "Defensa de las y los consumidores", href: CONSUMER_DEFENSE_URL, target: "_blank" },
+    ],
+  },
 ];
 
 export default function Footer() {
   return (
     <footer className="border-t border-white/8 bg-[#040404] px-6 py-16 text-white md:px-12 md:py-20">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 md:grid-cols-[1fr_auto_auto_auto] md:gap-16">
+        <div className="grid gap-12 md:grid-cols-[1fr_auto_auto_auto_auto] md:gap-12 lg:gap-16">
           {/* Brand */}
           <div>
             <a href="/" aria-label="Smile inicio">
@@ -53,6 +67,7 @@ export default function Footer() {
               Relojes, lentes y accesorios premium en Argentina. Compra directa
               con checkout seguro de Tiendanube.
             </p>
+            <p className="mt-3 text-sm text-white/42">{STORE_LOCATION.label}</p>
           </div>
 
           {/* Nav columns */}

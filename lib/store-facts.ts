@@ -25,3 +25,10 @@ export const STORE_LOCATION = {
   countryCode: "AR",
   label: "Rosario, Santa Fe, Argentina",
 } as const;
+
+// Consumer-protection links (Argentina). The cancellation form is the store's
+// own Tiendanube "botón de arrepentimiento".
+export const TIENDANUBE_STORE_URL = "https://smiletienda.mitiendanube.com";
+export const ORDER_CANCELLATION_URL = `${TIENDANUBE_STORE_URL}/contacto/?order_cancellation_without_id=true`;
+export const CONSUMER_DEFENSE_URL =
+  "https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario";

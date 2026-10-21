@@ -3,7 +3,15 @@ import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import JsonLd from "@/components/seo/JsonLd";
-import { absoluteUrl, pageMetadata, SITE_NAME, SITE_URL } from "@/lib/seo";
+import { absoluteUrl, ORGANIZATION_ID, pageMetadata, SITE_NAME, SITE_URL } from "@/lib/seo";
+import {
+  INSTAGRAM_URL,
+  PHONE_DISPLAY,
+  PHONE_E164,
+  STORE_EMAIL,
+  STORE_LOCATION,
+  WHATSAPP_URL,
+} from "@/lib/store-facts";
 
 export const metadata: Metadata = pageMetadata({
   title: "Contacto",
@@ -12,30 +20,29 @@ export const metadata: Metadata = pageMetadata({
   path: "/contacto",
 });
 
+// The store itself is the sitewide OnlineStore node (app/layout.tsx); the
+// contact page points to it instead of describing it again.
 const contactSchema = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
-  name: "Contacto | Smile",
+  "@id": `${absoluteUrl("/contacto")}#contactpage`,
+  name: `Contacto | ${SITE_NAME}`,
   url: absoluteUrl("/contacto"),
-  mainEntity: {
-    "@type": "Organization",
-    name: SITE_NAME,
-    url: SITE_URL,
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: "+54 9 341 261 3504",
-      contactType: "customer service",
-      areaServed: "AR",
-      availableLanguage: "Spanish",
-    },
-  },
+  inLanguage: "es-AR",
+  isPartOf: { "@id": `${SITE_URL}/#website` },
+  mainEntity: { "@id": ORGANIZATION_ID },
 };
 
-const contactItems = [
-  {
-    label: "Teléfono",
-    value: "+54 9 341 261 3504",
-  },
+const instagramHandle = `@${INSTAGRAM_URL.split("/").filter(Boolean).pop()}`;
+
+type ContactItem = { label: string; value: string; href?: string; external?: boolean };
+
+const contactItems: ContactItem[] = [
+  { label: "WhatsApp", value: PHONE_DISPLAY, href: WHATSAPP_URL, external: true },
+  { label: "Teléfono", value: PHONE_DISPLAY, href: `tel:${PHONE_E164}` },
+  { label: "Email", value: STORE_EMAIL, href: `mailto:${STORE_EMAIL}` },
+  { label: "Instagram", value: instagramHandle, href: INSTAGRAM_URL, external: true },
+  { label: "Ubicación", value: STORE_LOCATION.label },
   {
     label: "Consultas",
     value: "Stock, medios de pago, envíos y seguimiento de compra.",
@@ -73,8 +80,19 @@ export default function ContactPage() {
                 <p className="text-[10px] uppercase tracking-[0.3em] text-[#4a4540]">
                   {item.label}
                 </p>
-                <p className="mt-4 text-sm leading-[1.75] text-[#f0ece4]">
-                  {item.value}
+                <p className="mt-4 break-words text-sm leading-[1.75] text-[#f0ece4]">
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target={item.external ? "_blank" : undefined}
+                      rel={item.external ? "noopener noreferrer" : undefined}
+                      className="underline decoration-white/20 underline-offset-4 transition hover:text-[#c9a96e] hover:decoration-[#c9a96e]"
+                    >
+                      {item.value}
+                    </a>
+                  ) : (
+                    item.value
+                  )}
                 </p>
               </div>
             ))}
