@@ -65,6 +65,12 @@ export const allProductsIncludingOutOfStock = importedProducts;
 // Purchasable-only set used by every listing/grid, brand and collection page.
 export const allProducts = importedProducts.filter(hasPurchasableStock);
 
+// Listed by URL but not purchasable: collection hubs link them in a separate
+// "Sin stock por ahora" section so their pages are reachable by crawlers.
+export const outOfStockProducts = importedProducts.filter(
+  (product) => !hasPurchasableStock(product),
+);
+
 const salesRanking = (
   salesRankingData as { ranking: Array<{ productId: number; units: number }> }
 ).ranking;

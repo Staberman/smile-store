@@ -4,6 +4,7 @@ import RecentlyViewed from "@/components/product/RecentlyViewed";
 import JsonLd from "@/components/seo/JsonLd";
 import StoreShell from "@/components/store/StoreShell";
 import TiendaClient from "@/components/store/TiendaClient";
+import WatchesSection from "@/components/store/WatchesSection";
 import { allProducts, getBestSellers } from "@/lib/catalog";
 import { toProductSummaries } from "@/lib/product-summary";
 import { SITE_OPEN_GRAPH, SITE_TWITTER, collectionSchema } from "@/lib/seo";
@@ -45,6 +46,7 @@ export default function Home() {
       <JsonLd data={homeCollectionSchema} />
       <h1 className="sr-only">{HOME_TITLE}</h1>
       <TiendaClient products={storeProducts} bestSellerSlugs={bestSellerSlugs} />
+      <WatchesSection products={storeProducts} />
       <RecentlyViewed />
       <FaqSection />
     </StoreShell>

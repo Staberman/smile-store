@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -18,10 +19,12 @@ export const metadata: Metadata = {
 const ACCENT = "#c9a96e";
 const ferrariRed = "#dc0000";
 
-const ferrariProducts = allProducts.filter((product) => {
+const isFerrariProduct = (product: CatalogProduct) => {
   const values = [product.brand, ...product.categories, ...product.tags];
   return values.some((value) => value.toLowerCase().includes("ferrari"));
-});
+};
+const ferrariProducts = allProducts.filter(isFerrariProduct);
+const ferrariOutOfStock = outOfStockProducts.filter(isFerrariProduct);
 const ferrariSchema = collectionSchema(
   "/tienda/marcas/ray-ban/ferrari",
   "Scuderia Ferrari Collection",
@@ -112,6 +115,7 @@ export default function FerrariPage() {
         products={ferrariSummaries}
         brandLabel="Ferrari Collection"
       />
+      <OutOfStockProducts products={ferrariOutOfStock} />
 
       {/* Collection links */}
       <CollectionLinks current="ferrari" />

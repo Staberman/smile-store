@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import ProductGrid from "@/components/brand/ProductGrid";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -104,8 +105,9 @@ const availableBrands = BRANDS.filter((brand) => {
   return allProducts.some((product) => product.brand === catalogBrand);
 });
 
-// Purchasable products of every premium maison (category "Marcas premium").
+// Products of every premium maison (category "Marcas premium").
 const premiumProducts = filterStorefrontProducts(allProducts, "premium");
+const premiumOutOfStock = filterStorefrontProducts(outOfStockProducts, "premium");
 const premiumSchema = collectionSchema(
   "/tienda/marcas/premium",
   "Marcas Premium",
@@ -185,6 +187,7 @@ export default function MarcasPremiumPage() {
         brandLabel="Lentes de marcas premium"
         filterBy="brand"
       />
+      <OutOfStockProducts products={premiumOutOfStock} />
 
       <CollectionLinks current="premium" />
     </main>

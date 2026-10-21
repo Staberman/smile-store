@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/premium/versace" },
 };
 
-const versaceProducts = allProducts.filter((product) => product.brand === "Versace");
+const isVersaceProduct = (product: CatalogProduct) => product.brand === "Versace";
+const versaceProducts = allProducts.filter(isVersaceProduct);
+const versaceOutOfStock = outOfStockProducts.filter(isVersaceProduct);
 const breadcrumbs = premiumBrandTrail("versace");
 const versaceSchema = collectionSchema("/tienda/marcas/premium/versace", "Colección Versace", versaceProducts, breadcrumbs);
 
@@ -28,6 +31,7 @@ export default function VersacePage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={versaceSummaries} brand="Versace" showNav={false} />
       <ProductGrid products={versaceSummaries} brandLabel="Colección Versace" />
+      <OutOfStockProducts products={versaceOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );

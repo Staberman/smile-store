@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -16,10 +17,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/ray-ban" },
 };
 
-const rayBanProducts = allProducts.filter((product) => {
+const isRayBanProduct = (product: CatalogProduct) => {
   const values = [product.brand, ...product.categories];
   return values.some((value) => value.toLowerCase().includes("ray ban"));
-});
+};
+const rayBanProducts = allProducts.filter(isRayBanProduct);
+const rayBanOutOfStock = outOfStockProducts.filter(isRayBanProduct);
 const rayBanSchema = collectionSchema(
   "/tienda/marcas/ray-ban",
   "Colección Ray-Ban",
@@ -67,6 +70,7 @@ export default function RayBanPage() {
       </section>
 
       <ProductGrid products={rayBanSummaries} brandLabel="Colección Ray-Ban" />
+      <OutOfStockProducts products={rayBanOutOfStock} />
       <CollectionLinks current="ray-ban" />
     </main>
   );

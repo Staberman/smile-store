@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import ProductGrid from "@/components/brand/ProductGrid";
 import TrustHighlights from "@/components/brand/TrustHighlights";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -19,7 +20,9 @@ export const metadata: Metadata = {
   },
 };
 
-const watchProducts = allProducts.filter((product) => product.categories[0] === "RELOJES");
+const isWatchProduct = (product: CatalogProduct) => product.categories[0] === "RELOJES";
+const watchProducts = allProducts.filter(isWatchProduct);
+const watchOutOfStock = outOfStockProducts.filter(isWatchProduct);
 const watchSchema = collectionSchema("/tienda/relojes", "Relojes premium", watchProducts, COLLECTION_TRAILS.relojes);
 
 const watchSummaries = toProductSummaries(watchProducts);
@@ -32,6 +35,7 @@ export default function RelojesPage() {
       <BrandCarousel products={watchSummaries} brand="Relojes" showNav={false} />
       <TrustHighlights />
       <ProductGrid products={watchSummaries} brandLabel="Relojes premium" filterBy="brand" />
+      <OutOfStockProducts products={watchOutOfStock} />
       <CollectionLinks current="relojes" />
     </main>
   );

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/premium/dolce-gabbana" },
 };
 
-const dolceGabbanaProducts = allProducts.filter((product) => product.brand === "Dolce&Gabbana");
+const isDolceGabbanaProduct = (product: CatalogProduct) => product.brand === "Dolce&Gabbana";
+const dolceGabbanaProducts = allProducts.filter(isDolceGabbanaProduct);
+const dolceGabbanaOutOfStock = outOfStockProducts.filter(isDolceGabbanaProduct);
 const breadcrumbs = premiumBrandTrail("dolce-gabbana");
 const dolceGabbanaSchema = collectionSchema("/tienda/marcas/premium/dolce-gabbana", "Colección Dolce&Gabbana", dolceGabbanaProducts, breadcrumbs);
 
@@ -28,6 +31,7 @@ export default function DolceGabbanaPage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={dolceGabbanaSummaries} brand="Dolce&Gabbana" showNav={false} />
       <ProductGrid products={dolceGabbanaSummaries} brandLabel="Colección Dolce&Gabbana" />
+      <OutOfStockProducts products={dolceGabbanaOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );

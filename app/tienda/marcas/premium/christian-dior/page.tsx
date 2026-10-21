@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/premium/christian-dior" },
 };
 
-const diorProducts = allProducts.filter((product) => product.brand === "Christian Dior");
+const isDiorProduct = (product: CatalogProduct) => product.brand === "Christian Dior";
+const diorProducts = allProducts.filter(isDiorProduct);
+const diorOutOfStock = outOfStockProducts.filter(isDiorProduct);
 const breadcrumbs = premiumBrandTrail("christian-dior");
 const diorSchema = collectionSchema("/tienda/marcas/premium/christian-dior", "Colección Christian Dior", diorProducts, breadcrumbs);
 
@@ -28,6 +31,7 @@ export default function DiorPage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={diorSummaries} brand="Christian Dior" showNav={false} />
       <ProductGrid products={diorSummaries} brandLabel="Colección Christian Dior" />
+      <OutOfStockProducts products={diorOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );

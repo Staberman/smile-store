@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -18,9 +19,9 @@ export const metadata: Metadata = {
 
 const ACCENT = "#c9a96e";
 
-const omegaSwatchProducts = allProducts.filter(
-  (product) => product.brand === "OMEGA x Swatch"
-);
+const isOmegaSwatchProduct = (product: CatalogProduct) => product.brand === "OMEGA x Swatch";
+const omegaSwatchProducts = allProducts.filter(isOmegaSwatchProduct);
+const omegaSwatchOutOfStock = outOfStockProducts.filter(isOmegaSwatchProduct);
 const omegaSwatchSchema = collectionSchema(
   "/tienda/relojes/omega-swatch",
   "Omega × Swatch MoonSwatch",
@@ -76,6 +77,7 @@ export default function OmegaSwatchPage() {
       </section>
 
       <ProductGrid products={omegaSwatchSummaries} brandLabel="Omega × Swatch MoonSwatch" />
+      <OutOfStockProducts products={omegaSwatchOutOfStock} />
       <CollectionLinks current="omega-swatch" />
     </main>
   );

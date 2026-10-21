@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/premium/prada" },
 };
 
-const pradaProducts = allProducts.filter((product) => product.brand === "Prada");
+const isPradaProduct = (product: CatalogProduct) => product.brand === "Prada";
+const pradaProducts = allProducts.filter(isPradaProduct);
+const pradaOutOfStock = outOfStockProducts.filter(isPradaProduct);
 const breadcrumbs = premiumBrandTrail("prada");
 const pradaSchema = collectionSchema("/tienda/marcas/premium/prada", "Colección Prada", pradaProducts, breadcrumbs);
 
@@ -28,6 +31,7 @@ export default function PradaPage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={pradaSummaries} brand="Prada" showNav={false} />
       <ProductGrid products={pradaSummaries} brandLabel="Colección Prada" />
+      <OutOfStockProducts products={pradaOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );

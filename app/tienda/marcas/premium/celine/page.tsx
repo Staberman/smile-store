@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
 
-const celineProducts = allProducts.filter((product) => product.brand === "Celine Paris");
+const isCelineProduct = (product: CatalogProduct) => product.brand === "Celine Paris";
+const celineProducts = allProducts.filter(isCelineProduct);
+const celineOutOfStock = outOfStockProducts.filter(isCelineProduct);
 const breadcrumbs = premiumBrandTrail("celine");
 const celineSchema = collectionSchema(
   "/tienda/marcas/premium/celine",
@@ -37,6 +40,7 @@ export default function CelinePage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={celineSummaries} brand="Celine Paris" showNav={false} />
       <ProductGrid products={celineSummaries} brandLabel="Colección Celine Paris" />
+      <OutOfStockProducts products={celineOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );

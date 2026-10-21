@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/premium/balenciaga" },
 };
 
-const balenciagaProducts = allProducts.filter((product) => product.brand === "Balenciaga");
+const isBalenciagaProduct = (product: CatalogProduct) => product.brand === "Balenciaga";
+const balenciagaProducts = allProducts.filter(isBalenciagaProduct);
+const balenciagaOutOfStock = outOfStockProducts.filter(isBalenciagaProduct);
 const breadcrumbs = premiumBrandTrail("balenciaga");
 const balenciagaSchema = collectionSchema("/tienda/marcas/premium/balenciaga", "Colección Balenciaga", balenciagaProducts, breadcrumbs);
 
@@ -28,6 +31,7 @@ export default function BalenciagaPage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={balenciagaSummaries} brand="Balenciaga" showNav={false} />
       <ProductGrid products={balenciagaSummaries} brandLabel="Colección Balenciaga" />
+      <OutOfStockProducts products={balenciagaOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { premiumBrandTrail } from "@/lib/collections";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema } from "@/lib/seo";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tienda/marcas/premium/gucci" },
 };
 
-const gucciProducts = allProducts.filter((product) => product.brand === "Gucci");
+const isGucciProduct = (product: CatalogProduct) => product.brand === "Gucci";
+const gucciProducts = allProducts.filter(isGucciProduct);
+const gucciOutOfStock = outOfStockProducts.filter(isGucciProduct);
 const breadcrumbs = premiumBrandTrail("gucci");
 const gucciSchema = collectionSchema("/tienda/marcas/premium/gucci", "Colección Gucci", gucciProducts, breadcrumbs);
 
@@ -28,6 +31,7 @@ export default function GucciPage() {
       <Breadcrumbs trail={breadcrumbs} />
       <BrandCarousel products={gucciSummaries} brand="Gucci" showNav={false} />
       <ProductGrid products={gucciSummaries} brandLabel="Colección Gucci" />
+      <OutOfStockProducts products={gucciOutOfStock} />
       <CollectionLinks current="premium" />
     </main>
   );
