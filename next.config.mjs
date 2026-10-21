@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // On Vercel, Next's built-in trailing-slash redirect runs before the
+  // vercel.json redirects, so "/relojes/" would take two hops (strip the slash,
+  // then the legacy rule). vercel.json strips trailing slashes itself instead,
+  // in its last redirect, after the legacy Tiendanube rules.
+  skipTrailingSlashRedirect: true,
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

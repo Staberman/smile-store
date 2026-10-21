@@ -18,23 +18,68 @@
       "permanent": true
     },
     {
-      "source": "/productos/:slug",
+      "source": "/(lentes-de-sol|lentes-en-promo|mas-vendidos|productos|tienda){/}?",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/productos/:slug{/}?",
       "destination": "/tienda/productos/:slug",
       "permanent": true
     },
     {
-      "source": "/lentes-de-sol",
-      "destination": "/",
+      "source": "/lentes-de-sol/ray-ban-scuderia-ferrari-collection(/.*)?",
+      "destination": "/tienda/marcas/ray-ban/ferrari",
       "permanent": true
     },
     {
-      "source": "/tienda",
-      "destination": "/",
+      "source": "/lentes-de-sol/ray-ban(/.*)?",
+      "destination": "/tienda/marcas/ray-ban",
       "permanent": true
     },
     {
-      "source": "/tienda/",
-      "destination": "/",
+      "source": "/lentes-de-sol/marcas-premium/:brand(balenciaga|cartier|christian-dior|fendi|gucci|louis-vuitton|prada|saint-laurent|versace){/}?",
+      "destination": "/tienda/marcas/premium/:brand",
+      "permanent": true
+    },
+    {
+      "source": "/lentes-de-sol/marcas-premium/dolcegabbana{/}?",
+      "destination": "/tienda/marcas/premium/dolce-gabbana",
+      "permanent": true
+    },
+    {
+      "source": "/lentes-de-sol/marcas-premium(/.*)?",
+      "destination": "/tienda/marcas/premium",
+      "permanent": true
+    },
+    {
+      "source": "/lentes-de-sol/prada{/}?",
+      "destination": "/tienda/marcas/premium/prada",
+      "permanent": true
+    },
+    {
+      "source": "/relojes/invicta{/}?",
+      "destination": "/tienda/marcas/invicta",
+      "permanent": true
+    },
+    {
+      "source": "/relojes/omega-x-swacht{/}?",
+      "destination": "/tienda/relojes/omega-swatch",
+      "permanent": true
+    },
+    {
+      "source": "/relojes/tommy-hilfiger-(dama|caballero){/}?",
+      "destination": "/tienda/marcas/tommy-hilfiger",
+      "permanent": true
+    },
+    {
+      "source": "/relojes(/.*)?",
+      "destination": "/tienda/relojes",
+      "permanent": true
+    },
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
       "permanent": true
     }
   ]
