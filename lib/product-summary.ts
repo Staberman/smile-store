@@ -110,11 +110,18 @@ export function toProductSummaries(products: CatalogProduct[]): ProductSummary[]
   return products.map(toProductSummary);
 }
 
-export function toProductDetail(product: CatalogProduct): ProductDetail {
+/**
+ * `display` overrides what the page shows as the product's name and brand
+ * (the H1 carries the canonical brand: "Ray-Ban 4375 Polarizado").
+ */
+export function toProductDetail(
+  product: CatalogProduct,
+  display: Partial<Pick<ProductDetail, "name" | "brand">> = {},
+): ProductDetail {
   return {
     slug: product.slug,
-    name: product.name,
-    brand: product.brand,
+    name: display.name ?? product.name,
+    brand: display.brand ?? product.brand,
     categories: product.categories,
     descriptionText: product.descriptionText,
     price: product.price,

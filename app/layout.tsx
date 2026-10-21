@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import WhatsAppFloatingButton from "@/components/contact/WhatsAppFloatingButton";
 import SessionOfferPopup from "@/components/promo/SessionOfferPopup";
 import JsonLd from "@/components/seo/JsonLd";
+import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import { SITE_NAME, SITE_OPEN_GRAPH, SITE_TWITTER, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: "Smile | Relojes, lentes y accesorios premium en Argentina",
-    template: "%s | Smile",
+    template: `%s${TITLE_SUFFIX}`,
   },
   description:
     "Tienda online de relojes, lentes y accesorios premium en Argentina. Descubre modelos seleccionados de Invicta, Ray-Ban y Tommy Hilfiger.",

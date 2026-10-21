@@ -38,12 +38,6 @@ export function productUrl(product: Pick<CatalogProduct, "slug">): string {
   return absoluteUrl(`/tienda/productos/${product.slug}`);
 }
 
-export function truncateMetaDescription(value: string, maxLength = 158): string {
-  const normalized = value.replace(/\s+/g, " ").trim();
-  if (normalized.length <= maxLength) return normalized;
-  return `${normalized.slice(0, maxLength - 3).replace(/\s+\S*$/, "")}...`;
-}
-
 export function productAvailability(product: CatalogProduct): string {
   return product.variants.some((variant) => variant.available && variant.stock > 0)
     ? "https://schema.org/InStock"

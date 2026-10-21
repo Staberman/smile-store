@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { canonicalBrand } from "@/lib/brand-directory";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
 import { isWatch } from "@/lib/storefront.mjs";
@@ -130,7 +131,7 @@ export default function BrandCarousel({
   }
 
   const bgGradient = BG_GRADIENTS[currentIndex % BG_GRADIENTS.length];
-  const subtitle = slide.categories[slide.categories.length - 1] ?? slide.brand;
+  const subtitle = slide.categories[slide.categories.length - 1] ?? canonicalBrand(slide.brand);
   const price = slide.promotionalPrice ?? slide.price;
 
   return (
@@ -253,7 +254,7 @@ export default function BrandCarousel({
                   >
                     {index === currentIndex
                       ? subtitle
-                      : (prod.categories[prod.categories.length - 1] ?? prod.brand)}
+                      : (prod.categories[prod.categories.length - 1] ?? canonicalBrand(prod.brand))}
                   </p>
 
                   <p

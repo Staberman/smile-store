@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { canonicalBrand } from "@/lib/brand-directory";
 import {
   formatArs,
   snapshotPrice,
@@ -84,7 +85,7 @@ function RecentCard({ item }: { item: ProductSnapshot }) {
       </div>
       <div className="p-4">
         <p className="text-[9px] uppercase tracking-[0.28em] text-[#8b8580]">
-          {item.brand}
+          {canonicalBrand(item.brand)}
         </p>
         <h3 className="mt-1 line-clamp-2 min-h-[2.2rem] text-xs font-medium leading-tight text-[#f0ece4]">
           {item.name}

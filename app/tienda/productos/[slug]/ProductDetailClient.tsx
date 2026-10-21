@@ -8,6 +8,7 @@ import TrustHighlights from "@/components/brand/TrustHighlights";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
+import { canonicalBrand } from "@/lib/brand-directory";
 import { useRecentlyViewed } from "@/lib/browser-lists";
 import type { Crumb } from "@/lib/collections";
 import { formatPrice } from "@/lib/format";
@@ -614,7 +615,7 @@ function RecommendationCard({ product }: { product: ProductSummary }) {
         <h3 className="mt-2 line-clamp-2 min-h-10 text-sm font-medium leading-5 text-[#f0ece4]">
           {product.name}
         </h3>
-        <p className="mt-1 text-xs text-[#4a4540]">{product.brand}</p>
+        <p className="mt-1 text-xs text-[#4a4540]">{canonicalBrand(product.brand)}</p>
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-[12px]" style={{ color: ACCENT }}>
             {formatPrice(price)}

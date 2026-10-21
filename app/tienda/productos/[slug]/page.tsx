@@ -8,7 +8,7 @@ import {
   getRecommendedProducts,
   hasPurchasableStock,
 } from "@/lib/catalog";
-import { formatPrice } from "@/lib/format";
+import { getProductSeo } from "@/lib/product-meta";
 import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import { getProductTrail } from "@/lib/collections";
@@ -17,8 +17,8 @@ import {
   breadcrumbSchema,
   productUrl,
   SITE_NAME,
-  truncateMetaDescription,
 } from "@/lib/seo";
+import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import ProductDetailClient from "./ProductDetailClient";
 
 interface Props {
@@ -39,18 +39,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProductBySlug(params.slug);
   if (!product) return { title: "Producto" };
 
-  const metaTitle = product.seoTitle || product.name;
-  const metaDescription =
-    product.seoDescription || product.descriptionText ||
-    `${product.name} - disponible en Smile Argentina. ${formatPrice(
-      product.promotionalPrice ?? product.price
-    )}`;
+  // Title and description come from the catalog's structured fields (brand,
+  // model, type), not from Tiendanube's SEO fields, which are often store-wide
+  // defaults, lack the brand or run past 60 characters.
+  const seo = getProductSeo(product);
   const canonical = productUrl(product);
   const image = product.images[0] ? absoluteUrl(product.images[0]) : undefined;
 
   return {
-    title: metaTitle,
-    description: truncateMetaDescription(metaDescription),
+    title: seo.title,
+    description: seo.description,
     alternates: {
       canonical,
     },
@@ -58,22 +56,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       locale: "es_AR",
       siteName: SITE_NAME,
-      title: metaTitle,
-      description: truncateMetaDescription(metaDescription),
+      title: `${seo.title}${TITLE_SUFFIX}`,
+      description: seo.description,
       url: canonical,
       images: image
         ? [
             {
               url: image,
-              alt: product.name,
+              alt: seo.displayName,
             },
           ]
         : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: metaTitle,
-      description: truncateMetaDescription(metaDescription),
+      title: `${seo.title}${TITLE_SUFFIX}`,
+      description: seo.description,
       images: image ? [image] : undefined,
     },
   };
@@ -86,21 +84,12 @@ export default function ProductPage({ params }: Props) {
   const recommendations = getRecommendedProducts(product, 4);
   const complements = getComplementaryProducts(product, allProducts, 4);
 
-  const normalizedBrand = product.brand.trim().toLowerCase();
-  const isRayBan =
-    normalizedBrand === "ray ban" ||
-    normalizedBrand === "ray-ban" ||
-    normalizedBrand === "rayban";
-  const brandLabel = isRayBan
-    ? "Ray-Ban"
-    : normalizedBrand === "omega x swatch"
-      ? "OMEGA x Swatch"
-      : product.brand;
+  const seo = getProductSeo(product);
   // Collection trail plus the product itself: drives both the visible
   // breadcrumbs and the BreadcrumbList below.
   const breadcrumbs = [
     ...getProductTrail(product),
-    { name: product.name, href: `/tienda/productos/${product.slug}` },
+    { name: seo.displayName, href: `/tienda/productos/${product.slug}` },
   ];
   const currentPrice = product.promotionalPrice ?? product.price;
   const hasValidPrice = typeof currentPrice === "number" && currentPrice > 0;
@@ -114,12 +103,12 @@ export default function ProductPage({ params }: Props) {
       {
         "@type": "Product",
         "@id": `${productUrl(product)}#product`,
-        name: product.name,
+        name: seo.displayName,
         description: product.descriptionText,
         image: product.images.map(absoluteUrl),
         brand: {
           "@type": "Brand",
-          name: brandLabel,
+          name: seo.brand,
         },
         sku: product.variants.find((variant) => variant.sku)?.sku || product.slug,
         url: productUrl(product),
@@ -152,7 +141,7 @@ export default function ProductPage({ params }: Props) {
     <>
       <JsonLd data={productSchema} />
       <ProductDetailClient
-        product={toProductDetail(product)}
+        product={toProductDetail(product, { name: seo.displayName, brand: seo.brand })}
         breadcrumbs={breadcrumbs}
         recommendations={toProductSummaries(recommendations)}
         complements={toProductSummaries(complements)}

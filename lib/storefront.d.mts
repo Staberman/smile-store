@@ -43,6 +43,8 @@ export function getDisplayPrice(
   product: PriceFields,
   variant?: PriceFields | null,
 ): number | null;
+export const TRANSFER_DISCOUNT_PERCENT: number;
+export const INTEREST_FREE_INSTALLMENTS: number;
 export function getTransferPrice(price: number | null | undefined): number | null;
 export function getInstallmentPrice(price: number | null | undefined): number | null;
 export function isOffer(product: PriceFields): boolean;

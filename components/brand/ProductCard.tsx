@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import ProductMedia from "@/components/product/ProductMedia";
+import { canonicalBrand } from "@/lib/brand-directory";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
 import {
@@ -58,12 +59,13 @@ export default function ProductCard({
   const transferPrice = getTransferPrice(price);
   const installmentPrice = getInstallmentPrice(price);
   const lowStock = stockUrgencyLabel(product);
+  const brand = canonicalBrand(product.brand);
 
   // Minimal snapshot taken from the product already in scope — no catalog lookup.
   const snapshot = {
     slug: product.slug,
     name: product.name,
-    brand: product.brand,
+    brand,
     image: image ?? null,
     price: product.price,
     promotionalPrice: product.promotionalPrice,
@@ -116,7 +118,7 @@ export default function ProductCard({
         <h3 className="mt-1.5 line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-tight text-[#f0ece4]">
           {product.name}
         </h3>
-        <p className="mt-0.5 text-xs text-[#4a4540]">{product.brand}</p>
+        <p className="mt-0.5 text-xs text-[#4a4540]">{brand}</p>
 
         {availableVariants.length > 1 && (
           <select

@@ -98,20 +98,6 @@ function priceInBucket(price: number, bucket: PriceBucket): boolean {
   return price >= bucket.min && (bucket.max === Number.POSITIVE_INFINITY || price < bucket.max);
 }
 
-const BRAND_NAMES: Record<string, string> = {
-  prada: "Prada",
-  "christian-dior": "Christian Dior",
-  versace: "Versace",
-  gucci: "Gucci",
-  balenciaga: "Balenciaga",
-  "louis-vuitton": "Louis Vuitton",
-  "saint-laurent": "Saint Laurent",
-  fendi: "Fendi",
-  cartier: "Cartier",
-  "dolce-gabbana": "Dolce & Gabbana",
-  celine: "Celine",
-};
-
 type FilterOption = {
   key: string;
   label: string;
@@ -236,8 +222,8 @@ export default function ProductGrid({
 }: Props) {
   const searchableProducts = searchProducts ?? products;
   const getKey = (product: ProductSummary) =>
-    filterBy === "brand" ? product.brand : getCollectionKey(product);
-  const getLabel = (key: string) => filterBy === "brand" ? (BRAND_NAMES[key] ?? key) : key;
+    filterBy === "brand" ? canonicalBrand(product.brand) : getCollectionKey(product);
+  const getLabel = (key: string) => key;
 
   const filterOptions = useMemo<FilterOption[]>(() => {
     const counts = new Map<string, number>();

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import FavoriteButton from "@/components/product/FavoriteButton";
+import { canonicalBrand } from "@/lib/brand-directory";
 import {
   formatArs,
   snapshotPrice,
@@ -115,7 +116,7 @@ function FavoriteCard({ item }: { item: ProductSnapshot }) {
 
       <div className="p-5">
         <p className="text-[9px] uppercase tracking-[0.28em] text-[#8b8580]">
-          {item.brand}
+          {canonicalBrand(item.brand)}
         </p>
         <h3 className="mt-1.5 line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-tight text-[#f0ece4]">
           {item.name}
