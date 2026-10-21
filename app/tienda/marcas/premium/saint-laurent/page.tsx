@@ -24,7 +24,7 @@ const isSaintLaurentProduct = (product: CatalogProduct) => product.brand === "Sa
 const saintLaurentProducts = allProducts.filter(isSaintLaurentProduct);
 const saintLaurentOutOfStock = outOfStockProducts.filter(isSaintLaurentProduct);
 const breadcrumbs = premiumBrandTrail("saint-laurent");
-const saintLaurentSchema = collectionSchema("/tienda/marcas/premium/saint-laurent", "Colección Saint Laurent", saintLaurentProducts, breadcrumbs);
+const saintLaurentSchema = collectionSchema("/tienda/marcas/premium/saint-laurent", "Anteojos de sol Saint Laurent", saintLaurentProducts, breadcrumbs);
 
 const saintLaurentSummaries = toProductSummaries(saintLaurentProducts);
 const intro = hubIntro({

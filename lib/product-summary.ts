@@ -111,12 +111,13 @@ export function toProductSummaries(products: CatalogProduct[]): ProductSummary[]
 }
 
 /**
- * `display` overrides what the page shows as the product's name and brand
- * (the H1 carries the canonical brand: "Ray-Ban 4375 Polarizado").
+ * `display` overrides what the page shows as the product's name, brand and
+ * gallery (the H1 carries the canonical brand: "Ray-Ban 4375 Polarizado";
+ * the gallery skips repeated renditions of one photo).
  */
 export function toProductDetail(
   product: CatalogProduct,
-  display: Partial<Pick<ProductDetail, "name" | "brand">> = {},
+  display: Partial<Pick<ProductDetail, "name" | "brand" | "images">> = {},
 ): ProductDetail {
   return {
     slug: product.slug,
@@ -126,7 +127,7 @@ export function toProductDetail(
     descriptionText: product.descriptionText,
     price: product.price,
     promotionalPrice: product.promotionalPrice,
-    images: product.images,
+    images: display.images ?? product.images,
     tiendanubeProductId: product.tiendanubeProductId,
     // The product page only offers in-stock variants.
     variants: product.variants.filter(isInStockVariant).map(toSummaryVariant),

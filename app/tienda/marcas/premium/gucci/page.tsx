@@ -24,7 +24,7 @@ const isGucciProduct = (product: CatalogProduct) => product.brand === "Gucci";
 const gucciProducts = allProducts.filter(isGucciProduct);
 const gucciOutOfStock = outOfStockProducts.filter(isGucciProduct);
 const breadcrumbs = premiumBrandTrail("gucci");
-const gucciSchema = collectionSchema("/tienda/marcas/premium/gucci", "Colección Gucci", gucciProducts, breadcrumbs);
+const gucciSchema = collectionSchema("/tienda/marcas/premium/gucci", "Anteojos de sol Gucci", gucciProducts, breadcrumbs);
 
 const gucciSummaries = toProductSummaries(gucciProducts);
 const intro = hubIntro({

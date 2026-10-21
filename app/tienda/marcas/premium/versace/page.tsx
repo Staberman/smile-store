@@ -24,7 +24,7 @@ const isVersaceProduct = (product: CatalogProduct) => product.brand === "Versace
 const versaceProducts = allProducts.filter(isVersaceProduct);
 const versaceOutOfStock = outOfStockProducts.filter(isVersaceProduct);
 const breadcrumbs = premiumBrandTrail("versace");
-const versaceSchema = collectionSchema("/tienda/marcas/premium/versace", "Colección Versace", versaceProducts, breadcrumbs);
+const versaceSchema = collectionSchema("/tienda/marcas/premium/versace", "Anteojos de sol Versace", versaceProducts, breadcrumbs);
 
 const versaceSummaries = toProductSummaries(versaceProducts);
 const intro = hubIntro({

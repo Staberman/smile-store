@@ -24,7 +24,7 @@ const isFendiProduct = (product: CatalogProduct) => product.brand === "Fendi";
 const fendiProducts = allProducts.filter(isFendiProduct);
 const fendiOutOfStock = outOfStockProducts.filter(isFendiProduct);
 const breadcrumbs = premiumBrandTrail("fendi");
-const fendiSchema = collectionSchema("/tienda/marcas/premium/fendi", "Colección Fendi", fendiProducts, breadcrumbs);
+const fendiSchema = collectionSchema("/tienda/marcas/premium/fendi", "Anteojos de sol Fendi", fendiProducts, breadcrumbs);
 
 const fendiSummaries = toProductSummaries(fendiProducts);
 const intro = hubIntro({

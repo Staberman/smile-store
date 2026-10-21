@@ -24,7 +24,7 @@ const isCartierProduct = (product: CatalogProduct) => product.brand === "Cartier
 const cartierProducts = allProducts.filter(isCartierProduct);
 const cartierOutOfStock = outOfStockProducts.filter(isCartierProduct);
 const breadcrumbs = premiumBrandTrail("cartier");
-const cartierSchema = collectionSchema("/tienda/marcas/premium/cartier", "Colección Cartier", cartierProducts, breadcrumbs);
+const cartierSchema = collectionSchema("/tienda/marcas/premium/cartier", "Anteojos de sol Cartier", cartierProducts, breadcrumbs);
 
 const cartierSummaries = toProductSummaries(cartierProducts);
 const intro = hubIntro({

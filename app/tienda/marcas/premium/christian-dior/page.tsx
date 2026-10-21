@@ -24,7 +24,7 @@ const isDiorProduct = (product: CatalogProduct) => product.brand === "Christian 
 const diorProducts = allProducts.filter(isDiorProduct);
 const diorOutOfStock = outOfStockProducts.filter(isDiorProduct);
 const breadcrumbs = premiumBrandTrail("christian-dior");
-const diorSchema = collectionSchema("/tienda/marcas/premium/christian-dior", "Colección Christian Dior", diorProducts, breadcrumbs);
+const diorSchema = collectionSchema("/tienda/marcas/premium/christian-dior", "Anteojos de sol Christian Dior", diorProducts, breadcrumbs);
 
 const diorSummaries = toProductSummaries(diorProducts);
 const intro = hubIntro({

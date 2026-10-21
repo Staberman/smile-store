@@ -24,7 +24,7 @@ const isBalenciagaProduct = (product: CatalogProduct) => product.brand === "Bale
 const balenciagaProducts = allProducts.filter(isBalenciagaProduct);
 const balenciagaOutOfStock = outOfStockProducts.filter(isBalenciagaProduct);
 const breadcrumbs = premiumBrandTrail("balenciaga");
-const balenciagaSchema = collectionSchema("/tienda/marcas/premium/balenciaga", "Colección Balenciaga", balenciagaProducts, breadcrumbs);
+const balenciagaSchema = collectionSchema("/tienda/marcas/premium/balenciaga", "Anteojos de sol Balenciaga", balenciagaProducts, breadcrumbs);
 
 const balenciagaSummaries = toProductSummaries(balenciagaProducts);
 const intro = hubIntro({

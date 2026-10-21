@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import type { CatalogProduct } from "@/lib/catalog";
 import type { Crumb } from "@/lib/collections";
+import { getProductSeo } from "@/lib/product-meta";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
+import {
+  INSTAGRAM_URL,
+  PHONE_E164,
+  STORE_ALTERNATE_NAME,
+  STORE_EMAIL,
+  STORE_LOCATION,
+} from "@/lib/store-facts";
 
 export const SITE_URL = "https://smiletiendaimp.com.ar";
 export const SITE_NAME = "Smile";
@@ -77,6 +85,46 @@ export function pageMetadata({
   };
 }
 
+/** JSON-LD id of the store; other nodes reference it instead of repeating it. */
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+export const LOGO_URL = `${SITE_URL}/images/smile-logo.png`;
+
+/** The store as an OnlineStore (an Organization subtype), sitewide. */
+export function organizationSchema() {
+  return {
+    "@type": "OnlineStore",
+    "@id": ORGANIZATION_ID,
+    name: SITE_NAME,
+    alternateName: [STORE_ALTERNATE_NAME],
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: LOGO_URL,
+      width: 512,
+      height: 512,
+    },
+    image: LOGO_URL,
+    email: STORE_EMAIL,
+    telephone: PHONE_E164,
+    sameAs: [INSTAGRAM_URL],
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: STORE_LOCATION.locality,
+      addressRegion: STORE_LOCATION.region,
+      addressCountry: STORE_LOCATION.countryCode,
+    },
+    areaServed: STORE_LOCATION.countryCode,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: PHONE_E164,
+      email: STORE_EMAIL,
+      contactType: "customer service",
+      areaServed: STORE_LOCATION.countryCode,
+      availableLanguage: "es",
+    },
+  };
+}
+
 export function absoluteUrl(path: string): string {
   if (path.startsWith("http")) return path;
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
@@ -136,7 +184,7 @@ export function collectionSchema(
           "@type": "ListItem",
           position: index + 1,
           url: productUrl(product),
-          name: product.name,
+          name: getProductSeo(product).displayName,
         })),
       },
       ...breadcrumb,

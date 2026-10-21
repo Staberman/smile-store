@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import {
+  type CatalogProduct,
   allProducts,
   allProductsIncludingOutOfStock,
   getProductBySlug,
@@ -15,9 +16,9 @@ import { getProductTrail } from "@/lib/collections";
 import {
   absoluteUrl,
   breadcrumbSchema,
+  ORGANIZATION_ID,
   pageMetadata,
   productUrl,
-  SITE_NAME,
 } from "@/lib/seo";
 import ProductDetailClient from "./ProductDetailClient";
 
@@ -67,47 +68,26 @@ export default function ProductPage({ params }: Props) {
     ...getProductTrail(product),
     { name: seo.displayName, href: `/tienda/productos/${product.slug}` },
   ];
-  const currentPrice = product.promotionalPrice ?? product.price;
-  const hasValidPrice = typeof currentPrice === "number" && currentPrice > 0;
-  const buildDate = new Date();
-  const priceValidUntil = new Date(buildDate.getTime() + 30 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
+  const productLink = productUrl(product);
+  const offers = productOffers(product, productLink, outOfStock);
+  const sku = product.variants.map((variant) => variant.sku.trim()).find(Boolean);
   const productSchema = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Product",
-        "@id": `${productUrl(product)}#product`,
+        "@id": `${productLink}#product`,
         name: seo.displayName,
         description: product.descriptionText,
-        image: product.images.map(absoluteUrl),
+        image: seo.images.map(absoluteUrl),
         brand: {
           "@type": "Brand",
           name: seo.brand,
         },
-        sku: product.variants.find((variant) => variant.sku)?.sku || product.slug,
-        url: productUrl(product),
-        dateModified: buildDate.toISOString(),
-        ...(hasValidPrice
-          ? {
-              offers: {
-                "@type": "Offer",
-                url: productUrl(product),
-                priceCurrency: "ARS",
-                price: currentPrice,
-                priceValidUntil,
-                availability: outOfStock
-                  ? "https://schema.org/OutOfStock"
-                  : "https://schema.org/InStock",
-                seller: {
-                  "@type": "Organization",
-                  name: SITE_NAME,
-                  url: absoluteUrl("/"),
-                },
-              },
-            }
-          : {}),
+        ...(sku ? { sku } : {}),
+        ...(seo.mpn ? { mpn: seo.mpn } : {}),
+        url: productLink,
+        ...(offers ? { offers } : {}),
       },
       breadcrumbSchema(breadcrumbs),
     ],
@@ -117,7 +97,11 @@ export default function ProductPage({ params }: Props) {
     <>
       <JsonLd data={productSchema} />
       <ProductDetailClient
-        product={toProductDetail(product, { name: seo.displayName, brand: seo.brand })}
+        product={toProductDetail(product, {
+          name: seo.displayName,
+          brand: seo.brand,
+          images: seo.images,
+        })}
         breadcrumbs={breadcrumbs}
         recommendations={toProductSummaries(recommendations)}
         complements={toProductSummaries(complements)}
@@ -125,4 +109,48 @@ export default function ProductPage({ params }: Props) {
       />
     </>
   );
+}
+
+/**
+ * Offer for a single price, AggregateOffer when the offered variants differ
+ * in price. In-stock variants are the ones on offer; an out-of-stock product
+ * reports its listed variants as out of stock.
+ */
+function productOffers(product: CatalogProduct, url: string, outOfStock: boolean) {
+  const offered = product.variants.filter(
+    (variant) => outOfStock || (variant.available && variant.stock > 0),
+  );
+  const prices = offered
+    .map((variant) => variant.promotionalPrice ?? variant.price)
+    .filter((price): price is number => typeof price === "number" && price > 0);
+  const productPrice = product.promotionalPrice ?? product.price;
+  if (prices.length === 0 && !(typeof productPrice === "number" && productPrice > 0)) {
+    return null;
+  }
+
+  const common = {
+    url,
+    priceCurrency: "ARS",
+    itemCondition: "https://schema.org/NewCondition",
+    availability: outOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+    seller: { "@id": ORGANIZATION_ID },
+  };
+  const lowPrice = prices.length > 0 ? Math.min(...prices) : (productPrice as number);
+  const highPrice = prices.length > 0 ? Math.max(...prices) : (productPrice as number);
+
+  if (lowPrice !== highPrice) {
+    return {
+      "@type": "AggregateOffer",
+      ...common,
+      lowPrice,
+      highPrice,
+      offerCount: offered.length,
+    };
+  }
+
+  // Prices sync from Tiendanube hourly; each build restates them.
+  const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+  return { "@type": "Offer", ...common, price: lowPrice, priceValidUntil };
 }

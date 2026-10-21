@@ -18,7 +18,7 @@ const celineOutOfStock = outOfStockProducts.filter(isCelineProduct);
 const breadcrumbs = premiumBrandTrail("celine");
 const celineSchema = collectionSchema(
   "/tienda/marcas/premium/celine",
-  "Colección Celine Paris",
+  "Anteojos de sol Celine",
   celineProducts,
   breadcrumbs,
 );

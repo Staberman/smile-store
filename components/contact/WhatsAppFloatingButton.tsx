@@ -2,8 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { absoluteUrl } from "@/lib/seo";
-
-const PHONE_NUMBER = "5493412613504";
+import { WHATSAPP_URL } from "@/lib/store-facts";
 
 function getPageContext(pathname: string): string {
   if (pathname.includes("/tienda/productos/")) {
@@ -88,7 +87,7 @@ function buildMessage(pathname: string): string {
 export default function WhatsAppFloatingButton() {
   const pathname = usePathname();
   const isProductPage = pathname.includes("/tienda/productos/");
-  const href = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(buildMessage(pathname))}`;
+  const href = `${WHATSAPP_URL}?text=${encodeURIComponent(buildMessage(pathname))}`;
   const positionClass = isProductPage ? "bottom-24 md:bottom-6" : "bottom-5 md:bottom-6";
 
   return (

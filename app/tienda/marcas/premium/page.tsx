@@ -114,7 +114,7 @@ const premiumProducts = filterStorefrontProducts(allProducts, "premium");
 const premiumOutOfStock = filterStorefrontProducts(outOfStockProducts, "premium");
 const premiumSchema = collectionSchema(
   "/tienda/marcas/premium",
-  "Marcas Premium",
+  "Anteojos de sol de marcas premium",
   premiumProducts,
   COLLECTION_TRAILS.premium,
 );

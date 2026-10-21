@@ -11,6 +11,7 @@ import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { canonicalBrand } from "@/lib/brand-directory";
 import { useRecentlyViewed } from "@/lib/browser-lists";
 import type { Crumb } from "@/lib/collections";
+import { dedupeImages } from "@/lib/product-seo.mjs";
 import { formatPrice } from "@/lib/format";
 import type {
   ProductDetail,
@@ -65,15 +66,9 @@ export default function ProductDetailClient({
     availableVariants[0] ??
     null;
 
+  // The variant photo first; renditions of the same photo appear once.
   const galleryImages = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          [selectedVariant?.image, ...product.images].filter(
-            (image): image is string => Boolean(image)
-          )
-        )
-      ),
+    () => dedupeImages([selectedVariant?.image, ...product.images]),
     [product.images, selectedVariant?.image]
   );
 

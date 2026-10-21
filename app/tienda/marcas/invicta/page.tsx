@@ -23,7 +23,7 @@ export const metadata = pageMetadata({
 const isInvictaProduct = (product: CatalogProduct) => product.brand === "Invicta";
 const invictaProducts = allProducts.filter(isInvictaProduct);
 const invictaOutOfStock = outOfStockProducts.filter(isInvictaProduct);
-const invictaSchema = collectionSchema("/tienda/marcas/invicta", "Colección Invicta", invictaProducts, COLLECTION_TRAILS.invicta);
+const invictaSchema = collectionSchema("/tienda/marcas/invicta", "Relojes Invicta", invictaProducts, COLLECTION_TRAILS.invicta);
 
 const invictaSummaries = toProductSummaries(invictaProducts);
 const intro = hubIntro({

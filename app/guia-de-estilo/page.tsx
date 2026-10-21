@@ -4,11 +4,27 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import Header from "@/components/layout/Header";
 import JsonLd from "@/components/seo/JsonLd";
 import { HOME_CRUMB } from "@/lib/collections";
-import { absoluteUrl, breadcrumbSchema, pageMetadata } from "@/lib/seo";
+import {
+  absoluteUrl,
+  breadcrumbSchema,
+  ORGANIZATION_ID,
+  pageMetadata,
+  SITE_OPEN_GRAPH,
+} from "@/lib/seo";
 
 const PAGE_PATH = "/guia-de-estilo";
 const PAGE_TITLE = "Cómo elegir tus lentes según la forma de tu rostro";
 const BREADCRUMBS = [HOME_CRUMB, { name: "Guía de estilo", href: PAGE_PATH }];
+// First and last commit dates of this page (git log --format=%cs). Update
+// DATE_MODIFIED when the guide's content changes.
+const DATE_PUBLISHED = "2026-10-21";
+const DATE_MODIFIED = "2026-10-21";
+const DATE_MODIFIED_LABEL = new Intl.DateTimeFormat("es-AR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(DATE_MODIFIED));
 
 const PAGE_DESCRIPTION =
   "Cómo elegir anteojos de sol según la forma de tu rostro (ovalado, redondo, cuadrado, corazón o alargado) y qué tamaño de reloj le queda mejor a tu muñeca.";
@@ -75,9 +91,14 @@ const pageSchema = {
       "@type": "Article",
       "@id": `${absoluteUrl(PAGE_PATH)}#article`,
       headline: PAGE_TITLE,
-      description:
-        "Guía de estilo para elegir lentes de sol según la forma del rostro y para elegir el tamaño de tu reloj.",
+      description: PAGE_DESCRIPTION,
       inLanguage: "es-AR",
+      datePublished: DATE_PUBLISHED,
+      dateModified: DATE_MODIFIED,
+      author: { "@id": ORGANIZATION_ID },
+      publisher: { "@id": ORGANIZATION_ID },
+      image: absoluteUrl(SITE_OPEN_GRAPH.images[0].url),
+      mainEntityOfPage: absoluteUrl(PAGE_PATH),
       url: absoluteUrl(PAGE_PATH),
       isPartOf: { "@id": `${absoluteUrl("/")}#website` },
       about: [
@@ -111,6 +132,9 @@ export default function GuiaDeEstiloPage() {
             buscar contraste y equilibrio. Esta es una guía general para orientar
             tu elección, no una regla estricta —lo más importante es que te
             sientas cómodo con el estilo.
+          </p>
+          <p className="mt-6 text-[11px] uppercase tracking-[0.24em] text-[#6a6560]">
+            Actualizado: <time dateTime={DATE_MODIFIED}>{DATE_MODIFIED_LABEL}</time>
           </p>
         </div>
       </section>

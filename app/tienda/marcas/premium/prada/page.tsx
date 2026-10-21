@@ -24,7 +24,7 @@ const isPradaProduct = (product: CatalogProduct) => product.brand === "Prada";
 const pradaProducts = allProducts.filter(isPradaProduct);
 const pradaOutOfStock = outOfStockProducts.filter(isPradaProduct);
 const breadcrumbs = premiumBrandTrail("prada");
-const pradaSchema = collectionSchema("/tienda/marcas/premium/prada", "Colección Prada", pradaProducts, breadcrumbs);
+const pradaSchema = collectionSchema("/tienda/marcas/premium/prada", "Anteojos de sol Prada", pradaProducts, breadcrumbs);
 
 const pradaSummaries = toProductSummaries(pradaProducts);
 const intro = hubIntro({

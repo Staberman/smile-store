@@ -132,7 +132,8 @@ test("SEO outputs convert local product images to absolute URLs", () => {
     "utf8",
   );
 
-  assert.match(productPageSource, /product\.images\.map\(absoluteUrl\)/);
+  // Deduplicated product images (lib/product-meta), made absolute.
+  assert.match(productPageSource, /seo\.images\.map\(absoluteUrl\)/);
 });
 
 test("empty premium brands stay out of navigation and sitemap", () => {

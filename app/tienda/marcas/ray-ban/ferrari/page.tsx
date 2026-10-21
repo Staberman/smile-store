@@ -29,7 +29,7 @@ const ferrariProducts = allProducts.filter(isFerrariProduct);
 const ferrariOutOfStock = outOfStockProducts.filter(isFerrariProduct);
 const ferrariSchema = collectionSchema(
   "/tienda/marcas/ray-ban/ferrari",
-  "Scuderia Ferrari Collection",
+  "Anteojos de sol Ray-Ban Scuderia Ferrari",
   ferrariProducts,
   COLLECTION_TRAILS.ferrari,
 );

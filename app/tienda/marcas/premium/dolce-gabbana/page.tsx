@@ -24,7 +24,7 @@ const isDolceGabbanaProduct = (product: CatalogProduct) => product.brand === "Do
 const dolceGabbanaProducts = allProducts.filter(isDolceGabbanaProduct);
 const dolceGabbanaOutOfStock = outOfStockProducts.filter(isDolceGabbanaProduct);
 const breadcrumbs = premiumBrandTrail("dolce-gabbana");
-const dolceGabbanaSchema = collectionSchema("/tienda/marcas/premium/dolce-gabbana", "Colección Dolce&Gabbana", dolceGabbanaProducts, breadcrumbs);
+const dolceGabbanaSchema = collectionSchema("/tienda/marcas/premium/dolce-gabbana", "Anteojos de sol Dolce & Gabbana", dolceGabbanaProducts, breadcrumbs);
 
 const dolceGabbanaSummaries = toProductSummaries(dolceGabbanaProducts);
 const intro = hubIntro({

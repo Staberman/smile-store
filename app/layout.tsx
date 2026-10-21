@@ -4,7 +4,14 @@ import WhatsAppFloatingButton from "@/components/contact/WhatsAppFloatingButton"
 import SessionOfferPopup from "@/components/promo/SessionOfferPopup";
 import JsonLd from "@/components/seo/JsonLd";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
-import { SITE_NAME, SITE_OPEN_GRAPH, SITE_TWITTER, SITE_URL } from "@/lib/seo";
+import {
+  ORGANIZATION_ID,
+  organizationSchema,
+  SITE_NAME,
+  SITE_OPEN_GRAPH,
+  SITE_TWITTER,
+  SITE_URL,
+} from "@/lib/seo";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -50,20 +57,7 @@ export const metadata: Metadata = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#organization`,
-      name: SITE_NAME,
-      url: SITE_URL,
-      logo: `${SITE_URL}/images/smile-logo.svg`,
-      contactPoint: {
-        "@type": "ContactPoint",
-        telephone: "+54 9 341 261 3504",
-        contactType: "customer service",
-        areaServed: "AR",
-        availableLanguage: "Spanish",
-      },
-    },
+    organizationSchema(),
     {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
@@ -71,7 +65,7 @@ const websiteSchema = {
       url: SITE_URL,
       inLanguage: "es-AR",
       publisher: {
-        "@id": `${SITE_URL}/#organization`,
+        "@id": ORGANIZATION_ID,
       },
     },
   ],

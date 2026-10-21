@@ -23,7 +23,7 @@ export const metadata = pageMetadata({
 const isTommyProduct = (product: CatalogProduct) => product.brand === "Tommy Hilfiger";
 const tommyProducts = allProducts.filter(isTommyProduct);
 const tommyOutOfStock = outOfStockProducts.filter(isTommyProduct);
-const tommySchema = collectionSchema("/tienda/marcas/tommy-hilfiger", "Colección Tommy Hilfiger", tommyProducts, COLLECTION_TRAILS["tommy-hilfiger"]);
+const tommySchema = collectionSchema("/tienda/marcas/tommy-hilfiger", "Relojes Tommy Hilfiger", tommyProducts, COLLECTION_TRAILS["tommy-hilfiger"]);
 
 const tommySummaries = toProductSummaries(tommyProducts);
 const tommyAudiences = ["dama", "caballero"].filter((audience) =>

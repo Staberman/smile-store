@@ -24,7 +24,7 @@ const isLouisVuittonProduct = (product: CatalogProduct) => product.brand === "Lo
 const louisVuittonProducts = allProducts.filter(isLouisVuittonProduct);
 const louisVuittonOutOfStock = outOfStockProducts.filter(isLouisVuittonProduct);
 const breadcrumbs = premiumBrandTrail("louis-vuitton");
-const louisVuittonSchema = collectionSchema("/tienda/marcas/premium/louis-vuitton", "Colección Louis Vuitton", louisVuittonProducts, breadcrumbs);
+const louisVuittonSchema = collectionSchema("/tienda/marcas/premium/louis-vuitton", "Anteojos de sol Louis Vuitton", louisVuittonProducts, breadcrumbs);
 
 const louisVuittonSummaries = toProductSummaries(louisVuittonProducts);
 const intro = hubIntro({

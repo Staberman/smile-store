@@ -25,7 +25,7 @@ export const metadata = pageMetadata({
 const isWatchProduct = (product: CatalogProduct) => product.categories[0] === "RELOJES";
 const watchProducts = allProducts.filter(isWatchProduct);
 const watchOutOfStock = outOfStockProducts.filter(isWatchProduct);
-const watchSchema = collectionSchema("/tienda/relojes", "Relojes premium", watchProducts, COLLECTION_TRAILS.relojes);
+const watchSchema = collectionSchema("/tienda/relojes", "Relojes originales", watchProducts, COLLECTION_TRAILS.relojes);
 
 const watchSummaries = toProductSummaries(watchProducts);
 const intro = hubIntro({

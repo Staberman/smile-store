@@ -29,7 +29,7 @@ const rayBanProducts = allProducts.filter(isRayBanProduct);
 const rayBanOutOfStock = outOfStockProducts.filter(isRayBanProduct);
 const rayBanSchema = collectionSchema(
   "/tienda/marcas/ray-ban",
-  "Colección Ray-Ban",
+  "Anteojos de sol Ray-Ban",
   rayBanProducts,
   COLLECTION_TRAILS["ray-ban"],
 );

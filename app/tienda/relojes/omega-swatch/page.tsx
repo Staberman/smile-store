@@ -28,7 +28,7 @@ const omegaSwatchProducts = allProducts.filter(isOmegaSwatchProduct);
 const omegaSwatchOutOfStock = outOfStockProducts.filter(isOmegaSwatchProduct);
 const omegaSwatchSchema = collectionSchema(
   "/tienda/relojes/omega-swatch",
-  "Omega × Swatch MoonSwatch",
+  "Relojes OMEGA x Swatch MoonSwatch",
   omegaSwatchProducts,
   COLLECTION_TRAILS["omega-swatch"],
 );
