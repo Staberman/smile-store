@@ -7,6 +7,9 @@ import { isWatch } from "@/lib/storefront.mjs";
 const FALLBACK =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='600' height='600' fill='%23181410'/%3E%3Ctext x='300' y='300' text-anchor='middle' fill='%23c9a96e' font-family='Arial' font-size='44'%3ESMILE%3C/text%3E%3C/svg%3E";
 
+// Largest rendered size of the circular card media (h-48/w-48 from sm up).
+const MEDIA_SIZE = 192;
+
 type Props = {
   product: { name: string; categories: string[] };
   src: string | null | undefined;
@@ -19,12 +22,14 @@ export default function ProductMedia({ product, src, hovered = false }: Props) {
 
   return (
     <div className="relative h-44 w-44 overflow-hidden rounded-full border border-[#c9a96e]/20 bg-[#e9e6df] shadow-[0_0_0_10px_rgba(201,169,110,0.04),0_26px_70px_rgba(0,0,0,0.45)] sm:h-48 sm:w-48">
+      {/* Fixed-size media: explicit dimensions make next/image emit 1x/2x
+          candidates instead of the full responsive srcset `fill` produces. */}
       <Image
         src={failed || !src ? FALLBACK : src}
         alt={product.name}
-        fill
-        sizes="(max-width:640px) 176px, 192px"
-        className={`rounded-full transition-transform duration-300 ${
+        width={MEDIA_SIZE}
+        height={MEDIA_SIZE}
+        className={`h-full w-full rounded-full transition-transform duration-300 ${
           watch ? "object-contain p-4" : "object-cover"
         }`}
         style={{

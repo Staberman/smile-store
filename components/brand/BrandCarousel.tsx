@@ -16,6 +16,10 @@ interface Props {
 }
 
 const ACCENT = "#c9a96e";
+const IMAGE_FALLBACK =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E";
+// Rendered size of the circular slide image (220px mobile, 260px desktop).
+const SLIDE_IMAGE_SIZE = 260;
 const BG_GRADIENTS = [
   "radial-gradient(ellipse at 62% 52%, #1a1510 0%, #0a0a0a 72%)",
   "radial-gradient(ellipse at 38% 50%, #0d1520 0%, #0a0a0a 72%)",
@@ -337,27 +341,11 @@ export default function BrandCarousel({
                           background: `linear-gradient(to bottom, ${ACCENT}cc, ${ACCENT}88)`,
                         }}
                       />
-                      <img
-                        src={
-                          image ??
-                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E"
-                        }
+                      <CarouselImage
+                        src={image}
                         alt={prod.name}
-                        style={{
-                          display: "block",
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: "50%",
-                          objectFit: isWatch(prod) ? "contain" : "cover",
-                          objectPosition: "center",
-                          filter: "brightness(0.94) contrast(1.05)",
-                          transform: isWatch(prod) ? "scale(0.86)" : "scale(1.08)",
-                          transformOrigin: "center",
-                        }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23110f0d'/%3E%3Ctext x='300' y='288' text-anchor='middle' fill='%23c9a96e' font-family='Arial,sans-serif' font-size='58' font-weight='700' letter-spacing='6'%3ESMILE%3C/text%3E%3Cpath d='M235 326c42 28 88 28 130 0' fill='none' stroke='%23c9a96e' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E";
-                        }}
+                        watch={isWatch(prod)}
+                        priority={index === 0}
                       />
                       {/* strap bottom */}
                       <div
@@ -451,5 +439,46 @@ export default function BrandCarousel({
       {/* CSS rotate keyframe */}
       <style>{`@keyframes rotate { to { transform: rotate(360deg); } }`}</style>
     </section>
+  );
+}
+
+/**
+ * Slide image at its rendered size: next/image emits 1x/2x candidates instead
+ * of the 1024px source. Only the first slide is a priority (preloaded) image;
+ * the rest load lazily.
+ */
+function CarouselImage({
+  src,
+  alt,
+  watch,
+  priority,
+}: {
+  src: string | null;
+  alt: string;
+  watch: boolean;
+  priority: boolean;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <Image
+      src={failed || !src ? IMAGE_FALLBACK : src}
+      alt={alt}
+      width={SLIDE_IMAGE_SIZE}
+      height={SLIDE_IMAGE_SIZE}
+      priority={priority}
+      style={{
+        display: "block",
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        objectFit: watch ? "contain" : "cover",
+        objectPosition: "center",
+        filter: "brightness(0.94) contrast(1.05)",
+        transform: watch ? "scale(0.86)" : "scale(1.08)",
+        transformOrigin: "center",
+      }}
+      onError={() => setFailed(true)}
+    />
   );
 }

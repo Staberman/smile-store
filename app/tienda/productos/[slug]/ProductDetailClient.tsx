@@ -230,6 +230,8 @@ export default function ProductDetailClient({
                       alt={`${product.name} vista ${index + 1}`}
                       fill
                       sizes="(max-width:1024px) 100vw, 50vw"
+                      // The first slide is the product page's LCP image.
+                      priority={index === 0}
                       className="object-contain p-6 transition-opacity duration-300"
                       style={{ filter: "brightness(0.92) contrast(1.04)" }}
                       onError={() =>
