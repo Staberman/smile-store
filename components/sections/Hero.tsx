@@ -19,7 +19,7 @@ const slides = [
   {
     id: 2,
     eyebrow: "Lentes & Accesorios",
-    title: "La mirada también\ncomunica quién eres.",
+    title: "La mirada también\ncomunica quién sos.",
     description:
       "Lentes y accesorios con una dirección visual limpia, aspiracional y precisa, construidos para acompañar presencia y estilo personal.",
     image:

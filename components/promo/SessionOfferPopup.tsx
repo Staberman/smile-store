@@ -55,7 +55,7 @@ export default function SessionOfferPopup() {
           type="button"
           onClick={() => setOpen(false)}
           className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-sm text-white/55 transition hover:border-white/25 hover:text-white"
-          aria-label="Cerrar promocion"
+          aria-label="Cerrar promoción"
         >
           X
         </button>
@@ -120,7 +120,7 @@ export default function SessionOfferPopup() {
               </p>
               <div className="mt-6 h-px w-20 bg-[#c9a96e]/35" />
               <p className="mt-6 max-w-[10rem] text-[11px] uppercase leading-[1.8] tracking-[0.2em] text-[#f0ece4]">
-                6 cuotas sin interes
+                6 cuotas sin interés
               </p>
             </div>
           </div>

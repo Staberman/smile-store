@@ -4,15 +4,15 @@ const highlights = [
     text: "La compra se confirma con el checkout protegido de Tiendanube.",
   },
   {
-    title: "Stock disponible",
-    text: "Solo mostramos productos con variantes informadas como disponibles.",
+    title: "Stock actualizado",
+    text: "El stock se sincroniza con Tiendanube cada hora; los modelos agotados se marcan «Sin stock».",
   },
   {
-    title: "Atencion personalizada",
+    title: "Atención personalizada",
     text: "Consultas y seguimiento desde los canales oficiales de Smile.",
   },
   {
-    title: "Seleccion premium",
+    title: "Selección premium",
     text: "Relojes y lentes curados por marca, modelo y disponibilidad.",
   },
 ];

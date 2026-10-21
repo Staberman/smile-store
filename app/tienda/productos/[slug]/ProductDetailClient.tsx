@@ -45,7 +45,7 @@ function getVariantLabel(variant: ProductSummaryVariant, index: number): string 
   const optionLabel = variant.options.filter(Boolean).join(" / ");
   if (optionLabel) return optionLabel;
   if (variant.id !== null) return `Variante ${index + 1}`;
-  return "Unica opcion";
+  return "Única opción";
 }
 
 export default function ProductDetailClient({
@@ -501,7 +501,7 @@ export default function ProductDetailClient({
             <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.44em] text-[#4a4540]">
-                  Tambien te puede gustar
+                  También te puede gustar
                 </p>
                 <h2 className="font-display mt-2 text-[2rem] font-light italic text-[#f0ece4]">
                   Piezas similares

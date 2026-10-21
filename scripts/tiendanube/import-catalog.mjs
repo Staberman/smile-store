@@ -482,9 +482,9 @@ function buildFallbackDescription({ name, brand, categories }) {
     const isWomens = categoryText.includes("dama");
     const isMens = categoryText.includes("caballero");
     const audience = isWomens
-      ? "pensado para dama, con terminaciones prolijas y diseno atemporal"
+      ? "pensado para dama, con terminaciones prolijas y diseño atemporal"
       : isMens
-        ? "pensado para caballero, con caja robusta y estetica urbana contemporanea"
+        ? "pensado para caballero, con caja robusta y estética urbana contemporánea"
         : "de estilo urbano y elegante para uso diario";
     return `${name} es un reloj Tommy Hilfiger${modelText} disponible en Smile Argentina, ${audience}. Compra directa con stock verificado y checkout seguro de Tiendanube.`;
   }

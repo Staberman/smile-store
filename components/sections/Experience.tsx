@@ -26,7 +26,7 @@ const items = [
     num: "04",
     title: "Experiencia de compra",
     description:
-      "Descubre nuestro catálogo online. Navega por marcas, encuentra tu modelo ideal y accedé a una experiencia simple y segura.",
+      "Descubrí nuestro catálogo online. Navegá por marcas, encontrá tu modelo ideal y accedé a una experiencia simple y segura.",
   },
 ];
 

@@ -10,11 +10,11 @@ function getPageContext(pathname: string): string {
   }
 
   if (pathname.includes("/tienda/marcas/ray-ban/ferrari")) {
-    return "la coleccion Ray-Ban Scuderia Ferrari";
+    return "la colección Ray-Ban Scuderia Ferrari";
   }
 
   if (pathname.includes("/tienda/marcas/ray-ban")) {
-    return "la coleccion Ray-Ban";
+    return "la colección Ray-Ban";
   }
 
   if (pathname.includes("/tienda/marcas/premium")) {
@@ -34,11 +34,11 @@ function getPageContext(pathname: string): string {
   }
 
   if (pathname.includes("/tienda/relojes")) {
-    return "la coleccion de relojes";
+    return "la colección de relojes";
   }
 
   if (pathname === "/" || pathname.includes("/tienda")) {
-    return "el catalogo de Smile";
+    return "el catálogo de Smile";
   }
 
   return "la tienda Smile";
@@ -69,7 +69,7 @@ function buildMessage(pathname: string): string {
     return [
       `Hola Smile, estoy interesado/a en ${context}.`,
       "Quiero confirmar stock, variantes disponibles, cuotas y el beneficio por transferencia.",
-      pageUrl ? `Lo estoy viendo aca: ${pageUrl}` : "",
+      pageUrl ? `Lo estoy viendo acá: ${pageUrl}` : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -77,8 +77,8 @@ function buildMessage(pathname: string): string {
 
   return [
     `Hola Smile, estoy mirando ${context}.`,
-    "Me gustaria que me asesoren para elegir la mejor opcion segun stock, estilo y forma de pago.",
-    pageUrl ? `Estoy en esta pagina: ${pageUrl}` : "",
+    "Me gustaría que me asesoren para elegir la mejor opción según stock, estilo y forma de pago.",
+    pageUrl ? `Estoy en esta página: ${pageUrl}` : "",
   ]
     .filter(Boolean)
     .join(" ");

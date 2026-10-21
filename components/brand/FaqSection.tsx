@@ -9,27 +9,27 @@ const DEFAULT_FAQS: FaqItem[] = [
   {
     question: "¿Los productos son originales?",
     answer:
-      "Si. Todos los relojes y lentes de Smile son 100% originales e importados, con la garantia oficial de cada marca.",
+      "Sí. Todos los relojes y lentes de Smile son 100% originales e importados, con la garantía oficial de cada marca.",
   },
   {
-    question: "¿Como se hace el pago?",
+    question: "¿Cómo se hace el pago?",
     answer:
-      "El pago se realiza a traves del checkout seguro de Tiendanube, con tarjeta de credito, debito, transferencia o Mercado Pago. Tambien ofrecemos hasta 6 cuotas sin interes.",
+      "El pago se realiza a través del checkout seguro de Tiendanube, con tarjeta de crédito, débito, transferencia o Mercado Pago. También ofrecemos hasta 6 cuotas sin interés.",
   },
   {
-    question: "¿Hacen envios a todo el pais?",
+    question: "¿Hacen envíos a todo el país?",
     answer:
-      "Si, hacemos envios gratis a todo el pais, sin monto minimo de compra. Solo completas tus datos en el checkout y listo.",
+      "Sí, hacemos envíos gratis a todo el país, sin monto mínimo de compra. Solo completás tus datos en el checkout y listo.",
   },
   {
     question: "¿Puedo cambiar o devolver un producto?",
     answer:
-      "Si, contas con derecho a cambio o devolucion dentro de los primeros 10 dias de recibido el producto, siempre que este en su empaque original.",
+      "Sí, contás con derecho a cambio o devolución dentro de los primeros 10 días de recibido el producto, siempre que esté en su empaque original.",
   },
   {
-    question: "¿Como se si un producto tiene stock?",
+    question: "¿Cómo sé si un producto tiene stock?",
     answer:
-      "Solo publicamos productos con stock real y disponible. Si un modelo aparece en la tienda, esta listo para comprar y enviar.",
+      "El stock de la tienda se sincroniza con Tiendanube cada hora. Los modelos agotados siguen publicados con la etiqueta «Sin stock» y no se pueden comprar hasta que se reponen; podés consultarnos por WhatsApp por su reposición.",
   },
 ];
 

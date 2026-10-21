@@ -33,12 +33,12 @@ const contactSchema = {
 
 const contactItems = [
   {
-    label: "Telefono",
+    label: "Teléfono",
     value: "+54 9 341 261 3504",
   },
   {
     label: "Consultas",
-    value: "Stock, medios de pago, envios y seguimiento de compra.",
+    value: "Stock, medios de pago, envíos y seguimiento de compra.",
   },
   {
     label: "Checkout",
@@ -61,7 +61,7 @@ export default function ContactPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-sm leading-[1.9] text-[#8b8580] md:text-base">
             Estamos para ayudarte con consultas sobre productos, stock,
-            metodos de pago, envios y compras realizadas en Smile.
+            métodos de pago, envíos y compras realizadas en Smile.
           </p>
 
           <div className="mt-12 grid gap-4 md:grid-cols-3">
