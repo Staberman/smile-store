@@ -1,6 +1,7 @@
 import type { CatalogProduct, CatalogVariant } from "./catalog";
 import { toStorefrontProductUrl } from "./checkout/storefront";
-import { getProductDescription } from "./product-meta";
+import type { ProductSpec } from "./product-copy.mjs";
+import { getProductCopy, getProductSearchText } from "./product-meta";
 import { displayProductName } from "./product-name";
 
 // Slim product DTOs for client components. Everything passed from a server
@@ -41,12 +42,14 @@ export type ProductDetail = Pick<
   | "name"
   | "brand"
   | "categories"
-  | "descriptionText"
   | "price"
   | "promotionalPrice"
   | "images"
   | "tiendanubeProductId"
 > & {
+  /** Description prose; its "Clave: valor" lines are in `specs`. */
+  descriptionParagraphs: string[];
+  specs: ProductSpec[];
   variants: ProductSummaryVariant[];
   /** Tiendanube storefront page, used when direct checkout is unavailable. */
   storefrontUrl: string | null;
@@ -88,7 +91,7 @@ function getGenders(tags: string[]): ProductGender[] {
 export function getExtendedSearchText(product: CatalogProduct): string {
   return [
     ...product.tags,
-    getProductDescription(product),
+    getProductSearchText(product),
     product.seoTitle,
     product.seoDescription,
   ].join(" ");
@@ -125,12 +128,14 @@ export function toProductDetail(
   product: CatalogProduct,
   display: Partial<Pick<ProductDetail, "name" | "brand" | "images">> = {},
 ): ProductDetail {
+  const copy = getProductCopy(product);
   return {
     slug: product.slug,
     name: display.name ?? displayProductName(product.name, product.brand),
     brand: display.brand ?? product.brand,
     categories: product.categories,
-    descriptionText: getProductDescription(product),
+    descriptionParagraphs: copy.paragraphs,
+    specs: copy.specs,
     price: product.price,
     promotionalPrice: product.promotionalPrice,
     images: display.images ?? product.images,

@@ -1,3 +1,5 @@
+import { decodeHtmlEntities } from "../../lib/product-copy.mjs";
+
 export function parseTiendanubePrice(value) {
   const raw = String(value ?? "").trim();
   if (!raw) return null;
@@ -25,59 +27,6 @@ export function stripBase64Images(html) {
     /<img\b[^>]*src=["']data:image\/[^"']+["'][^>]*>/gi,
     "",
   );
-}
-
-function decodeHtmlEntities(value) {
-  const namedEntities = {
-    nbsp: " ",
-    amp: "&",
-    quot: '"',
-    apos: "'",
-    lt: "<",
-    gt: ">",
-    aacute: "á",
-    eacute: "é",
-    iacute: "í",
-    oacute: "ó",
-    uacute: "ú",
-    Aacute: "Á",
-    Eacute: "É",
-    Iacute: "Í",
-    Oacute: "Ó",
-    Uacute: "Ú",
-    ntilde: "ñ",
-    Ntilde: "Ñ",
-    uuml: "ü",
-    Uuml: "Ü",
-    Egrave: "È",
-    deg: "°",
-    bull: "•",
-    middot: "·",
-    ldquo: "“",
-    rdquo: "”",
-    lsquo: "‘",
-    rsquo: "’",
-    ndash: "–",
-    mdash: "—",
-    hellip: "…",
-    reg: "®",
-    copy: "©",
-    trade: "™",
-  };
-
-  return String(value ?? "").replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/g, (entity, token) => {
-    if (token.startsWith("#x") || token.startsWith("#X")) {
-      const codePoint = Number.parseInt(token.slice(2), 16);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : entity;
-    }
-
-    if (token.startsWith("#")) {
-      const codePoint = Number.parseInt(token.slice(1), 10);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : entity;
-    }
-
-    return namedEntities[token] ?? entity;
-  });
 }
 
 export function htmlToText(html) {

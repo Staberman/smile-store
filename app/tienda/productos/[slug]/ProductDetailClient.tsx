@@ -439,17 +439,47 @@ export default function ProductDetailClient({
               </button>
             </div>
 
-            {product.descriptionText && (
+            {product.descriptionParagraphs.length > 0 && (
               <>
                 <div className="my-6 h-px bg-white/8" />
-                <div>
-                  <p className="mb-2 text-[9px] uppercase tracking-[0.4em] text-[#4a4540]">
+                <section aria-labelledby="product-description-heading">
+                  <h2
+                    id="product-description-heading"
+                    className="mb-2 text-[9px] uppercase tracking-[0.4em] text-[#4a4540]"
+                  >
                     Sobre este producto
-                  </p>
-                  <p className="text-sm leading-[1.9] text-[#b8b0a4]">
-                    {product.descriptionText}
-                  </p>
-                </div>
+                  </h2>
+                  <div className="space-y-3 text-sm leading-[1.9] text-[#b8b0a4]">
+                    {product.descriptionParagraphs.map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
+
+            {product.specs.length > 0 && (
+              <>
+                <div className="my-6 h-px bg-white/8" />
+                <section aria-labelledby="product-specs-heading">
+                  <h2
+                    id="product-specs-heading"
+                    className="mb-3 text-[9px] uppercase tracking-[0.4em] text-[#4a4540]"
+                  >
+                    Características
+                  </h2>
+                  <dl className="divide-y divide-white/6 text-sm">
+                    {product.specs.map((spec) => (
+                      <div
+                        key={`${spec.name}-${spec.value}`}
+                        className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 py-2.5"
+                      >
+                        <dt className="text-[#8b8580]">{spec.name}</dt>
+                        <dd className="text-[#b8b0a4]">{spec.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
               </>
             )}
 

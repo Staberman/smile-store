@@ -1,5 +1,6 @@
 import { canonicalBrand } from "@/lib/brand-directory";
 import type { CatalogProduct } from "@/lib/catalog";
+import { descriptionLines, splitDescription, type ProductSpec } from "@/lib/product-copy.mjs";
 import { displayProductName } from "@/lib/product-name";
 import {
   dedupeImages,
@@ -116,13 +117,50 @@ function describe(product: CatalogProduct, displayName: string, kind: ProductKin
   });
 }
 
+export type ProductCopy = {
+  /** Description paragraphs, without the lines moved to `specs`. */
+  paragraphs: string[];
+  /** "Clave: valor" lines of the description, e.g. Género: Unisex. */
+  specs: ProductSpec[];
+};
+
 /**
  * Product description as the site shows and emits it (product page, Product
- * JSON-LD, search index). Applied at read time: the hourly Tiendanube sync
- * rewrites data/tiendanube-catalog.json, so the stored copy is left as is.
+ * JSON-LD, search index): read from the description HTML, which keeps its
+ * line breaks, with spec lines split out and eyewear terms normalized.
+ * Applied at read time: the hourly Tiendanube sync rewrites
+ * data/tiendanube-catalog.json, so the stored copy is left as is.
  */
-export function getProductDescription(product: Pick<CatalogProduct, "descriptionText">): string {
-  return normalizeEyewearTerms(product.descriptionText);
+export function getProductCopy(
+  product: Pick<CatalogProduct, "descriptionHtml" | "descriptionText">,
+): ProductCopy {
+  const lines = descriptionLines(product.descriptionHtml);
+  if (lines.length > 0) return splitDescription(lines);
+  const text = normalizeEyewearTerms(product.descriptionText).trim();
+  return { paragraphs: text ? [text] : [], specs: [] };
+}
+
+function specsText(specs: ProductSpec[]): string {
+  return specs.map((spec) => `${spec.name}: ${spec.value}.`).join(" ");
+}
+
+/**
+ * Plain-text description for Product JSON-LD: the prose, or the specs when the
+ * description has nothing else (they also go to Product.additionalProperty).
+ */
+export function getProductDescription(
+  product: Pick<CatalogProduct, "descriptionHtml" | "descriptionText">,
+): string {
+  const { paragraphs, specs } = getProductCopy(product);
+  return paragraphs.join(" ") || specsText(specs);
+}
+
+/** Description prose and specs, for product search. */
+export function getProductSearchText(
+  product: Pick<CatalogProduct, "descriptionHtml" | "descriptionText">,
+): string {
+  const { paragraphs, specs } = getProductCopy(product);
+  return [...paragraphs, specsText(specs)].join(" ").trim();
 }
 
 export function getProductSeo(product: CatalogProduct): ProductSeo {

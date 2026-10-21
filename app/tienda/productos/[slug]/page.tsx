@@ -9,7 +9,7 @@ import {
   getRecommendedProducts,
   hasPurchasableStock,
 } from "@/lib/catalog";
-import { getProductDescription, getProductSeo } from "@/lib/product-meta";
+import { getProductCopy, getProductDescription, getProductSeo } from "@/lib/product-meta";
 import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import { getProductTrail } from "@/lib/collections";
@@ -71,6 +71,8 @@ export default function ProductPage({ params }: Props) {
   const productLink = productUrl(product);
   const offers = productOffers(product, productLink, outOfStock);
   const sku = product.variants.map((variant) => variant.sku.trim()).find(Boolean);
+  // The spec table on the page, as name/value pairs.
+  const { specs } = getProductCopy(product);
   const productSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -86,6 +88,15 @@ export default function ProductPage({ params }: Props) {
         },
         ...(sku ? { sku } : {}),
         ...(seo.mpn ? { mpn: seo.mpn } : {}),
+        ...(specs.length > 0
+          ? {
+              additionalProperty: specs.map((spec) => ({
+                "@type": "PropertyValue",
+                name: spec.name,
+                value: spec.value,
+              })),
+            }
+          : {}),
         url: productLink,
         ...(offers ? { offers } : {}),
       },
