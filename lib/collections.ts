@@ -33,6 +33,19 @@ export const COLLECTION_TRAILS = {
   premium: [HOME_CRUMB, PREMIUM_CRUMB],
 } satisfies Record<string, Crumb[]>;
 
+export type CollectionKey = keyof typeof COLLECTION_TRAILS;
+
+/** One-line summary of each hub, for llms.txt and other indexes. */
+export const COLLECTION_SUMMARIES: Record<CollectionKey, string> = {
+  relojes: "Relojes originales de Invicta, Tommy Hilfiger y OMEGA x Swatch.",
+  "omega-swatch": "Relojes OMEGA x Swatch MoonSwatch de la colección Mission.",
+  invicta: "Relojes Invicta, entre ellos las líneas Pro Diver y Speedway.",
+  "tommy-hilfiger": "Relojes Tommy Hilfiger para dama y caballero.",
+  "ray-ban": "Anteojos de sol Ray-Ban: Aviador, Wayfarer, Clubmaster, Round, Erika y más.",
+  ferrari: "Anteojos de sol Ray-Ban Scuderia Ferrari Collection.",
+  premium: "Anteojos de sol de marcas premium: Prada, Christian Dior, Versace, Gucci y más.",
+};
+
 /** Premium maisons with their own page; `catalogBrand` is the raw catalog value. */
 export const PREMIUM_BRANDS = [
   { slug: "balenciaga", name: "Balenciaga", catalogBrand: "Balenciaga" },
