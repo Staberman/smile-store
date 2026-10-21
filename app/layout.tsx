@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import WhatsAppFloatingButton from "@/components/contact/WhatsAppFloatingButton";
 import SessionOfferPopup from "@/components/promo/SessionOfferPopup";
 import JsonLd from "@/components/seo/JsonLd";
@@ -81,6 +82,7 @@ export default function RootLayout({
         {children}
         <WhatsAppFloatingButton />
         <SessionOfferPopup />
+        <Analytics />
       </body>
     </html>
   );
