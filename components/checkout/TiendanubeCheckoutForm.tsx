@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
+import type { CatalogVariant } from "@/lib/catalog";
+import type { ProductDetail } from "@/lib/product-summary";
 
 type Props = {
-  product: Pick<CatalogProduct, "tiendanubeProductId">;
+  product: Pick<ProductDetail, "tiendanubeProductId" | "storefrontUrl">;
   variant: Pick<CatalogVariant, "id" | "available" | "stock"> | null;
   disabled?: boolean;
   label?: string;
@@ -56,6 +57,12 @@ export default function TiendanubeCheckoutForm({
         throw new Error("no_checkout_url");
       }
     } catch {
+      // Direct checkout depends on the Tiendanube API; the storefront product
+      // page still lets the customer buy when that call fails.
+      if (product.storefrontUrl) {
+        window.location.href = product.storefrontUrl;
+        return;
+      }
       setError("No pudimos iniciar la compra. Probá de nuevo.");
       setLoading(false);
     }

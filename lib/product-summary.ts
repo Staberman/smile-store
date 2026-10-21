@@ -1,4 +1,5 @@
 import type { CatalogProduct, CatalogVariant } from "./catalog";
+import { toStorefrontProductUrl } from "./checkout/storefront";
 
 // Slim product DTOs for client components. Everything passed from a server
 // component to a client component is serialized into the page's RSC payload,
@@ -44,6 +45,8 @@ export type ProductDetail = Pick<
   | "tiendanubeProductId"
 > & {
   variants: ProductSummaryVariant[];
+  /** Tiendanube storefront page, used when direct checkout is unavailable. */
+  storefrontUrl: string | null;
 };
 
 function toSummaryVariant(variant: CatalogVariant): ProductSummaryVariant {
@@ -131,5 +134,6 @@ export function toProductDetail(
     tiendanubeProductId: product.tiendanubeProductId,
     // The product page only offers in-stock variants.
     variants: product.variants.filter(isInStockVariant).map(toSummaryVariant),
+    storefrontUrl: toStorefrontProductUrl(product.sourceUrl),
   };
 }
