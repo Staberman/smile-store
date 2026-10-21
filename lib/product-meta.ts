@@ -1,5 +1,6 @@
-import { BRAND_DIRECTORY, canonicalBrand } from "@/lib/brand-directory";
+import { canonicalBrand } from "@/lib/brand-directory";
 import type { CatalogProduct } from "@/lib/catalog";
+import { displayProductName } from "@/lib/product-name";
 import {
   dedupeImages,
   extractModelCode,
@@ -8,7 +9,6 @@ import {
   listPhrase,
   normalizeEyewearTerms,
   plainName,
-  productDisplayName,
   productPageTitle,
   type ProductKind,
 } from "@/lib/product-seo.mjs";
@@ -18,7 +18,7 @@ import { isWatch } from "@/lib/storefront.mjs";
 export type ProductSeo = {
   /** Canonical brand label ("Ray-Ban", never "RAY BAN"). */
   brand: string;
-  /** H1 and Product.name: the catalog name with the canonical brand. */
+  /** H1, cards and Product.name: the catalog name with the canonical brand. */
   displayName: string;
   kind: ProductKind;
   /** <title> without the site suffix, at most 52 characters. */
@@ -127,9 +127,8 @@ export function getProductDescription(product: Pick<CatalogProduct, "description
 
 export function getProductSeo(product: CatalogProduct): ProductSeo {
   const brand = canonicalBrand(product.brand);
-  const aliases = BRAND_DIRECTORY.find((entry) => entry.name === brand)?.aliases ?? [];
   const kind = getKind(product);
-  const displayName = productDisplayName(product.name, { label: brand, aliases });
+  const displayName = displayProductName(product.name, product.brand);
 
   return {
     brand,

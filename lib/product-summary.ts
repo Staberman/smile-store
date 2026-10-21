@@ -1,6 +1,7 @@
 import type { CatalogProduct, CatalogVariant } from "./catalog";
 import { toStorefrontProductUrl } from "./checkout/storefront";
 import { getProductDescription } from "./product-meta";
+import { displayProductName } from "./product-name";
 
 // Slim product DTOs for client components. Everything passed from a server
 // component to a client component is serialized into the page's RSC payload,
@@ -19,6 +20,7 @@ export type ProductGender = (typeof GENDER_TAGS)[number];
 
 /**
  * Card-sized product: what cards, carousels, view filters and facets read.
+ * `name` is the display name the product page shows, not the raw catalog name.
  * Catalog tags are SEO keyword lists; cards only need the gender facet derived
  * from them, and search reads them from the lazily loaded search index.
  */
@@ -95,7 +97,7 @@ export function getExtendedSearchText(product: CatalogProduct): string {
 export function toProductSummary(product: CatalogProduct): ProductSummary {
   return {
     slug: product.slug,
-    name: product.name,
+    name: displayProductName(product.name, product.brand),
     brand: product.brand,
     categories: product.categories,
     price: product.price,
@@ -125,7 +127,7 @@ export function toProductDetail(
 ): ProductDetail {
   return {
     slug: product.slug,
-    name: display.name ?? product.name,
+    name: display.name ?? displayProductName(product.name, product.brand),
     brand: display.brand ?? product.brand,
     categories: product.categories,
     descriptionText: getProductDescription(product),

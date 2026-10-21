@@ -40,6 +40,42 @@ test("display names carry the canonical brand exactly once", () => {
   assert.equal(productDisplayName("FENDI FE008", { label: "Fendi", aliases: ["fendi"] }), "Fendi FE008");
 });
 
+test("display names fix known typos in catalog names", () => {
+  assert.equal(
+    productDisplayName("Hexagonal 3674M Scuderia Ferrari Colletion", RAY_BAN),
+    "Ray-Ban Hexagonal 3674M Scuderia Ferrari Collection",
+  );
+  assert.equal(
+    productDisplayName("Aviador 8313 Scuderia Ferrari Collettion", RAY_BAN),
+    "Ray-Ban Aviador 8313 Scuderia Ferrari Collection",
+  );
+  assert.equal(
+    productDisplayName("RAY BAN AVIADOR SCUDERIA FERRARI COLLETION", RAY_BAN),
+    "Ray-Ban Aviador Scuderia Ferrari Collection",
+  );
+  // "Catier" is fixed wherever it appears, not only as the leading brand.
+  assert.equal(
+    productDisplayName("Lentes Catier CA002", { label: "Cartier", aliases: ["cartier"] }),
+    "Lentes Cartier CA002",
+  );
+  assert.equal(
+    productDisplayName("Wayfarer Liteforce 4195 Scuderia Ferrari Collection", RAY_BAN),
+    "Ray-Ban Wayfarer Liteforce 4195 Scuderia Ferrari Collection",
+  );
+});
+
+test("display names are stable when applied again", () => {
+  const catalog = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "data/tiendanube-catalog.json"), "utf8"),
+  );
+  for (const product of catalog) {
+    const brand = { label: product.brand, aliases: [] };
+    const once = productDisplayName(product.name, brand);
+    assert.doesNotMatch(once, /\b(catier|coll?ett?ion)\b/i, product.slug);
+    assert.equal(productDisplayName(once, brand), once, product.slug);
+  }
+});
+
 test("product titles fit 60 characters with the site suffix", () => {
   const long = productPageTitle(
     "Ray-Ban Wayfarer Liteforce 4195 Scuderia Ferrari Collection",
