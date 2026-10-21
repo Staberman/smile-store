@@ -123,7 +123,7 @@ export default function Experience() {
         {/* CTAs */}
         <motion.div variants={item} className="mt-10 flex flex-wrap gap-4">
           <a
-            href="/tienda"
+            href="/"
             className="cursor-pointer rounded-full bg-white px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-black transition hover:opacity-88"
           >
             Ir a tienda

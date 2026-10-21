@@ -170,9 +170,9 @@ export default function BrandCarousel({
         </a>
         <ul className="flex items-center gap-1 list-none">
           {[
-            { label: "Colecciones", href: "/#colecciones" },
-            { label: "Tienda", href: "/tienda" },
-            { label: "Marcas", href: "/tienda" },
+            { label: "Colecciones", href: "/#catalogo" },
+            { label: "Tienda", href: "/" },
+            { label: "Marcas", href: "/" },
           ].map((link, i) => (
             <li key={link.label} className="flex items-center">
               {i > 0 && (

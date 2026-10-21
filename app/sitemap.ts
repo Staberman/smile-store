@@ -6,7 +6,6 @@ const staticRoutes = [
   "/",
   "/contacto",
   "/guia-de-estilo",
-  "/tienda",
   "/tienda/relojes",
   "/tienda/relojes/omega-swatch",
   "/tienda/marcas/invicta",
@@ -42,8 +41,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...indexableRoutes.map((route) => ({
       url: absoluteUrl(route),
       lastModified: now,
-      changeFrequency: route === "/" || route === "/tienda" ? "daily" as const : "weekly" as const,
-      priority: route === "/" ? 1 : route === "/tienda" ? 0.9 : 0.7,
+      changeFrequency: route === "/" ? "daily" as const : "weekly" as const,
+      priority: route === "/" ? 1 : 0.7,
     })),
     // Include out-of-stock products so their direct URLs stay indexable.
     ...allProductsIncludingOutOfStock.map((product) => ({

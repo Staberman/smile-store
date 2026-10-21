@@ -112,7 +112,7 @@ export default function ProductPage({ params }: Props) {
           ? "/tienda/relojes/omega-swatch"
           : premiumBrandSlugs[normalizedBrand]
             ? `/tienda/marcas/premium/${premiumBrandSlugs[normalizedBrand]}`
-            : "/tienda";
+            : "/";
 
   const brandLabel = isRayBan
     ? "Ray-Ban"
@@ -164,25 +164,18 @@ export default function ProductPage({ params }: Props) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Tienda",
-            item: absoluteUrl("/tienda"),
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: brandLabel,
-            item: absoluteUrl(brandHref),
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: product.name,
-            item: productUrl(product),
-          },
-        ],
+          { name: "Inicio", item: absoluteUrl("/") },
+          // Brands without their own collection page fall back to "/";
+          // skip that level so the breadcrumb does not repeat the homepage.
+          ...(brandHref === "/"
+            ? []
+            : [{ name: brandLabel, item: absoluteUrl(brandHref) }]),
+          { name: product.name, item: productUrl(product) },
+        ].map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          ...crumb,
+        })),
       },
     ],
   };

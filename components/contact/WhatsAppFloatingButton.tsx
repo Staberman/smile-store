@@ -38,7 +38,7 @@ function getPageContext(pathname: string): string {
     return "la coleccion de relojes";
   }
 
-  if (pathname.includes("/tienda")) {
+  if (pathname === "/" || pathname.includes("/tienda")) {
     return "el catalogo de Smile";
   }
 

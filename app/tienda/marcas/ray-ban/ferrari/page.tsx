@@ -45,8 +45,8 @@ export default function FerrariPage() {
         {/* Breadcrumb */}
         <div className="mx-auto max-w-7xl">
           <nav className="mb-10 flex items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-[#4a4540]">
-            <Link href="/tienda" className="transition hover:text-[#f0ece4]">
-              Tienda
+            <Link href="/" className="transition hover:text-[#f0ece4]">
+              Inicio
             </Link>
             <span>/</span>
             <Link

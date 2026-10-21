@@ -1,42 +1,47 @@
 import type { Metadata } from "next";
-import Header from "../components/layout/Header";
-import Hero from "../components/sections/Hero";
-import BenefitsStrip from "../components/sections/BenefitsStrip";
-import Collections from "../components/sections/Collections";
-import Experience from "../components/sections/Experience";
-import RecentlyViewed from "../components/product/RecentlyViewed";
-import Footer from "../components/layout/Footer";
+import FaqSection from "@/components/brand/FaqSection";
+import RecentlyViewed from "@/components/product/RecentlyViewed";
+import JsonLd from "@/components/seo/JsonLd";
+import StoreShell from "@/components/store/StoreShell";
+import TiendaClient from "@/components/store/TiendaClient";
+import { allProducts } from "@/lib/catalog";
+import { SITE_OPEN_GRAPH, SITE_TWITTER, collectionSchema } from "@/lib/seo";
+
+const HOME_TITLE = "Anteojos de sol y relojes originales en Argentina";
+const HOME_SOCIAL_TITLE = `${HOME_TITLE} | Smile`;
+const HOME_SOCIAL_DESCRIPTION =
+  "Anteojos de sol y lentes originales, relojes y accesorios premium en Argentina. Invicta, Ray-Ban y Tommy Hilfiger con checkout seguro.";
 
 export const metadata: Metadata = {
-  title: "Anteojos de sol y relojes originales en Argentina",
+  title: HOME_TITLE,
   description:
     "Comprá anteojos de sol y lentes originales, relojes y accesorios premium en Argentina. Modelos seleccionados de Invicta, Ray-Ban y Tommy Hilfiger con checkout seguro.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    type: "website",
-    locale: "es_AR",
+    ...SITE_OPEN_GRAPH,
     url: "/",
-    title: "Anteojos de sol y relojes originales en Argentina | Smile",
-    description:
-      "Anteojos de sol y lentes originales, relojes y accesorios premium en Argentina. Invicta, Ray-Ban y Tommy Hilfiger con checkout seguro.",
+    title: HOME_SOCIAL_TITLE,
+    description: HOME_SOCIAL_DESCRIPTION,
+  },
+  twitter: {
+    ...SITE_TWITTER,
+    title: HOME_SOCIAL_TITLE,
+    description: HOME_SOCIAL_DESCRIPTION,
   },
 };
 
+const homeCollectionSchema = collectionSchema("/", HOME_TITLE, allProducts);
+
 export default function Home() {
   return (
-    <main className="bg-black text-white">
-      <h1 className="sr-only">
-        Anteojos de sol y relojes originales en Argentina
-      </h1>
-      <Header />
-      <Hero />
-      <BenefitsStrip />
-      <Collections />
-      <Experience />
+    <StoreShell>
+      <JsonLd data={homeCollectionSchema} />
+      <h1 className="sr-only">{HOME_TITLE}</h1>
+      <TiendaClient />
       <RecentlyViewed />
-      <Footer />
-    </main>
+      <FaqSection />
+    </StoreShell>
   );
 }

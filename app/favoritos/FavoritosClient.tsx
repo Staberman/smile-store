@@ -78,7 +78,7 @@ function EmptyState() {
         más rápido.
       </p>
       <Link
-        href="/tienda"
+        href="/"
         className="mt-8 inline-flex min-h-11 items-center rounded-full bg-[#c9a96e] px-7 text-[11px] uppercase tracking-[0.2em] text-[#0a0a0a] transition hover:bg-[#e2c989]"
       >
         Explorar la tienda

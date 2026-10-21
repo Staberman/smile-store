@@ -100,8 +100,9 @@ test("collection carousel exposes one semantic page heading", () => {
     path.join(projectRoot, "components/brand/BrandCarousel.tsx"),
     "utf8",
   );
+  // The store catalog is served from the homepage ("/").
   const storePageSource = fs.readFileSync(
-    path.join(projectRoot, "app/tienda/page.tsx"),
+    path.join(projectRoot, "app/page.tsx"),
     "utf8",
   );
 

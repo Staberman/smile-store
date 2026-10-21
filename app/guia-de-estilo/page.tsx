@@ -175,7 +175,7 @@ export default function GuiaDeEstiloPage() {
 
           <div className="mt-10">
             <Link
-              href="/tienda"
+              href="/"
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#c9a96e] px-7 text-[11px] font-medium uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:bg-[#e2c989]"
             >
               Ver lentes de sol
@@ -246,7 +246,7 @@ export default function GuiaDeEstiloPage() {
               Ver relojes
             </Link>
             <Link
-              href="/tienda"
+              href="/"
               className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/10 px-7 text-[11px] uppercase tracking-[0.24em] text-[#6a6560] transition hover:border-white/25 hover:text-[#f0ece4]"
             >
               Explorar la tienda

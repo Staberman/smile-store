@@ -5,8 +5,8 @@ const nav = [
     heading: "Colecciones",
     links: [
       { label: "Relojes", href: "/tienda/relojes" },
-      { label: "Lentes", href: "/tienda" },
-      { label: "Ver todo", href: "/tienda" },
+      { label: "Lentes", href: "/" },
+      { label: "Ver todo", href: "/" },
     ],
   },
   {
@@ -20,10 +20,10 @@ const nav = [
   {
     heading: "Información",
     links: [
-      { label: "Todos los productos", href: "/tienda" },
+      { label: "Todos los productos", href: "/" },
       { label: "Guía de estilo", href: "/guia-de-estilo" },
       { label: "Contacto", href: "/contacto" },
-      { label: "Checkout seguro", href: "/tienda" },
+      { label: "Checkout seguro", href: "/" },
     ],
   },
 ];

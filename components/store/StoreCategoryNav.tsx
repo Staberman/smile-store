@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { DEFAULT_STORE_VIEW } from "./storeView";
 
 const GROUPS = [
   {
@@ -23,7 +25,7 @@ const GROUPS = [
       // "Más vendidos" (view=best-sellers) queda oculto: depende de
       // data/tiendanube-sales-ranking.json, que está vacío y nada lo genera,
       // así que la vista renderiza una página en blanco. El filtro en
-      // TiendaClient/storefront.mjs se deja intacto para reactivarlo cuando
+      // TiendaCatalog/storefront.mjs se deja intacto para reactivarlo cuando
       // exista un generador de ranking.
       // { label: "Más vendidos", view: "best-sellers" },
       { label: "Ofertas", view: "offers" },
@@ -31,10 +33,8 @@ const GROUPS = [
   },
 ] as const;
 
-export default function StoreCategoryNav() {
-  const searchParams = useSearchParams();
-  const activeView = searchParams.get("view") ?? "lentes";
-
+/** Category links for a given active view. Pure, so it can be server-rendered. */
+function StoreCategoryLinks({ activeView }: { activeView: string }) {
   return (
     <nav aria-label="Categorías de la tienda" className="min-w-0 flex-1">
       <div className="scrollbar-none flex snap-x snap-mandatory items-center gap-5 overflow-x-auto px-1 py-2 md:justify-center md:gap-7 md:overflow-visible">
@@ -52,7 +52,7 @@ export default function StoreCategoryNav() {
               return (
                 <Link
                   key={item.view}
-                  href={`/tienda?view=${item.view}#catalogo`}
+                  href={`/?view=${item.view}#catalogo`}
                   scroll={false}
                   className="relative flex min-h-11 snap-start items-center whitespace-nowrap text-[9px] uppercase tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#c9a96e] md:text-[10px]"
                   style={{ color: active ? "#e2c989" : "#8b8580" }}
@@ -72,3 +72,18 @@ export default function StoreCategoryNav() {
   );
 }
 
+function StoreCategoryLinksFromUrl() {
+  const searchParams = useSearchParams();
+  return (
+    <StoreCategoryLinks activeView={searchParams.get("view") ?? DEFAULT_STORE_VIEW} />
+  );
+}
+
+export default function StoreCategoryNav() {
+  return (
+    // The fallback keeps the category links in the static HTML for crawlers.
+    <Suspense fallback={<StoreCategoryLinks activeView={DEFAULT_STORE_VIEW} />}>
+      <StoreCategoryLinksFromUrl />
+    </Suspense>
+  );
+}

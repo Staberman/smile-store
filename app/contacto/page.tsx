@@ -92,7 +92,7 @@ export default function ContactPage() {
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/tienda"
+              href="/"
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#c9a96e] px-7 text-[11px] font-medium uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:bg-[#e2c989]"
             >
               Ver productos

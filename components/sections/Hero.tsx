@@ -105,7 +105,7 @@ export default function Hero() {
               </a>
 
               <a
-                href="/tienda"
+                href="/"
                 className="cursor-pointer rounded-full border border-white/25 px-7 py-3 text-[11px] uppercase tracking-[0.22em] text-white transition hover:border-white hover:bg-white hover:text-black"
               >
                 {current.secondaryCta}

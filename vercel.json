@@ -13,7 +13,17 @@
     },
     {
       "source": "/lentes-de-sol",
-      "destination": "/tienda",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/tienda",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/tienda/",
+      "destination": "/",
       "permanent": true
     }
   ]

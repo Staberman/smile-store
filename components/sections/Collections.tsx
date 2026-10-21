@@ -11,7 +11,7 @@ const collections = [
     description:
       "Piezas seleccionadas de Invicta y Tommy Hilfiger construidas para destacar fuerza visual, proporción y carácter.",
     image: "/images/card-relojes.jpg",
-    href: "/tienda?view=relojes",
+    href: "/?view=relojes",
     cta: "Ver relojes en tienda",
   },
   {
@@ -21,7 +21,7 @@ const collections = [
     description:
       "Modelos Ray-Ban seleccionados para aportar identidad, contraste y una presencia visual claramente premium.",
     image: "/images/card-lentes.jpg",
-    href: "/tienda",
+    href: "/",
     cta: "Ver lentes en tienda",
   },
 ];

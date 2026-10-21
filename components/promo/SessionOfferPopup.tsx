@@ -90,7 +90,7 @@ export default function SessionOfferPopup() {
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/tienda"
+                href="/"
                 onClick={() => setOpen(false)}
                 className="flex min-h-12 items-center justify-center rounded-full bg-[#c9a96e] px-6 text-[11px] font-medium uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:bg-[#e2c989]"
               >

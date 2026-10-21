@@ -10,7 +10,7 @@ export type BrandDirectoryEntry = {
 };
 
 export const BRAND_DIRECTORY: BrandDirectoryEntry[] = [
-  { name: "Ray-Ban", aliases: ["ray ban", "rayban"], href: "/tienda?view=ray-ban#catalogo", image: "/images/brands/ray-ban.svg", group: "lentes" },
+  { name: "Ray-Ban", aliases: ["ray ban", "rayban"], href: "/?view=ray-ban#catalogo", image: "/images/brands/ray-ban.svg", group: "lentes" },
   { name: "Prada", aliases: ["prada"], href: "/tienda/marcas/premium/prada", image: "/images/brands/prada.svg", group: "lentes" },
   { name: "Versace", aliases: ["versace"], href: "/tienda/marcas/premium/versace", image: "/images/brands/versace.svg", group: "lentes" },
   { name: "Christian Dior", aliases: ["christian dior"], href: "/tienda/marcas/premium/christian-dior", image: "/images/brands/christian-dior.svg", group: "lentes" },

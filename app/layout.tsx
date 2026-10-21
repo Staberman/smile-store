@@ -3,7 +3,7 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import WhatsAppFloatingButton from "@/components/contact/WhatsAppFloatingButton";
 import SessionOfferPopup from "@/components/promo/SessionOfferPopup";
 import JsonLd from "@/components/seo/JsonLd";
-import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_OPEN_GRAPH, SITE_TWITTER, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -33,28 +33,17 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    type: "website",
-    locale: "es_AR",
+    ...SITE_OPEN_GRAPH,
     url: SITE_URL,
-    siteName: SITE_NAME,
     title: "Smile | Relojes, lentes y accesorios premium en Argentina",
     description:
       "Tienda online de relojes, lentes y accesorios premium en Argentina.",
-    images: [
-      {
-        url: "/images/card-relojes.jpg",
-        width: 1152,
-        height: 603,
-        alt: "Smile | Relojes, lentes y accesorios premium en Argentina",
-      },
-    ],
   },
   twitter: {
-    card: "summary_large_image",
+    ...SITE_TWITTER,
     title: "Smile | Relojes, lentes y accesorios premium en Argentina",
     description:
       "Tienda online de relojes, lentes y accesorios premium en Argentina.",
-    images: ["/images/card-relojes.jpg"],
   },
 };
 

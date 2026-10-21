@@ -25,6 +25,10 @@ interface Props {
   /** Opt-in faceted filters (Tipo/Marca/Género/Precio). Off by default so
    *  single-brand pages keep their lean toolbar untouched. */
   enableFacets?: boolean;
+  /** Fade cards in on first mount. Disable it when the grid replaces
+   *  server-rendered markup, so visible cards do not blink out and back in.
+   *  Cards added later by filtering always animate. */
+  animateEntrance?: boolean;
 }
 
 const ACCENT = "#c9a96e";
@@ -209,6 +213,7 @@ export default function ProductGrid({
   filterBy = "collection",
   searchProducts,
   enableFacets = false,
+  animateEntrance = true,
 }: Props) {
   const searchableProducts = searchProducts ?? products;
   const getKey = (product: CatalogProduct) =>
@@ -627,7 +632,7 @@ export default function ProductGrid({
           layout
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
-          <AnimatePresence>
+          <AnimatePresence initial={animateEntrance}>
             {filtered.map((product) => (
               <motion.div
                 key={product.id}
