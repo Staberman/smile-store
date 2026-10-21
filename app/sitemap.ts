@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
-import { allProducts } from "@/lib/catalog";
+import { allProducts, allProductsIncludingOutOfStock } from "@/lib/catalog";
 import { absoluteUrl, productUrl } from "@/lib/seo";
 
 const staticRoutes = [
   "/",
   "/contacto",
+  "/guia-de-estilo",
   "/tienda",
   "/tienda/relojes",
   "/tienda/relojes/omega-swatch",
@@ -44,7 +45,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: route === "/" || route === "/tienda" ? "daily" as const : "weekly" as const,
       priority: route === "/" ? 1 : route === "/tienda" ? 0.9 : 0.7,
     })),
-    ...allProducts.map((product) => ({
+    // Include out-of-stock products so their direct URLs stay indexable.
+    ...allProductsIncludingOutOfStock.map((product) => ({
       url: productUrl(product),
       lastModified: now,
       changeFrequency: "daily" as const,

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 const collections = [
@@ -10,7 +11,7 @@ const collections = [
     description:
       "Piezas seleccionadas de Invicta y Tommy Hilfiger construidas para destacar fuerza visual, proporción y carácter.",
     image: "/images/card-relojes.jpg",
-    href: "/tienda?cat=relojes",
+    href: "/tienda?view=relojes",
     cta: "Ver relojes en tienda",
   },
   {
@@ -54,21 +55,33 @@ export default function Collections() {
           className="relative overflow-hidden rounded-[2.5rem] border border-white/8"
         >
           <div className="absolute inset-0 grid grid-cols-3">
-            <img
-              src="/images/bg-watch.jpg"
-              alt=""
-              className="h-full w-full object-cover opacity-[0.28] animate-slowZoom"
-            />
-            <img
-              src="/images/bg-tommy.jpg"
-              alt=""
-              className="h-full w-full object-cover opacity-[0.28] animate-slowZoom"
-            />
-            <img
-              src="/images/bg-rayban.jpg"
-              alt=""
-              className="h-full w-full object-cover opacity-[0.28] animate-slowZoom"
-            />
+            <div className="relative">
+              <Image
+                src="/images/bg-watch.jpg"
+                alt=""
+                fill
+                sizes="(max-width:768px) 34vw, 33vw"
+                className="object-cover opacity-[0.28] animate-slowZoom"
+              />
+            </div>
+            <div className="relative">
+              <Image
+                src="/images/bg-tommy.jpg"
+                alt=""
+                fill
+                sizes="(max-width:768px) 34vw, 33vw"
+                className="object-cover opacity-[0.28] animate-slowZoom"
+              />
+            </div>
+            <div className="relative">
+              <Image
+                src="/images/bg-rayban.jpg"
+                alt=""
+                fill
+                sizes="(max-width:768px) 34vw, 33vw"
+                className="object-cover opacity-[0.28] animate-slowZoom"
+              />
+            </div>
             <div className="absolute inset-0 bg-black/60" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/68 via-black/50 to-black/60" />
           </div>
@@ -99,10 +112,12 @@ export default function Collections() {
             >
               <a href={collection.href} className="block">
                 <div className="relative h-[560px] overflow-hidden">
-                  <img
+                  <Image
                     src={collection.image}
                     alt={collection.category}
-                    className="h-full w-full object-cover brightness-[0.75] contrast-[1.05] saturate-[0.9] blur-[0.2px] transition duration-[1200ms] ease-out group-hover:scale-110"
+                    fill
+                    sizes="(max-width:1024px) 100vw, 50vw"
+                    className="object-cover brightness-[0.75] contrast-[1.05] saturate-[0.9] blur-[0.2px] transition duration-[1200ms] ease-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-black/50 transition duration-500 group-hover:bg-black/28" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/16 to-transparent" />

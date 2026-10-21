@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { collectionSchema } from "@/lib/seo";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -18,10 +20,16 @@ const ferrariProducts = allProducts.filter((product) => {
   const values = [product.brand, ...product.categories, ...product.tags];
   return values.some((value) => value.toLowerCase().includes("ferrari"));
 });
+const ferrariSchema = collectionSchema(
+  "/tienda/marcas/ray-ban/ferrari",
+  "Scuderia Ferrari Collection",
+  ferrariProducts,
+);
 
 export default function FerrariPage() {
   return (
     <main className="bg-[#0a0a0a]">
+      <JsonLd data={ferrariSchema} />
       {/* Hero header */}
       <section className="relative overflow-hidden bg-[#0a0a0a] px-6 pb-16 pt-36 text-[#f0ece4] md:px-12 md:pt-44">
         {/* Subtle red glow */}

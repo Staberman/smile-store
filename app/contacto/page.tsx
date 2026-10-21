@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import JsonLd from "@/components/seo/JsonLd";
+import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Contacto",
@@ -9,6 +11,33 @@ export const metadata: Metadata = {
     "Contacto oficial de Smile para consultas sobre relojes, lentes, stock, pagos y envios en Argentina.",
   alternates: {
     canonical: "/contacto",
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    url: "/contacto",
+    title: "Contacto | Smile",
+    description:
+      "Contacto oficial de Smile para consultas sobre relojes, lentes, stock, pagos y envios en Argentina.",
+  },
+};
+
+const contactSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contacto | Smile",
+  url: absoluteUrl("/contacto"),
+  mainEntity: {
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: SITE_URL,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+54 9 341 261 3504",
+      contactType: "customer service",
+      areaServed: "AR",
+      availableLanguage: "Spanish",
+    },
   },
 };
 
@@ -30,6 +59,7 @@ const contactItems = [
 export default function ContactPage() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
+      <JsonLd data={contactSchema} />
       <Header />
       <section className="px-6 pb-20 pt-36 md:px-12 md:pb-28 md:pt-44">
         <div className="mx-auto max-w-5xl">

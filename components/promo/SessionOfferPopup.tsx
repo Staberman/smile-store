@@ -48,7 +48,7 @@ export default function SessionOfferPopup() {
       onClick={() => setOpen(false)}
     >
       <div
-        className="relative w-full max-w-[34rem] overflow-hidden rounded-t-2xl border border-white/10 bg-[#080706] text-[#f0ece4] shadow-[0_30px_90px_rgba(0,0,0,0.75)] md:rounded-2xl"
+        className="relative w-full max-w-[34rem] overflow-hidden rounded-t-2xl border border-white/10 bg-[#080706] text-[#f0ece4] shadow-[0_30px_90px_rgba(0,0,0,0.75)] md:max-w-[58rem] md:rounded-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -64,38 +64,37 @@ export default function SessionOfferPopup() {
           Smile tienda oficial
         </div>
 
-        <div className="grid gap-0 md:grid-cols-[1fr_0.78fr]">
-          <div className="px-6 pb-7 pt-8 md:px-8 md:py-9">
+        <div className="grid gap-0 md:grid-cols-[1.35fr_0.65fr]">
+          <div className="px-6 pb-7 pt-8 md:px-10 md:py-7">
             <p className="text-[10px] uppercase tracking-[0.36em] text-[#6a6560]">
               Beneficio activo
             </p>
             <h2
               id="session-offer-title"
-              className="font-display mt-3 text-[2.5rem] font-light italic leading-[1.02] md:text-[3.2rem]"
+              className="font-display mt-3 text-[2.5rem] font-light italic leading-[1.02] md:text-[2.8rem]"
             >
-              6 cuotas
+              Lentes originales
               <br />
-              sin interes
+              y premium
             </h2>
             <p className="mt-4 max-w-[24rem] text-sm leading-[1.8] text-[#8b8580]">
-              Tambien tenes 20% OFF abonando en efectivo o transferencia.
-              Productos con stock informado disponible y compra segura por
-              checkout de Tiendanube.
+              Encontrá el modelo ideal con beneficios claros y asesoramiento
+              personalizado antes y después de tu compra.
             </p>
 
-            <div className="mt-6 grid gap-2 text-[11px] uppercase tracking-[0.2em] text-[#c9a96e]">
-              <span>20% OFF efectivo/transferencia</span>
-              <span>Checkout seguro</span>
-              <span>Productos con stock disponible</span>
+            <div className="mt-5 grid gap-2 text-[11px] uppercase tracking-[0.2em] text-[#c9a96e] md:grid-cols-3">
+              <span>Hasta 6 cuotas sin interés</span>
+              <span>Envío gratis a todo el país</span>
+              <span>Garantía y asesoramiento</span>
             </div>
 
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/tienda"
                 onClick={() => setOpen(false)}
                 className="flex min-h-12 items-center justify-center rounded-full bg-[#c9a96e] px-6 text-[11px] font-medium uppercase tracking-[0.24em] text-[#0a0a0a] transition hover:bg-[#e2c989]"
               >
-                Ver productos
+                Ver colección
               </Link>
               <button
                 type="button"
@@ -109,7 +108,7 @@ export default function SessionOfferPopup() {
 
           <div className="relative hidden min-h-full border-l border-white/8 bg-[#0e0d0b] md:block">
             <div className="absolute inset-6 rounded-full border border-[#c9a96e]/25" />
-            <div className="flex h-full min-h-[25rem] flex-col items-center justify-center px-6 text-center">
+            <div className="flex h-full min-h-[21rem] flex-col items-center justify-center px-6 text-center">
               <p className="font-display text-[4.8rem] font-light leading-none text-[#c9a96e]">
                 20%
               </p>
@@ -119,8 +118,8 @@ export default function SessionOfferPopup() {
               <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-[#8b8580]">
                 efectivo / transferencia
               </p>
-              <div className="mt-8 h-px w-20 bg-[#c9a96e]/35" />
-              <p className="mt-8 max-w-[10rem] text-[11px] uppercase leading-[1.8] tracking-[0.2em] text-[#f0ece4]">
+              <div className="mt-6 h-px w-20 bg-[#c9a96e]/35" />
+              <p className="mt-6 max-w-[10rem] text-[11px] uppercase leading-[1.8] tracking-[0.2em] text-[#f0ece4]">
                 6 cuotas sin interes
               </p>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 
 const slides = [
@@ -52,10 +53,14 @@ export default function Hero() {
           transition={{ duration: 2, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <img
+          <Image
             src={current.image}
             alt=""
-            className="h-full w-full object-cover"
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-black/48" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/38 to-black/8" />
@@ -83,9 +88,9 @@ export default function Hero() {
               {current.eyebrow}
             </motion.p>
 
-            <h1 className="font-display whitespace-pre-line text-[3.4rem] font-light italic leading-[0.93] tracking-[-0.01em] text-white md:text-[5.2rem] lg:text-[6.2rem]">
+            <p className="font-display whitespace-pre-line text-[3.4rem] font-light italic leading-[0.93] tracking-[-0.01em] text-white md:text-[5.2rem] lg:text-[6.2rem]">
               {current.title}
-            </h1>
+            </p>
 
             <p className="mt-7 max-w-lg text-sm leading-[1.85] text-white/68 md:text-[15px]">
               {current.description}

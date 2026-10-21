@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import type { CatalogProduct } from "@/lib/catalog";
 import { formatPrice } from "@/lib/catalog";
+import { isWatch } from "@/lib/storefront.mjs";
 
 interface Props {
   products: CatalogProduct[];
@@ -24,7 +25,9 @@ const BG_GRADIENTS = [
 ];
 
 function hasAvailableVariant(product: CatalogProduct) {
-  return product.variants.some((variant) => variant.available);
+  return product.variants.some(
+    (variant) => variant.available && variant.stock > 0,
+  );
 }
 
 function getCarouselImage(product: CatalogProduct): string | null {
@@ -55,6 +58,7 @@ function buildSlides(products: CatalogProduct[]) {
       if (slides.length >= 5) break;
       if (seen.has(product.id)) continue;
       slides.push(product);
+      seen.add(product.id);
     }
   }
 
@@ -196,6 +200,7 @@ export default function BrandCarousel({
             <div
               key={prod.id}
               className="absolute inset-0 flex items-center justify-center"
+              style={{ pointerEvents: isActive ? "auto" : "none" }}
             >
               {/* Content grid */}
               <div className="grid w-full max-w-[1100px] grid-cols-1 items-center gap-5 px-6 pb-16 pt-8 md:grid-cols-2 md:gap-16 md:px-16 md:py-0">
@@ -343,10 +348,10 @@ export default function BrandCarousel({
                           width: "100%",
                           height: "100%",
                           borderRadius: "50%",
-                          objectFit: "cover",
+                          objectFit: isWatch(prod) ? "contain" : "cover",
                           objectPosition: "center",
                           filter: "brightness(0.94) contrast(1.05)",
-                          transform: "scale(1.08)",
+                          transform: isWatch(prod) ? "scale(0.86)" : "scale(1.08)",
                           transformOrigin: "center",
                         }}
                         onError={(e) => {

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Omega × Swatch MoonSwatch",
@@ -16,10 +18,16 @@ const ACCENT = "#c9a96e";
 const omegaSwatchProducts = allProducts.filter(
   (product) => product.brand === "OMEGA x Swatch"
 );
+const omegaSwatchSchema = collectionSchema(
+  "/tienda/relojes/omega-swatch",
+  "Omega × Swatch MoonSwatch",
+  omegaSwatchProducts,
+);
 
 export default function OmegaSwatchPage() {
   return (
     <main className="bg-[#0a0a0a]">
+      <JsonLd data={omegaSwatchSchema} />
       <BrandCarousel products={omegaSwatchProducts} brand="Omega × Swatch" showNav={false} />
 
       {/* Collab callout */}

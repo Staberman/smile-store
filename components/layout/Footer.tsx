@@ -21,6 +21,7 @@ const nav = [
     heading: "Información",
     links: [
       { label: "Todos los productos", href: "/tienda" },
+      { label: "Guía de estilo", href: "/guia-de-estilo" },
       { label: "Contacto", href: "/contacto" },
       { label: "Checkout seguro", href: "/tienda" },
     ],

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Relojes Tommy Hilfiger",
@@ -14,10 +16,12 @@ export const metadata: Metadata = {
 };
 
 const tommyProducts = allProducts.filter((product) => product.brand === "Tommy Hilfiger");
+const tommySchema = collectionSchema("/tienda/marcas/tommy-hilfiger", "Colección Tommy Hilfiger", tommyProducts);
 
 export default function TommyHilfigerPage() {
   return (
     <main className="bg-[#0a0a0a]">
+      <JsonLd data={tommySchema} />
       <BrandCarousel products={tommyProducts} brand="Tommy Hilfiger" showNav={false} />
       <ProductGrid products={tommyProducts} brandLabel="Colección Tommy Hilfiger" />
       <CollectionLinks current="tommy-hilfiger" />

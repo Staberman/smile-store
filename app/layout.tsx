@@ -40,12 +40,21 @@ export const metadata: Metadata = {
     title: "Smile | Relojes, lentes y accesorios premium en Argentina",
     description:
       "Tienda online de relojes, lentes y accesorios premium en Argentina.",
+    images: [
+      {
+        url: "/images/card-relojes.jpg",
+        width: 1152,
+        height: 603,
+        alt: "Smile | Relojes, lentes y accesorios premium en Argentina",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Smile | Relojes, lentes y accesorios premium en Argentina",
     description:
       "Tienda online de relojes, lentes y accesorios premium en Argentina.",
+    images: ["/images/card-relojes.jpg"],
   },
 };
 
@@ -58,6 +67,13 @@ const websiteSchema = {
       name: SITE_NAME,
       url: SITE_URL,
       logo: `${SITE_URL}/images/smile-logo.svg`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+54 9 341 261 3504",
+        contactType: "customer service",
+        areaServed: "AR",
+        availableLanguage: "Spanish",
+      },
     },
     {
       "@type": "WebSite",
@@ -76,7 +92,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="es-AR" className={`${cormorant.variable} ${inter.variable}`}>
       <body>
         <JsonLd data={websiteSchema} />
         {children}

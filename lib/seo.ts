@@ -23,3 +23,44 @@ export function productAvailability(product: CatalogProduct): string {
     ? "https://schema.org/InStock"
     : "https://schema.org/OutOfStock";
 }
+
+export function collectionSchema(path: string, name: string, products: CatalogProduct[]) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${absoluteUrl(path)}#collection`,
+        name,
+        url: absoluteUrl(path),
+        isPartOf: { "@id": `${absoluteUrl("/")}#website` },
+      },
+      {
+        "@type": "ItemList",
+        itemListElement: products.slice(0, 50).map((product, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: productUrl(product),
+          name: product.name,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Inicio",
+            item: absoluteUrl("/"),
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name,
+            item: absoluteUrl(path),
+          },
+        ],
+      },
+    ],
+  };
+}

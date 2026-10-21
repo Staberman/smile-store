@@ -3,13 +3,15 @@ import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import {
   allProducts,
+  allProductsIncludingOutOfStock,
   formatPrice,
   getProductBySlug,
   getRecommendedProducts,
+  hasPurchasableStock,
 } from "@/lib/catalog";
+import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import {
   absoluteUrl,
-  productAvailability,
   productUrl,
   SITE_NAME,
   truncateMetaDescription,
@@ -21,7 +23,8 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return allProducts.map((product) => ({ slug: product.slug }));
+  // Include out-of-stock slugs so their pages are statically rendered and 200.
+  return allProductsIncludingOutOfStock.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -71,7 +74,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default function ProductPage({ params }: Props) {
   const product = getProductBySlug(params.slug);
   if (!product) notFound();
+  const outOfStock = !hasPurchasableStock(product);
   const recommendations = getRecommendedProducts(product, 4);
+  const complements = getComplementaryProducts(product, allProducts, 4);
 
   const normalizedBrand = product.brand.trim().toLowerCase();
   const categoryText = product.categories.join(" ").toLowerCase();
@@ -115,6 +120,11 @@ export default function ProductPage({ params }: Props) {
       ? "OMEGA x Swatch"
       : product.brand;
   const currentPrice = product.promotionalPrice ?? product.price;
+  const hasValidPrice = typeof currentPrice === "number" && currentPrice > 0;
+  const buildDate = new Date();
+  const priceValidUntil = new Date(buildDate.getTime() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
   const productSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -130,18 +140,26 @@ export default function ProductPage({ params }: Props) {
         },
         sku: product.variants.find((variant) => variant.sku)?.sku || product.slug,
         url: productUrl(product),
-        offers: {
-          "@type": "Offer",
-          url: productUrl(product),
-          priceCurrency: "ARS",
-          price: currentPrice ?? undefined,
-          availability: productAvailability(product),
-          seller: {
-            "@type": "Organization",
-            name: SITE_NAME,
-            url: absoluteUrl("/"),
-          },
-        },
+        dateModified: buildDate.toISOString(),
+        ...(hasValidPrice
+          ? {
+              offers: {
+                "@type": "Offer",
+                url: productUrl(product),
+                priceCurrency: "ARS",
+                price: currentPrice,
+                priceValidUntil,
+                availability: outOfStock
+                  ? "https://schema.org/OutOfStock"
+                  : "https://schema.org/InStock",
+                seller: {
+                  "@type": "Organization",
+                  name: SITE_NAME,
+                  url: absoluteUrl("/"),
+                },
+              },
+            }
+          : {}),
       },
       {
         "@type": "BreadcrumbList",
@@ -177,6 +195,8 @@ export default function ProductPage({ params }: Props) {
         brandHref={brandHref}
         brandLabel={brandLabel}
         recommendations={recommendations}
+        complements={complements}
+        outOfStock={outOfStock}
       />
     </>
   );

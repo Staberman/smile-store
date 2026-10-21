@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
+import JsonLd from "@/components/seo/JsonLd";
 import { allProducts } from "@/lib/catalog";
+import { collectionSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Ray-Ban",
@@ -15,10 +17,16 @@ const rayBanProducts = allProducts.filter((product) => {
   const values = [product.brand, ...product.categories];
   return values.some((value) => value.toLowerCase().includes("ray ban"));
 });
+const rayBanSchema = collectionSchema(
+  "/tienda/marcas/ray-ban",
+  "Colección Ray-Ban",
+  rayBanProducts,
+);
 
 export default function RayBanPage() {
   return (
     <main className="bg-[#0a0a0a]">
+      <JsonLd data={rayBanSchema} />
       <BrandCarousel
         products={rayBanProducts}
         brand="Ray-Ban"

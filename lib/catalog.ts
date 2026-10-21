@@ -52,6 +52,16 @@ export function hasPurchasableStock(product: CatalogProduct): boolean {
   );
 }
 
+export function isPurchasable(product: CatalogProduct): boolean {
+  return hasPurchasableStock(product);
+}
+
+// Full set: every catalog product, including out-of-stock ones. The import step
+// already excludes anything hidden from the store ("Mostrar en tienda" != "SI"),
+// so out-of-stock products here stay listable-by-URL and indexable.
+export const allProductsIncludingOutOfStock = importedProducts;
+
+// Purchasable-only set used by every listing/grid, brand and collection page.
 export const allProducts = importedProducts.filter(hasPurchasableStock);
 
 export function formatPrice(value: number | null | undefined): string {
@@ -64,7 +74,7 @@ export function formatPrice(value: number | null | undefined): string {
 }
 
 export function getProductBySlug(slug: string): CatalogProduct | undefined {
-  return allProducts.find((product) => product.slug === slug);
+  return allProductsIncludingOutOfStock.find((product) => product.slug === slug);
 }
 
 function getComparablePrice(product: CatalogProduct): number | null {
