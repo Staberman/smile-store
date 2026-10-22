@@ -6,7 +6,7 @@ import Image from "next/image";
 import { canonicalBrand } from "@/lib/brand-directory";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
-import { isWatch } from "@/lib/storefront.mjs";
+import { carouselImage, carouselSlides, isWatch } from "@/lib/storefront.mjs";
 
 interface Props {
   products: ProductSummary[];
@@ -28,62 +28,12 @@ const BG_GRADIENTS = [
   "radial-gradient(ellipse at 44% 48%, #14100a 0%, #0a0a0a 72%)",
 ];
 
-function hasAvailableVariant(product: ProductSummary) {
-  return product.variants.some(
-    (variant) => variant.available && variant.stock > 0,
-  );
-}
-
-function getCarouselImage(product: ProductSummary): string | null {
-  return product.image ?? product.variants.find((variant) => variant.image)?.image ?? null;
-}
-
-function hasCarouselImage(product: ProductSummary) {
-  return Boolean(getCarouselImage(product));
-}
-
-function buildSlides(products: ProductSummary[]) {
-  const preferred = products.filter(
-    (product) => hasAvailableVariant(product) && hasCarouselImage(product),
-  );
-  const imageProducts = products.filter(hasCarouselImage);
-  const source = preferred.length > 0 ? preferred : imageProducts.length > 0 ? imageProducts : products;
-  const slides: ProductSummary[] = [];
-  const seen = new Set<string>();
-
-  for (const product of source) {
-    if (slides.length >= 5) break;
-    slides.push(product);
-    seen.add(product.slug);
-  }
-
-  if (preferred.length > 0 && slides.length < 5) {
-    for (const product of products) {
-      if (slides.length >= 5) break;
-      if (seen.has(product.slug)) continue;
-      slides.push(product);
-      seen.add(product.slug);
-    }
-  }
-
-  if (imageProducts.length > 0 && slides.length < 5) {
-    for (const product of imageProducts) {
-      if (slides.length >= 5) break;
-      if (seen.has(product.slug)) continue;
-      slides.push(product);
-      seen.add(product.slug);
-    }
-  }
-
-  return slides.slice(0, 5);
-}
-
 export default function BrandCarousel({
   products,
   brand,
   showNav = true,
 }: Props) {
-  const featured = buildSlides(products);
+  const featured = carouselSlides(products);
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
@@ -190,7 +140,7 @@ export default function BrandCarousel({
         {featured.map((prod, index) => {
           const isActive = index === currentIndex;
           const isExiting = index === exiting;
-          const image = getCarouselImage(prod);
+          const image = carouselImage(prod);
 
           return (
             <div

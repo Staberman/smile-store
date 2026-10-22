@@ -56,6 +56,14 @@ export function getComplementaryProducts(
   products: CatalogProduct[],
   limit?: number,
 ): CatalogProduct[];
+type CarouselProduct = {
+  slug: string;
+  image?: string | null;
+  variants: { available: boolean; stock: number; image?: string | null }[];
+};
+
+export function carouselImage(product: CarouselProduct): string | null;
+export function carouselSlides<P extends CarouselProduct>(products: P[], limit?: number): P[];
 export function filterStorefrontProducts<P extends FilterableProduct>(
   products: P[],
   view: StorefrontView | string,
