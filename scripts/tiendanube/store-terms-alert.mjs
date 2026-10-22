@@ -1,5 +1,6 @@
 // Turns the payment-terms sync result into one GitHub issue action, so a
 // failed read reaches the owner (a warning on a green run sends no email).
+import { freeShippingCondition } from "../../lib/store-copy.mjs";
 
 export const STORE_TERMS_ISSUE_TITLE =
   "Sincronización de cuotas y descuento con Tiendanube falló";
@@ -66,10 +67,19 @@ export async function previousTermsVerdict(runs, annotationsOf) {
   return null;
 }
 
+// "10% de descuento por transferencia, 6 cuotas sin interés y envío gratis en
+// compras superiores a $ 200.000", as the site words it.
 function describeKeptTerms(terms) {
-  return terms
-    ? `${terms.transferDiscountPercent}% de descuento por transferencia y ${terms.interestFreeInstallments} cuotas sin interés`
-    : "los valores anteriores";
+  if (!terms) return "los valores anteriores";
+  const parts = [
+    `${terms.transferDiscountPercent}% de descuento por transferencia`,
+    `${terms.interestFreeInstallments} cuotas sin interés`,
+  ];
+  // A data/store-terms.json written before the free-shipping sync has no minimum.
+  if (Number.isFinite(terms.freeShippingMinimumArs)) {
+    parts.push(`envío gratis ${freeShippingCondition(terms.freeShippingMinimumArs)}`);
+  }
+  return `${parts.slice(0, -1).join(", ")} y ${parts.at(-1)}`;
 }
 
 // Latest moment anyone wrote on the issue (opening it counts).
@@ -125,7 +135,7 @@ export function planStoreTermsAlert({
     if (previousRunFailed === false) return { action: "defer" };
 
     const failedRead =
-      "La sincronización horaria no pudo leer el descuento por transferencia y las cuotas sin interés desde las páginas de producto de Tiendanube";
+      "La sincronización horaria no pudo leer el descuento por transferencia, las cuotas sin interés y el monto mínimo para envío gratis desde las páginas de producto de Tiendanube";
     return {
       action: "create",
       title: STORE_TERMS_ISSUE_TITLE,

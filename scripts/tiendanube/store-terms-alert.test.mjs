@@ -11,7 +11,9 @@ import {
 } from "./store-terms-alert.mjs";
 
 const runUrl = "https://github.com/Staberman/smile-store/actions/runs/123";
-const terms = { transferDiscountPercent: 10, interestFreeInstallments: 6 };
+const terms = { transferDiscountPercent: 10, interestFreeInstallments: 6, freeShippingMinimumArs: 200000 };
+const keptTerms =
+  "10% de descuento por transferencia, 6 cuotas sin interés y envío gratis en compras superiores a $ 200.000";
 const failure = {
   status: "failed",
   reason: "las páginas no coinciden",
@@ -35,7 +37,11 @@ test("a second consecutive failed read opens the issue with what failed, the kep
   assert.equal(plan.title, "Sincronización de cuotas y descuento con Tiendanube falló");
   assert.match(plan.body, /en dos ejecuciones seguidas\./);
   assert.match(plan.body, /\*\*Qué falló:\*\* las páginas no coinciden\./);
-  assert.match(plan.body, /10% de descuento por transferencia y 6 cuotas sin interés/);
+  assert.ok(
+    plan.body.includes(`**Valores que se mantienen en el sitio:** ${keptTerms} (\`data/store-terms.json\`).`),
+    plan.body,
+  );
+  assert.match(plan.body, /las cuotas sin interés y el monto mínimo para envío gratis/);
   assert.match(plan.body, /actions\/runs\/123/);
   assert.match(plan.body, /cc @Staberman/);
 });
@@ -105,9 +111,25 @@ test("a valid read closes the open issue, or does nothing without one", () => {
   });
   assert.equal(close.action, "close");
   assert.equal(close.issue, 7);
-  assert.match(close.comment, /10% de descuento por transferencia y 6 cuotas sin interés/);
+  assert.ok(close.comment.includes(`desde Tiendanube: ${keptTerms}. Ejecución:`), close.comment);
 
   assert.deepEqual(planStoreTermsAlert({ ...failure, status: "ok" }), { action: "none" });
+});
+
+test("the kept values name free shipping the way the site does, or leave it out when unknown", () => {
+  const keptWith = (keptTermsFile) =>
+    planStoreTermsAlert({ ...failure, terms: keptTermsFile }).body;
+
+  assert.match(
+    keptWith({ ...terms, freeShippingMinimumArs: 0 }),
+    /6 cuotas sin interés y envío gratis a todo el país \(/,
+  );
+  // A data/store-terms.json from before the free-shipping sync.
+  assert.match(
+    keptWith({ transferDiscountPercent: 10, interestFreeInstallments: 6 }),
+    /\*\*Valores que se mantienen en el sitio:\*\* 10% de descuento por transferencia y 6 cuotas sin interés \(/,
+  );
+  assert.match(keptWith(null), /\*\*Valores que se mantienen en el sitio:\*\* los valores anteriores \(/);
 });
 
 // Parses a workflow command the way GitHub turns it into a check-run annotation.
@@ -130,7 +152,7 @@ test("each run's verdict annotation reads back as that verdict", () => {
   );
   assert.equal(
     ok,
-    "::notice title=Condiciones de pago::Condiciones de pago leídas desde Tiendanube: 10%25 de descuento por transferencia y 6 cuotas sin interés.",
+    "::notice title=Condiciones de pago::Condiciones de pago leídas desde Tiendanube: 10%25 de descuento por transferencia, 6 cuotas sin interés y envío gratis en compras superiores a $ 200.000.",
   );
   assert.equal(termsVerdict([asAnnotation(failed)]), "failed");
   assert.equal(termsVerdict([asAnnotation(ok)]), "ok");
