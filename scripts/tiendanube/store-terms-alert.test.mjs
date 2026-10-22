@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { STORE_TERMS_ISSUE_TITLE, planStoreTermsAlert } from "./store-terms-alert.mjs";
+import {
+  STORE_TERMS_ANNOTATION_TITLE,
+  STORE_TERMS_ISSUE_TITLE,
+  planStoreTermsAlert,
+  previousTermsVerdict,
+  termsAnnotation,
+  termsVerdict,
+} from "./store-terms-alert.mjs";
 
 const runUrl = "https://github.com/Staberman/smile-store/actions/runs/123";
 const terms = { transferDiscountPercent: 10, interestFreeInstallments: 6 };
@@ -10,6 +17,7 @@ const failure = {
   terms,
   runUrl,
   owner: "Staberman",
+  previousRunFailed: true,
   now: new Date("2026-10-21T12:00:00Z"),
 };
 const openIssue = (createdAt, commentDates = []) => ({
@@ -19,20 +27,39 @@ const openIssue = (createdAt, commentDates = []) => ({
   comments: commentDates.map((date) => ({ createdAt: date })),
 });
 
-test("a failed read opens the issue with what failed, the kept values and the run", () => {
+test("a second consecutive failed read opens the issue with what failed, the kept values and the run", () => {
   const plan = planStoreTermsAlert(failure);
 
   assert.equal(plan.action, "create");
   assert.equal(plan.title, "Sincronización de cuotas y descuento con Tiendanube falló");
+  assert.match(plan.body, /en dos ejecuciones seguidas\./);
   assert.match(plan.body, /\*\*Qué falló:\*\* las páginas no coinciden\./);
   assert.match(plan.body, /10% de descuento por transferencia y 6 cuotas sin interés/);
   assert.match(plan.body, /actions\/runs\/123/);
   assert.match(plan.body, /cc @Staberman/);
 });
 
+test("a first failed read after a good run opens nothing yet", () => {
+  assert.deepEqual(planStoreTermsAlert({ ...failure, previousRunFailed: false }), {
+    action: "defer",
+  });
+});
+
+test("when the previous run can't be checked, the failure is reported right away", () => {
+  for (const previousRunFailed of [null, undefined]) {
+    const plan = planStoreTermsAlert({ ...failure, previousRunFailed });
+    assert.equal(plan.action, "create");
+    assert.match(plan.body, /No se pudo consultar la ejecución anterior/);
+  }
+});
+
 test("issues with other titles are ignored", () => {
   const other = { ...openIssue("2026-10-21T11:00:00Z"), title: "Otra cosa" };
   assert.equal(planStoreTermsAlert({ ...failure, openIssues: [other] }).action, "create");
+  assert.equal(
+    planStoreTermsAlert({ ...failure, previousRunFailed: false, openIssues: [other] }).action,
+    "defer",
+  );
 });
 
 test("an open issue gets at most one comment every 24 h", () => {
@@ -60,6 +87,15 @@ test("an open issue gets at most one comment every 24 h", () => {
   assert.match(comment.body, /actions\/runs\/123/);
 });
 
+test("the debounce only gates opening: an open issue still gets its comment", () => {
+  const plan = planStoreTermsAlert({
+    ...failure,
+    previousRunFailed: false,
+    openIssues: [openIssue("2026-10-19T12:00:00Z", ["2026-10-20T12:00:00Z"])],
+  });
+  assert.equal(plan.action, "comment");
+});
+
 test("a valid read closes the open issue, or does nothing without one", () => {
   const close = planStoreTermsAlert({
     ...failure,
@@ -71,4 +107,80 @@ test("a valid read closes the open issue, or does nothing without one", () => {
   assert.match(close.comment, /10% de descuento por transferencia y 6 cuotas sin interés/);
 
   assert.deepEqual(planStoreTermsAlert({ ...failure, status: "ok" }), { action: "none" });
+});
+
+// Parses a workflow command the way GitHub turns it into a check-run annotation.
+function asAnnotation(command) {
+  const [, level, title, message] = /^::(\w+) title=([^:]*)::(.*)$/.exec(command);
+  return {
+    annotation_level: level,
+    title,
+    message: message.replace(/%0A/g, "\n").replace(/%0D/g, "\r").replace(/%25/g, "%"),
+  };
+}
+
+test("each run's verdict annotation reads back as that verdict", () => {
+  const failed = termsAnnotation({ status: "failed", reason: "HTTP 503, tras 3 intentos", terms });
+  const ok = termsAnnotation({ status: "ok", terms });
+
+  assert.equal(
+    failed,
+    "::warning title=Condiciones de pago::No se actualizaron las condiciones de pago: HTTP 503, tras 3 intentos. Se mantiene data/store-terms.json sin cambios.",
+  );
+  assert.equal(
+    ok,
+    "::notice title=Condiciones de pago::Condiciones de pago leídas desde Tiendanube: 10%25 de descuento por transferencia y 6 cuotas sin interés.",
+  );
+  assert.equal(termsVerdict([asAnnotation(failed)]), "failed");
+  assert.equal(termsVerdict([asAnnotation(ok)]), "ok");
+});
+
+test("annotation messages escape % and line breaks", () => {
+  const command = termsAnnotation({ status: "failed", reason: "a dice 10%\ny b 15%\r" });
+
+  assert.doesNotMatch(command, /[\r\n]/);
+  assert.match(
+    asAnnotation(command).message,
+    /^No se actualizaron las condiciones de pago: a dice 10%\ny b 15%\r\. Se mantiene/,
+  );
+});
+
+test("termsVerdict ignores annotations other than the payment-terms verdict", () => {
+  const annotation = (annotation_level, title) => ({ annotation_level, title, message: "" });
+
+  assert.equal(termsVerdict([]), null);
+  assert.equal(
+    termsVerdict([
+      annotation("warning", ""),
+      annotation("failure", ""),
+      annotation("warning", "Aviso de condiciones de pago"),
+    ]),
+    null,
+  );
+  assert.equal(
+    termsVerdict([annotation("notice", ""), annotation("warning", STORE_TERMS_ANNOTATION_TITLE)]),
+    "failed",
+  );
+  assert.equal(termsVerdict([annotation("notice", STORE_TERMS_ANNOTATION_TITLE)]), "ok");
+});
+
+test("previousTermsVerdict takes the latest run that read the terms, newest first", async () => {
+  const verdictOf = { 3: [], 2: [{ annotation_level: "warning", title: "Condiciones de pago" }] };
+  const asked = [];
+  const annotationsOf = async (run) => {
+    asked.push(run.id);
+    if (!(run.id in verdictOf)) throw new Error(`run ${run.id} should not be read`);
+    return verdictOf[run.id];
+  };
+
+  // Run 3 skipped the terms step (paused sync, failed catalog sync…).
+  assert.equal(
+    await previousTermsVerdict([{ id: 3 }, { id: 2 }, { id: 1 }], annotationsOf),
+    "failed",
+  );
+  assert.deepEqual(asked, [3, 2]);
+
+  assert.equal(await previousTermsVerdict([{ id: 3 }], annotationsOf), null);
+  assert.equal(await previousTermsVerdict([], annotationsOf), null);
+  await assert.rejects(previousTermsVerdict([{ id: 9 }], annotationsOf), /should not be read/);
 });

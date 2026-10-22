@@ -6,6 +6,61 @@ export const STORE_TERMS_ISSUE_TITLE =
 
 const COMMENT_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
+// Every run that reads the terms records its verdict as an annotation with this
+// title: a warning when the read failed, a notice when it worked. The next run
+// reads it back through the GitHub API to know whether the previous run failed.
+export const STORE_TERMS_ANNOTATION_TITLE = "Condiciones de pago";
+
+// Runs that skip the terms step (sync paused, catalog sync failed, cancelled)
+// leave no verdict, so the lookup goes back this many completed runs at most.
+export const PREVIOUS_RUNS_TO_CHECK = 5;
+
+// Workflow-command escaping for annotation messages (as @actions/core does).
+function escapeAnnotationMessage(text) {
+  return String(text).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+}
+
+/** The workflow command that records this run's verdict on the run's page. */
+export function termsAnnotation({ status, reason, terms }) {
+  const [level, message] =
+    status === "ok"
+      ? [
+          "notice",
+          `Condiciones de pago leídas desde Tiendanube${terms ? `: ${describeKeptTerms(terms)}` : ""}.`,
+        ]
+      : [
+          "warning",
+          `No se actualizaron las condiciones de pago: ${reason || "sin detalle"}. Se mantiene data/store-terms.json sin cambios.`,
+        ];
+  return `::${level} title=${STORE_TERMS_ANNOTATION_TITLE}::${escapeAnnotationMessage(message)}`;
+}
+
+/**
+ * The payment-terms verdict a run left among its check-run annotations
+ * (`{ annotation_level, title }`, as the GitHub API lists them): "failed",
+ * "ok", or null when that run didn't read the terms.
+ */
+export function termsVerdict(annotations) {
+  const own = annotations.filter(
+    (annotation) => annotation.title === STORE_TERMS_ANNOTATION_TITLE,
+  );
+  if (own.some((annotation) => annotation.annotation_level !== "notice")) return "failed";
+  return own.length > 0 ? "ok" : null;
+}
+
+/**
+ * The verdict of the most recent run (newest first) that read the terms, or
+ * null when none of `runs` did. `annotationsOf(run)` is only called until a
+ * verdict turns up; its errors propagate so the caller can tell "unknown".
+ */
+export async function previousTermsVerdict(runs, annotationsOf) {
+  for (const run of runs) {
+    const verdict = termsVerdict(await annotationsOf(run));
+    if (verdict) return verdict;
+  }
+  return null;
+}
+
 function describeKeptTerms(terms) {
   return terms
     ? `${terms.transferDiscountPercent}% de descuento por transferencia y ${terms.interestFreeInstallments} cuotas sin interés`
@@ -22,7 +77,11 @@ function lastActivity(issue) {
 
 /**
  * Decides what to do with the alert issue:
- * - failed read, no open issue -> create it;
+ * - failed read, no open issue, previous run read fine -> "defer": a single
+ *   failure may be transient, the issue opens if the next run fails too;
+ * - failed read, no open issue, previous run failed too -> create it;
+ * - failed read, no open issue, previous run unknown (`previousRunFailed`
+ *   null/undefined: the lookup failed) -> create it, rather than stay silent;
  * - failed read, open issue -> comment, at most once every 24 h ("wait" otherwise);
  * - valid read, open issue -> close it with a short comment;
  * - valid read, no open issue -> nothing.
@@ -34,6 +93,7 @@ export function planStoreTermsAlert({
   runUrl,
   owner,
   openIssues = [],
+  previousRunFailed = null,
   now = new Date(),
 }) {
   const issue = openIssues
@@ -57,11 +117,17 @@ export function planStoreTermsAlert({
   ].join("\n");
 
   if (!issue) {
+    if (previousRunFailed === false) return { action: "defer" };
+
+    const failedRead =
+      "La sincronización horaria no pudo leer el descuento por transferencia y las cuotas sin interés desde las páginas de producto de Tiendanube";
     return {
       action: "create",
       title: STORE_TERMS_ISSUE_TITLE,
       body: [
-        "La sincronización horaria no pudo leer el descuento por transferencia y las cuotas sin interés desde las páginas de producto de Tiendanube.",
+        previousRunFailed
+          ? `${failedRead} en dos ejecuciones seguidas.`
+          : `${failedRead}. No se pudo consultar la ejecución anterior, así que se avisa sin esperar una segunda falla.`,
         "",
         details,
         "",

@@ -12,6 +12,9 @@ concurrency:
 permissions:
   contents: write
   issues: write
+  # The payment-terms alert reads the previous runs' annotations.
+  actions: read
+  checks: read
 
 jobs:
   sync:
@@ -41,8 +44,8 @@ jobs:
         run: npm run sync:catalog
 
       # Reads the transfer discount and interest-free installments from the
-      # public storefront. On failure it keeps the last values and warns; it
-      # never blocks the stock and price sync.
+      # public storefront. On failure it keeps the last values; it never
+      # blocks the stock and price sync.
       - name: Actualizar condiciones de pago
         id: terms
         continue-on-error: true
@@ -74,9 +77,12 @@ jobs:
           git commit -m "chore: sync Tiendanube stock, prices and payment terms"
           git push
 
-      # A warning on a green run emails nobody: open (or comment on, at most
-      # daily) an issue while the payment terms can't be read, and close it
-      # once they can. Runs last and never fails the run.
+      # Records the payment-terms verdict on the run (warning or notice titled
+      # "Condiciones de pago"). A warning on a green run emails nobody, so it
+      # also opens an issue once two consecutive runs fail to read the terms
+      # (it finds the previous verdict in the earlier runs' annotations),
+      # comments on it at most daily while it stays open, and closes it once
+      # they read fine. Runs last and never fails the run.
       - name: Avisar si fallan las condiciones de pago
         if: ${{ !cancelled() && steps.terms.outcome != 'skipped' }}
         continue-on-error: true

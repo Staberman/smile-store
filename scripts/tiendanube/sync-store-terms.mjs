@@ -17,8 +17,9 @@ const termsPath = path.join(projectRoot, "data/store-terms.json");
 const temporaryPath = `${termsPath}.tmp`;
 const dryRun = process.argv.includes("--dry-run");
 
-// Step outputs for the workflow's alert step, which opens or closes the
-// GitHub issue. No-op outside GitHub Actions.
+// Step outputs for the workflow's alert step, which records the verdict as an
+// annotation on the run and opens or closes the GitHub issue. No-op outside
+// GitHub Actions.
 async function setStepOutputs(status, reason = "") {
   if (!process.env.GITHUB_OUTPUT) return;
   await appendFile(
@@ -27,11 +28,11 @@ async function setStepOutputs(status, reason = "") {
   );
 }
 
-// Shows up as an annotation on the GitHub Actions run. This step never fails
-// the job: the stock and price sync must keep publishing.
+// This step never fails the job: the stock and price sync must keep
+// publishing. The alert step turns the failure into the run's warning.
 async function fail(reason) {
   console.log(
-    `::warning title=Condiciones de pago::No se actualizaron las condiciones de pago: ${reason}. Se mantiene data/store-terms.json sin cambios.`,
+    `No se actualizaron las condiciones de pago: ${reason}. Se mantiene data/store-terms.json sin cambios.`,
   );
   await setStepOutputs("failed", reason);
 }
