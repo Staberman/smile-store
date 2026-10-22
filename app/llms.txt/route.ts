@@ -9,6 +9,7 @@ import { indexableHubs } from "@/lib/hub-pages";
 import { absoluteUrl, SITE_NAME } from "@/lib/seo";
 import {
   CHECKOUT_PHRASE,
+  FREE_SHIPPING_PHRASE,
   INSTAGRAM_URL,
   INSTALLMENTS_PHRASE,
   PHONE_DISPLAY,
@@ -63,7 +64,7 @@ function buildLlmsTxt(): string {
   return [
     `# ${SITE_NAME}`,
     "",
-    `> ${SITE_NAME} (${STORE_ALTERNATE_NAME}) es una tienda online de ${STORE_LOCATION.label}, que vende anteojos de sol y relojes originales: Ray-Ban (incluida la Scuderia Ferrari Collection), marcas premium como Prada, Christian Dior, Versace, Gucci y Louis Vuitton, y relojes Invicta, Tommy Hilfiger y OMEGA x Swatch. Las compras se confirman en el ${CHECKOUT_PHRASE}; se puede pagar en ${INSTALLMENTS_PHRASE} o con ${TRANSFER_DISCOUNT_PHRASE}. Envíos a todo el país y ${STORE_PICKUP_PHRASE}, ${STORE_LOCATION.locality}.`,
+    `> ${SITE_NAME} (${STORE_ALTERNATE_NAME}) es una tienda online de ${STORE_LOCATION.label}, que vende anteojos de sol y relojes originales: Ray-Ban (incluida la Scuderia Ferrari Collection), marcas premium como Prada, Christian Dior, Versace, Gucci y Louis Vuitton, y relojes Invicta, Tommy Hilfiger y OMEGA x Swatch. Las compras se confirman en el ${CHECKOUT_PHRASE}; se puede pagar en ${INSTALLMENTS_PHRASE} o con ${TRANSFER_DISCOUNT_PHRASE}. Envíos a todo el país y ${STORE_PICKUP_PHRASE}, ${STORE_LOCATION.locality}. ${FREE_SHIPPING_PHRASE}.`,
     "",
     `El catálogo tiene ${sunglasses} modelos de anteojos de sol y ${watches} relojes con stock. Stock y precios se sincronizan con Tiendanube cada hora; los modelos agotados siguen publicados con la etiqueta "Sin stock". Precios en pesos argentinos (ARS).`,
     "",

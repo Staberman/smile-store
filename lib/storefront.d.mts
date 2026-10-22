@@ -45,6 +45,8 @@ export function getDisplayPrice(
 ): number | null;
 export const TRANSFER_DISCOUNT_PERCENT: number;
 export const INTEREST_FREE_INSTALLMENTS: number;
+/** Order total (ARS) above which checkout ships for free; 0 = every order. */
+export const FREE_SHIPPING_MINIMUM_ARS: number;
 export function getTransferPrice(price: number | null | undefined): number | null;
 export function getInstallmentPrice(price: number | null | undefined): number | null;
 export function isOffer(product: PriceFields): boolean;

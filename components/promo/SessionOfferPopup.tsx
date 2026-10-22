@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { FREE_SHIPPING_PHRASE } from "@/lib/store-facts";
 import { INTEREST_FREE_INSTALLMENTS, TRANSFER_DISCOUNT_PERCENT } from "@/lib/storefront.mjs";
 
 const STORAGE_KEY = "smile-session-offer-seen";
@@ -114,7 +115,7 @@ function OfferBanner({ entered, onClose }: { entered: boolean; onClose: () => vo
           </p>
           <p className="mt-1 text-[11px] leading-snug text-[#b8b0a4]">
             {TRANSFER_DISCOUNT_PERCENT}% OFF por transferencia · Hasta {INTEREST_FREE_INSTALLMENTS}{" "}
-            cuotas sin interés · Envío gratis a todo el país
+            cuotas sin interés · {FREE_SHIPPING_PHRASE}
           </p>
         </div>
         <button
@@ -203,7 +204,7 @@ function OfferModal({ entered, onClose }: { entered: boolean; onClose: () => voi
 
             <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] uppercase tracking-[0.2em] text-[#c9a96e]">
               <span>Hasta {INTEREST_FREE_INSTALLMENTS} cuotas sin interés</span>
-              <span>Envío gratis a todo el país</span>
+              <span>{FREE_SHIPPING_PHRASE}</span>
               <span>Garantía y asesoramiento</span>
             </div>
 

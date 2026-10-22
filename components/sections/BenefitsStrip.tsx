@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { FREE_SHIPPING_CONDITION } from "@/lib/store-facts";
 import { INTEREST_FREE_INSTALLMENTS, TRANSFER_DISCOUNT_PERCENT } from "@/lib/storefront.mjs";
 
 type Benefit = {
@@ -48,7 +49,8 @@ const benefits: Benefit[] = [
   },
   {
     key: "envio",
-    label: "Envío gratis a todo el país",
+    label: "Envío gratis",
+    detail: FREE_SHIPPING_CONDITION,
     icon: (
       <svg viewBox="0 0 24 24" {...stroke} aria-hidden="true">
         <path d="M3 6.5h11v9H3z" />

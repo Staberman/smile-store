@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import {
+  FREE_SHIPPING_MINIMUM_ARS,
   INTEREST_FREE_INSTALLMENTS,
   TRANSFER_DISCOUNT_PERCENT,
   getInstallmentPrice,
@@ -482,6 +483,7 @@ test("lib/storefront.mjs exposes the synced store terms", () => {
   assert.equal(storeTermsProblem(stored), null);
   assert.equal(TRANSFER_DISCOUNT_PERCENT, stored.transferDiscountPercent);
   assert.equal(INTEREST_FREE_INSTALLMENTS, stored.interestFreeInstallments);
+  assert.equal(FREE_SHIPPING_MINIMUM_ARS, stored.freeShippingMinimumArs);
   assert.equal(
     getTransferPrice(100000),
     Math.round(100000 * (1 - stored.transferDiscountPercent / 100)),
