@@ -39,10 +39,17 @@ jobs:
       - name: Actualizar precios y stock
         run: npm run sync:catalog
 
+      # Reads the transfer discount and interest-free installments from the
+      # public storefront. On failure it keeps the last values and warns; it
+      # never blocks the stock and price sync.
+      - name: Actualizar condiciones de pago
+        continue-on-error: true
+        run: npm run sync:terms
+
       - name: Detectar cambios
         id: changes
         run: |
-          if git diff --quiet -- data/tiendanube-catalog.json; then
+          if git diff --quiet -- data/tiendanube-catalog.json data/store-terms.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -61,6 +68,6 @@ jobs:
         run: |
           git config user.name "Staberman"
           git config user.email "redes@staberman.com.ar"
-          git add data/tiendanube-catalog.json
-          git commit -m "chore: sync Tiendanube stock and prices"
+          git add data/tiendanube-catalog.json data/store-terms.json
+          git commit -m "chore: sync Tiendanube stock, prices and payment terms"
           git push
