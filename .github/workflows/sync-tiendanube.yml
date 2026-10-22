@@ -46,8 +46,17 @@ jobs:
       # Reads the transfer discount and interest-free installments from the
       # public storefront. On failure it keeps the last values; it never
       # blocks the stock and price sync.
+      #
+      # Pause switch: set the repository variable STORE_TERMS_SYNC to "off"
+      # (any letter case; Settings > Secrets and variables > Actions >
+      # Variables) to skip this step and its alert, e.g. to keep a value
+      # edited by hand in data/store-terms.json from being overwritten (keep
+      # the file's exact format: test:catalog checks it). Unset or any other
+      # value runs it. An alert issue that is already open stays open while
+      # paused.
       - name: Actualizar condiciones de pago
         id: terms
+        if: ${{ vars.STORE_TERMS_SYNC != 'off' }}
         continue-on-error: true
         run: npm run sync:terms
 
@@ -84,7 +93,7 @@ jobs:
       # comments on it at most daily while it stays open, and closes it once
       # they read fine. Runs last and never fails the run.
       - name: Avisar si fallan las condiciones de pago
-        if: ${{ !cancelled() && steps.terms.outcome != 'skipped' }}
+        if: ${{ !cancelled() && vars.STORE_TERMS_SYNC != 'off' && steps.terms.outcome != 'skipped' }}
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
