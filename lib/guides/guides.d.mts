@@ -15,13 +15,16 @@ export type GuideContext<P extends GuideProduct = GuideProduct> = {
 /**
  * Body blocks. Text fields may carry internal links as `[label](/path)`;
  * render them with inlineSegments() and strip them with stripLinks().
+ * `catalog` marks blocks built from the products in stock: capped at
+ * CATALOG_LIST_LIMIT products and left out of guideAuthoredText().
  */
-export type GuideBlock =
+export type GuideBlock = { catalog?: boolean } & (
   | { type: "paragraph"; text: string }
   | { type: "list"; ordered: boolean; items: string[] }
   | { type: "steps"; items: { title: string; text: string }[] }
   | { type: "table"; caption: string; head: string[]; rows: string[][] }
-  | { type: "links"; items: { label: string; href: string }[] };
+  | { type: "links"; items: { label: string; href: string }[] }
+);
 
 export type GuideSection = {
   /** Anchor id, unique within the guide. */
@@ -114,6 +117,12 @@ export function buildGuides<P extends GuideProduct>(context: GuideContext<P>): G
 
 /** Visible body text without link markup: lead, sections and FAQ. */
 export function guideText(guide: Guide): string;
+/** guideText() without the catalog blocks: the copy the word-count rule applies to. */
+export function guideAuthoredText(guide: Guide): string;
+/** Blocks built from the products in stock (`catalog: true`), in order. */
+export function catalogBlocks(guide: Guide): GuideBlock[];
+/** Most products a catalog block lists before a "y N más" link to the hub. */
+export const CATALOG_LIST_LIMIT: number;
 /** Internal hrefs the guide body links to (inline links and link lists). */
 export function guideLinks(guide: Guide): string[];
 /** Latest dateModified among the guides. */
