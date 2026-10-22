@@ -1,11 +1,25 @@
 import { getAvailableVariants } from "../../lib/storefront.mjs";
 import { htmlToText } from "./catalog-utils.mjs";
 
-// Same origin as lib/checkout/storefront.ts: catalog `sourceUrl`s still carry
-// the store's former custom domain, so only their `/productos/<handle>/` path
-// is reused.
+// Same origin as lib/checkout/storefront.ts (store-terms.test.mjs keeps them
+// equal): catalog `sourceUrl`s still carry the store's former custom domain,
+// so only their `/productos/<handle>/` path is reused.
 export const STOREFRONT_ORIGIN = "https://smiletienda.mitiendanube.com";
 export const STORE_TERMS_SOURCE = `${STOREFRONT_ORIGIN} product pages`;
+
+// Sanity bounds: a reading outside them is a misread, not a store setting.
+// 0% is a transfer discount switched off in the admin; more than half the price
+// off for paying by transfer is beyond any discount the store would run.
+export const MAX_TRANSFER_DISCOUNT_PERCENT = 50;
+// Argentine card plans top out at 24 installments.
+export const MAX_INTEREST_FREE_INSTALLMENTS = 24;
+
+// Why a page's reading can't be trusted. In Spanish: they reach the alert issue.
+export const STORE_TERMS_FAILURES = Object.freeze({
+  discountMissing: "no se encontró el descuento por transferencia",
+  discountConflicting: "la página muestra descuentos por transferencia distintos",
+  installmentsMissing: "no se encontraron las cuotas sin interés",
+});
 
 // Returns the whole element (balanced by tag name) whose start tag contains
 // `index`, or null when it never closes.
@@ -36,22 +50,27 @@ function productPaymentsBlock(html) {
   return match ? elementAt(html, match.index, "a") : null;
 }
 
-// Structured value: the payment-methods modal tags each method's discounted
-// total with `data-payment-discount`; only the transfer method is read.
-function structuredTransferDiscount(html) {
+// Structured values: the payment-methods modal tags each method's discounted
+// total with `data-payment-discount`; only the transfer method is read. Every
+// distinct value comes back, so "none" and "several" stay distinguishable.
+function structuredTransferDiscounts(html) {
   const values = new Set();
   for (const match of html.matchAll(/id="info-payment-method-wire_transfer"/g)) {
     const method = elementAt(html, match.index, "div") ?? "";
     const discount = /data-payment-discount="([\d.,]+)"/.exec(method);
-    if (discount) values.add(toNumber(discount[1]));
+    const value = discount ? toNumber(discount[1]) : null;
+    if (value !== null) values.add(value);
   }
-  return values.size === 1 ? [...values][0] : null;
+  return [...values].sort((a, b) => a - b);
 }
 
 /**
  * Reads the store-wide payment terms from a Tiendanube storefront product page.
  * Never reads the announcement bar: its "20% OFF" is a marketing banner, not
  * the discount Tiendanube's checkout applies. Missing values come back as null.
+ * When the transfer method carries several different discounts the page is
+ * ambiguous: `transferDiscountPercent` is null, the visible text is not used as
+ * a tie-breaker, and `conflictingTransferDiscounts` lists the values.
  */
 export function parseStorefrontPaymentTerms(html) {
   const source = String(html ?? "");
@@ -61,11 +80,20 @@ export function parseStorefrontPaymentTerms(html) {
       paymentsText,
     );
   const installments = /(\d{1,2})\s*cuotas\s+sin\s+inter[eé]s/i.exec(paymentsText);
+  const interestFreeInstallments = installments ? Number(installments[1]) : null;
+  const structured = structuredTransferDiscounts(source);
 
+  if (structured.length > 1) {
+    return {
+      transferDiscountPercent: null,
+      interestFreeInstallments,
+      conflictingTransferDiscounts: structured,
+    };
+  }
   return {
     transferDiscountPercent:
-      structuredTransferDiscount(source) ?? (textDiscount ? toNumber(textDiscount[1]) : null),
-    interestFreeInstallments: installments ? Number(installments[1]) : null,
+      structured.length === 1 ? structured[0] : textDiscount ? toNumber(textDiscount[1]) : null,
+    interestFreeInstallments,
   };
 }
 
@@ -73,17 +101,26 @@ export function parseStorefrontPaymentTerms(html) {
 export function storeTermsProblem(terms) {
   const discount = terms?.transferDiscountPercent;
   const installments = terms?.interestFreeInstallments;
+  const conflicting = terms?.conflictingTransferDiscounts ?? [];
 
-  if (discount === null || discount === undefined) {
-    return "no se encontró el descuento por transferencia";
+  if (conflicting.length > 0) {
+    const values = conflicting.map((value) => `${value}%`).join(" y ");
+    return `${STORE_TERMS_FAILURES.discountConflicting} (${values})`;
   }
-  if (!Number.isFinite(discount) || discount < 0 || discount > 50) {
+  if (discount === null || discount === undefined) {
+    return STORE_TERMS_FAILURES.discountMissing;
+  }
+  if (!Number.isFinite(discount) || discount < 0 || discount > MAX_TRANSFER_DISCOUNT_PERCENT) {
     return `descuento por transferencia fuera de rango (${discount}%)`;
   }
   if (installments === null || installments === undefined) {
-    return "no se encontraron las cuotas sin interés";
+    return STORE_TERMS_FAILURES.installmentsMissing;
   }
-  if (!Number.isInteger(installments) || installments < 1 || installments > 24) {
+  if (
+    !Number.isInteger(installments) ||
+    installments < 1 ||
+    installments > MAX_INTEREST_FREE_INSTALLMENTS
+  ) {
     return `cuotas sin interés fuera de rango (${installments})`;
   }
   return null;

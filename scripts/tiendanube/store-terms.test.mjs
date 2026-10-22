@@ -9,6 +9,10 @@ import {
   getTransferPrice,
 } from "../../lib/storefront.mjs";
 import {
+  MAX_INTEREST_FREE_INSTALLMENTS,
+  MAX_TRANSFER_DISCOUNT_PERCENT,
+  STOREFRONT_ORIGIN,
+  STORE_TERMS_FAILURES,
   agreeOnStoreTerms,
   parseStorefrontPaymentTerms,
   pickStorefrontProductUrls,
@@ -38,6 +42,11 @@ const withoutAnyPayments = withoutProductPayments.slice(
 );
 const withModalDiscount = (value) =>
   erikaPage.replace('data-payment-discount="10"', `data-payment-discount="${value}"`);
+// A second transfer method in the modal that disagrees with the first (10%).
+const withConflictingModal = erikaPage.replace(
+  "</body>",
+  '<div id="info-payment-method-wire_transfer"><strong data-payment-discount="15">$152.915,00</strong></div></body>',
+);
 
 test("storefront product pages yield the transfer discount and interest-free installments", () => {
   for (const page of [erikaPage, watchPage]) {
@@ -86,6 +95,26 @@ test("the transfer method's data-payment-discount wins over the visible text", (
   assert.equal(parseStorefrontPaymentTerms(withModalDiscount(0)).transferDiscountPercent, 0);
 });
 
+test("a transfer discount that conflicts within the page is rejected as conflicting, not missing", () => {
+  const conflicting = parseStorefrontPaymentTerms(withConflictingModal);
+
+  // The visible "10% de descuento" text is not used to pick a side.
+  assert.deepEqual(conflicting, {
+    transferDiscountPercent: null,
+    interestFreeInstallments: 6,
+    conflictingTransferDiscounts: [10, 15],
+  });
+  assert.equal(
+    storeTermsProblem(conflicting),
+    "la página muestra descuentos por transferencia distintos (10% y 15%)",
+  );
+  assert.equal(
+    storeTermsProblem(parseStorefrontPaymentTerms(withoutAnyPayments)),
+    STORE_TERMS_FAILURES.discountMissing,
+  );
+  assert.notEqual(STORE_TERMS_FAILURES.discountConflicting, STORE_TERMS_FAILURES.discountMissing);
+});
+
 test("installments must be interest-free", () => {
   const withInterest = erikaPage.replace(/cuotas\s+sin interés/, "cuotas");
   assert.equal(parseStorefrontPaymentTerms(withInterest).interestFreeInstallments, null);
@@ -99,19 +128,36 @@ test("storeTermsProblem enforces sane bounds", () => {
 
   assert.equal(storeTermsProblem(terms(10, 6)), null);
   assert.equal(storeTermsProblem(terms(0, 1)), null);
-  assert.equal(storeTermsProblem(terms(50, 24)), null);
+  assert.equal(
+    storeTermsProblem(terms(MAX_TRANSFER_DISCOUNT_PERCENT, MAX_INTEREST_FREE_INSTALLMENTS)),
+    null,
+  );
   for (const insane of [
     terms(null, 6),
     terms(-1, 6),
-    terms(51, 6),
+    terms(MAX_TRANSFER_DISCOUNT_PERCENT + 1, 6),
     terms(Number.NaN, 6),
     terms(10, null),
     terms(10, 0),
-    terms(10, 25),
+    terms(10, MAX_INTEREST_FREE_INSTALLMENTS + 1),
     terms(10, 6.5),
   ]) {
     assert.notEqual(storeTermsProblem(insane), null, JSON.stringify(insane));
   }
+  assert.equal(storeTermsProblem(terms(null, 6)), STORE_TERMS_FAILURES.discountMissing);
+  assert.equal(storeTermsProblem(terms(10, null)), STORE_TERMS_FAILURES.installmentsMissing);
+  assert.equal(storeTermsProblem(terms(51, 6)), "descuento por transferencia fuera de rango (51%)");
+});
+
+test("the sync reads the same storefront origin the checkout links to", () => {
+  const checkoutSource = fs.readFileSync(
+    path.join(projectRoot, "lib/checkout/storefront.ts"),
+    "utf8",
+  );
+  const declared = /const STOREFRONT_ORIGIN = "([^"]+)"/.exec(checkoutSource);
+
+  assert.ok(declared, "lib/checkout/storefront.ts no longer declares STOREFRONT_ORIGIN");
+  assert.equal(STOREFRONT_ORIGIN, declared[1]);
 });
 
 test("agreeOnStoreTerms needs three sane readings that agree", () => {
