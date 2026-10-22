@@ -4,6 +4,12 @@ const ACCENT = "#c9a96e";
 
 const COLLECTIONS = [
   {
+    slug: "anteojos-de-sol",
+    label: "Anteojos de sol",
+    sub: "Todas las marcas",
+    href: "/tienda/anteojos-de-sol",
+  },
+  {
     slug: "ray-ban",
     label: "Ray-Ban",
     sub: "Lentes de sol",

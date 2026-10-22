@@ -1,6 +1,7 @@
 import BrandCarousel from "@/components/brand/BrandCarousel";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import HubHeader from "@/components/brand/HubHeader";
+import HubLinks from "@/components/brand/HubLinks";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import ProductGrid from "@/components/brand/ProductGrid";
 import TrustHighlights from "@/components/brand/TrustHighlights";
@@ -8,6 +9,7 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { hubsOf, indexableHubs } from "@/lib/hub-pages";
 import { brandHighlight, hubDescription, hubIntro } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema, pageMetadata } from "@/lib/seo";
@@ -35,12 +37,19 @@ const intro = hubIntro({
   highlight: brandHighlight(watchProducts),
 });
 
+// Hombre / mujer hubs with enough products in the catalog to be indexed.
+const audienceLinks = indexableHubs(hubsOf("audience", "relojes")).map((hub) => ({
+  label: hub.linkLabel,
+  href: hub.path,
+}));
+
 export default function RelojesPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={watchSchema} />
       <Breadcrumbs trail={COLLECTION_TRAILS.relojes} />
       <HubHeader eyebrow="Colección" title="Relojes originales" intro={intro} />
+      <HubLinks eyebrow="Por público" title="Relojes para hombre y mujer" links={audienceLinks} />
       <BrandCarousel products={watchSummaries} brand="Relojes" showNav={false} />
       <TrustHighlights />
       <ProductGrid products={watchSummaries} brandLabel="Relojes premium" filterBy="brand" />

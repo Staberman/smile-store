@@ -25,6 +25,7 @@ import { isWatch } from "@/lib/storefront.mjs";
 export const dynamic = "force-static";
 
 const HUB_ORDER: CollectionKey[] = [
+  "anteojos-de-sol",
   "ray-ban",
   "ferrari",
   "premium",
@@ -46,9 +47,11 @@ function buildLlmsTxt(): string {
     const crumb = COLLECTION_TRAILS[key][COLLECTION_TRAILS[key].length - 1];
     return link(crumb.name, crumb.href, COLLECTION_SUMMARIES[key]);
   });
-  // Ray-Ban model hubs, same rule as the sitemap: only those with enough
-  // products in the catalog.
-  const collectionHubs = indexableHubs().map((hub) => link(hub.linkLabel, hub.path, hub.summary));
+  // Model and audience hubs, same rule as the sitemap: only those with enough
+  // products in the catalog. The sunglasses hub is in HUB_ORDER.
+  const collectionHubs = indexableHubs()
+    .filter((hub) => hub.group !== "category")
+    .map((hub) => link(hub.linkLabel, hub.path, hub.summary));
   // Same rule as the sitemap: premium brands without stock are not indexed.
   const premiumBrands = PREMIUM_BRANDS.filter((brand) =>
     allProducts.some((product) => product.brand === brand.catalogBrand),

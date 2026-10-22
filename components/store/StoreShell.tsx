@@ -1,7 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
-import StoreCategoryNav from "@/components/store/StoreCategoryNav";
+import StoreCategoryNav, { type AudienceNavLinks } from "@/components/store/StoreCategoryNav";
+import type { HubParent } from "@/lib/collection-hubs.mjs";
+import { hubsOf, indexableHubs } from "@/lib/hub-pages";
+
+/** Indexed hombre / mujer hubs of a section, as category nav links. */
+function audienceNavLinks(parent: HubParent) {
+  return indexableHubs(hubsOf("audience", parent)).map((hub) => ({
+    label: hub.crumb,
+    ariaLabel: hub.linkLabel,
+    href: hub.path,
+  }));
+}
+
+// Computed here, on the server: noindex hubs (e.g. sunglasses hubs that
+// would repeat /tienda/anteojos-de-sol) get no nav link.
+const audienceLinks: AudienceNavLinks = {
+  lentes: audienceNavLinks("anteojos-de-sol"),
+  relojes: audienceNavLinks("relojes"),
+};
 
 /**
  * Store chrome shared by the homepage ("/") and every /tienda/* route:
@@ -32,7 +50,7 @@ export default function StoreShell({
             </Link>
 
             <div className="hidden min-w-0 flex-1 md:block">
-              <StoreCategoryNav />
+              <StoreCategoryNav audienceLinks={audienceLinks} />
             </div>
 
             <nav className="flex shrink-0 items-center gap-2">
@@ -46,7 +64,7 @@ export default function StoreShell({
           </div>
 
           <div className="border-t border-white/6 md:hidden">
-            <StoreCategoryNav />
+            <StoreCategoryNav audienceLinks={audienceLinks} />
           </div>
         </div>
       </header>

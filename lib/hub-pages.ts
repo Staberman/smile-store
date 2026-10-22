@@ -85,8 +85,9 @@ export function hubsOf(
 }
 
 /**
- * Hubs that are indexed (enough products in the catalog): the ones the
- * sitemap, llms.txt and site navigation link to.
+ * Hubs that are indexed (enough products in the catalog and, for audience
+ * hubs, a listing distinct from their parent's): the ones the sitemap,
+ * llms.txt and site navigation link to.
  */
 export function indexableHubs(hubs: readonly CollectionHub[] = COLLECTION_HUBS): CollectionHub[] {
   return hubs.filter((hub) => getHubPage(hub).indexable);
@@ -96,8 +97,10 @@ export function indexableHubs(hubs: readonly CollectionHub[] = COLLECTION_HUBS):
 export function hubMetadata(page: HubPage): Metadata {
   return {
     ...pageMetadata({ title: page.hub.title, description: page.description, path: page.hub.path }),
-    // Hubs with too few products in the catalog stay out of the index (and of
-    // the sitemap), whatever their stock; their links are still followed.
+    // Hubs with too few products in the catalog, or audience hubs that would
+    // repeat their parent's listing, stay out of the index (and of the
+    // sitemap and navigation), whatever their stock. No cross-canonical:
+    // noindex is the one signal. Their links are still followed.
     robots: { index: page.indexable, follow: true },
   };
 }

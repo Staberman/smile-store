@@ -8,11 +8,13 @@ export type Crumb = { name: string; href: string };
 
 export const HOME_CRUMB: Crumb = { name: "Inicio", href: "/" };
 const RELOJES_CRUMB: Crumb = { name: "Relojes", href: "/tienda/relojes" };
+const SUNGLASSES_CRUMB: Crumb = { name: "Anteojos de sol", href: "/tienda/anteojos-de-sol" };
 const RAY_BAN_CRUMB: Crumb = { name: "Ray-Ban", href: "/tienda/marcas/ray-ban" };
 const PREMIUM_CRUMB: Crumb = { name: "Marcas premium", href: "/tienda/marcas/premium" };
 
 /** Trails of the collection hubs, from home to the hub itself. */
 export const COLLECTION_TRAILS = {
+  "anteojos-de-sol": [HOME_CRUMB, SUNGLASSES_CRUMB],
   relojes: [HOME_CRUMB, RELOJES_CRUMB],
   "omega-swatch": [
     HOME_CRUMB,
@@ -38,6 +40,7 @@ export type CollectionKey = keyof typeof COLLECTION_TRAILS;
 
 /** One-line summary of each hub, for llms.txt and other indexes. */
 export const COLLECTION_SUMMARIES: Record<CollectionKey, string> = {
+  "anteojos-de-sol": "Todos los anteojos de sol: Ray-Ban, Scuderia Ferrari y marcas premium.",
   relojes: "Relojes originales de Invicta, Tommy Hilfiger y OMEGA x Swatch.",
   "omega-swatch": "Relojes OMEGA x Swatch MoonSwatch de la colección Mission.",
   invicta: "Relojes Invicta, entre ellos las líneas Pro Diver y Speedway.",
@@ -66,10 +69,11 @@ export type PremiumBrandSlug = (typeof PREMIUM_BRANDS)[number]["slug"];
 
 /**
  * Trail of a hub from lib/collection-hubs: its parent section's trail plus
- * the hub ("Inicio > Ray-Ban > Aviador").
+ * the hub ("Inicio > Ray-Ban > Aviador", "Inicio > Relojes > Hombre").
  */
 export function collectionHubTrail(hub: CollectionHub): Crumb[] {
-  return [...COLLECTION_TRAILS[hub.parent], { name: hub.crumb, href: hub.path }];
+  const own = { name: hub.crumb, href: hub.path };
+  return hub.parent ? [...COLLECTION_TRAILS[hub.parent], own] : [HOME_CRUMB, own];
 }
 
 export function premiumBrandTrail(slug: PremiumBrandSlug): Crumb[] {

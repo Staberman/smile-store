@@ -18,9 +18,9 @@ export type HubProduct = {
   }[];
 };
 
-export type HubGroup = "model";
-/** Section a hub hangs from in the breadcrumbs (lib/collections). */
-export type HubParent = "ray-ban";
+export type HubGroup = "category" | "audience" | "model";
+/** Section a hub hangs from in the breadcrumbs (lib/collections); null for top-level hubs. */
+export type HubParent = "ray-ban" | "anteojos-de-sol" | "relojes" | null;
 
 export type CollectionHub = {
   key: string;
@@ -46,8 +46,13 @@ export type CollectionHub = {
   summary: string;
   descriptionLeads: readonly string[];
   alternativesTitle: string;
-  /** One verifiable sentence about the model. */
-  fact: string;
+  /** Model hubs: one verifiable sentence about the model. */
+  fact?: string;
+  /** Audience hubs only. */
+  kind?: "sunglasses" | "watch";
+  audience?: "men" | "women";
+  audienceLabel?: string;
+  storeTerm?: string;
   matches: (product: HubProduct) => boolean;
   /** Products of the section the hub belongs to (Ray-Ban for a model hub). */
   inParent: (product: HubProduct) => boolean;
@@ -65,24 +70,34 @@ export type HubCopyContext = {
 export type HubFacts = {
   count: number;
   price: { min: number; max: number } | null;
+  brands: { label: string; count: number }[];
   lensTypes: string[];
   lensMaterials: string[];
   frameMaterials: string[];
+  formats: string[];
   colorways: string[];
   genders: { unisex: number; men: number; women: number; unknown: number };
 };
 
 export const MIN_INDEXABLE_PRODUCTS: number;
 export const MIN_IN_STOCK_PRODUCTS: number;
+export const MIN_AUDIENCE_EXCLUSION: number;
 
 export const RAY_BAN_MODEL_HUBS: readonly CollectionHub[];
+export const SUNGLASSES_HUB: CollectionHub;
+export const AUDIENCE_HUBS: readonly CollectionHub[];
 export const COLLECTION_HUBS: readonly CollectionHub[];
 
 export function isIndexableHub(catalogCount: number): boolean;
+export function isDistinctFromParent(catalogCount: number, parentCount: number): boolean;
 export function isRayBanProduct(product: Pick<HubProduct, "brand" | "categories">): boolean;
+export function isSunglassesProduct(product: Pick<HubProduct, "categories">): boolean;
 export function productGender(product: HubProduct): Audience;
 export function priceRange(products: readonly HubProduct[]): { min: number; max: number } | null;
-export function hubFacts(products: readonly HubProduct[]): HubFacts;
+export function hubFacts(
+  products: readonly HubProduct[],
+  context?: Partial<Pick<HubCopyContext, "brandLabel">>,
+): HubFacts;
 export function countWords(text: string): number;
 export function hubMetaDescription(leads: readonly string[]): string;
 

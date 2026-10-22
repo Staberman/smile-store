@@ -27,7 +27,12 @@
       "permanent": true
     },
     {
-      "source": "/(lentes-de-sol|lentes-en-promo|mas-vendidos|productos|tienda){/}?",
+      "source": "/lentes-de-sol{/}?",
+      "destination": "/tienda/anteojos-de-sol",
+      "permanent": true
+    },
+    {
+      "source": "/(lentes-en-promo|mas-vendidos|productos|tienda){/}?",
       "destination": "/",
       "permanent": true
     },

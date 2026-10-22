@@ -7,6 +7,8 @@ import { DEFAULT_STORE_VIEW } from "./storeView";
 
 type NavItem = {
   label: string;
+  /** Accessible name when the visible label needs its group to make sense. */
+  ariaLabel?: string;
   /** Catalog view this item matches on "/" (?view=, legacy inbound links). */
   view: string;
   /** Indexable destination. Items without one are in-page filters on "/". */
@@ -20,65 +22,90 @@ const isUnder = (pathname: string, route: string) =>
 
 const OFFERS_HREF = "/?view=offers#catalogo";
 
-const GROUPS: { label: string; items: NavItem[] }[] = [
-  {
-    label: "Lentes",
-    items: [
-      // The homepage catalog defaults to the "lentes" view.
-      { label: "Lentes de sol", view: "lentes", href: "/#catalogo" },
-      {
-        label: "Ray-Ban",
-        view: "ray-ban",
-        href: "/tienda/marcas/ray-ban",
-        // The Ray-Ban hub and its model hubs; Ferrari has its own item.
-        isCurrentRoute: (pathname) =>
-          isUnder(pathname, "/tienda/marcas/ray-ban") &&
-          !isUnder(pathname, "/tienda/marcas/ray-ban/ferrari"),
-      },
-      {
-        label: "Scuderia Ferrari",
-        view: "ferrari",
-        href: "/tienda/marcas/ray-ban/ferrari",
-        isCurrentRoute: (pathname) => pathname === "/tienda/marcas/ray-ban/ferrari",
-      },
-      {
-        label: "Marcas premium",
-        view: "premium",
-        href: "/tienda/marcas/premium",
-        isCurrentRoute: (pathname) => isUnder(pathname, "/tienda/marcas/premium"),
-      },
-    ],
-  },
-  {
-    label: "Relojes",
-    items: [
-      {
-        label: "Relojes",
-        view: "relojes",
-        href: "/tienda/relojes",
-        isCurrentRoute: (pathname) =>
-          isUnder(pathname, "/tienda/relojes") ||
-          isUnder(pathname, "/tienda/marcas/invicta") ||
-          isUnder(pathname, "/tienda/marcas/tommy-hilfiger"),
-      },
-    ],
-  },
-  {
-    label: "Descubrir",
-    items: [
-      // "Más vendidos" (view=best-sellers) queda oculto: depende de
-      // data/tiendanube-sales-ranking.json, que está vacío y nada lo genera,
-      // así que la vista renderiza una página en blanco. El filtro en
-      // TiendaCatalog/lib/catalog.ts se deja intacto para reactivarlo cuando
-      // exista un generador de ranking.
-      // { label: "Más vendidos", view: "best-sellers" },
-      //
-      // Ofertas has no hub page: it filters the homepage catalog, so it is a
-      // button rather than a crawlable ?view= URL.
-      { label: "Ofertas", view: "offers" },
-    ],
-  },
-];
+/** A hombre / mujer hub, e.g. { label: "Hombre", ariaLabel: "Relojes para hombre" }. */
+export type AudienceNavLink = { label: string; ariaLabel: string; href: string };
+
+/**
+ * Indexed audience hubs per group. StoreShell computes them on the server
+ * (lib/hub-pages): this client component must not import the catalog.
+ */
+export type AudienceNavLinks = { lentes: AudienceNavLink[]; relojes: AudienceNavLink[] };
+
+type NavGroup = { label: string; items: NavItem[] };
+
+function audienceItems(links: AudienceNavLink[]): NavItem[] {
+  return links.map((link) => ({
+    ...link,
+    view: link.href,
+    isCurrentRoute: (pathname) => pathname === link.href,
+  }));
+}
+
+function navGroups(audience: AudienceNavLinks): NavGroup[] {
+  const watchAudienceHrefs = audience.relojes.map((link) => link.href);
+
+  return [
+    {
+      label: "Lentes",
+      items: [
+        // The homepage catalog defaults to the "lentes" view.
+        { label: "Lentes de sol", view: "lentes", href: "/#catalogo" },
+        ...audienceItems(audience.lentes),
+        {
+          label: "Ray-Ban",
+          view: "ray-ban",
+          href: "/tienda/marcas/ray-ban",
+          // The Ray-Ban hub and its model hubs; Ferrari has its own item.
+          isCurrentRoute: (pathname) =>
+            isUnder(pathname, "/tienda/marcas/ray-ban") &&
+            !isUnder(pathname, "/tienda/marcas/ray-ban/ferrari"),
+        },
+        {
+          label: "Scuderia Ferrari",
+          view: "ferrari",
+          href: "/tienda/marcas/ray-ban/ferrari",
+          isCurrentRoute: (pathname) => pathname === "/tienda/marcas/ray-ban/ferrari",
+        },
+        {
+          label: "Marcas premium",
+          view: "premium",
+          href: "/tienda/marcas/premium",
+          isCurrentRoute: (pathname) => isUnder(pathname, "/tienda/marcas/premium"),
+        },
+      ],
+    },
+    {
+      label: "Relojes",
+      items: [
+        {
+          label: "Relojes",
+          view: "relojes",
+          href: "/tienda/relojes",
+          isCurrentRoute: (pathname) =>
+            (isUnder(pathname, "/tienda/relojes") && !watchAudienceHrefs.includes(pathname)) ||
+            isUnder(pathname, "/tienda/marcas/invicta") ||
+            isUnder(pathname, "/tienda/marcas/tommy-hilfiger"),
+        },
+        ...audienceItems(audience.relojes),
+      ],
+    },
+    {
+      label: "Descubrir",
+      items: [
+        // "Más vendidos" (view=best-sellers) queda oculto: depende de
+        // data/tiendanube-sales-ranking.json, que está vacío y nada lo genera,
+        // así que la vista renderiza una página en blanco. El filtro en
+        // TiendaCatalog/lib/catalog.ts se deja intacto para reactivarlo cuando
+        // exista un generador de ranking.
+        // { label: "Más vendidos", view: "best-sellers" },
+        //
+        // Ofertas has no hub page: it filters the homepage catalog, so it is a
+        // button rather than a crawlable ?view= URL.
+        { label: "Ofertas", view: "offers" },
+      ],
+    },
+  ];
+}
 
 const ITEM_CLASS =
   "relative flex min-h-11 snap-start items-center whitespace-nowrap text-[9px] uppercase tracking-[0.18em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#c9a96e] md:text-[10px]";
@@ -92,14 +119,23 @@ function isActive(item: NavItem, pathname: string, view: string | null): boolean
  * Category links for a pathname and homepage view. `view` is null when the
  * URL has none (or while it cannot be read, e.g. in the static HTML).
  */
-function StoreCategoryLinks({ pathname, view }: { pathname: string; view: string | null }) {
+function StoreCategoryLinks({
+  groups,
+  pathname,
+  view,
+}: {
+  groups: NavGroup[];
+  pathname: string;
+  view: string | null;
+}) {
   const router = useRouter();
   const onHome = pathname === "/";
 
   return (
     <nav aria-label="Categorías de la tienda" className="min-w-0 flex-1">
-      <div className="scrollbar-none flex snap-x snap-mandatory items-center gap-5 overflow-x-auto px-1 py-2 md:justify-center md:gap-7 md:overflow-visible">
-        {GROUPS.map((group, groupIndex) => (
+      {/* Centered while it fits; scrolls from the first item when it does not. */}
+      <div className="scrollbar-none flex snap-x snap-mandatory items-center gap-5 overflow-x-auto px-1 py-2 md:justify-center-safe md:gap-7">
+        {groups.map((group, groupIndex) => (
           <div
             key={group.label}
             className="flex shrink-0 items-center gap-4 md:gap-5"
@@ -147,6 +183,7 @@ function StoreCategoryLinks({ pathname, view }: { pathname: string; view: string
                   scroll={!inPage}
                   className={ITEM_CLASS}
                   style={style}
+                  aria-label={item.ariaLabel}
                   aria-current={active ? "page" : undefined}
                 >
                   {content}
@@ -160,22 +197,23 @@ function StoreCategoryLinks({ pathname, view }: { pathname: string; view: string
   );
 }
 
-function StoreCategoryLinksFromUrl() {
+function StoreCategoryLinksFromUrl({ groups }: { groups: NavGroup[] }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  return <StoreCategoryLinks pathname={pathname} view={searchParams.get("view")} />;
+  return <StoreCategoryLinks groups={groups} pathname={pathname} view={searchParams.get("view")} />;
 }
 
-function StoreCategoryLinksFallback() {
-  return <StoreCategoryLinks pathname={usePathname()} view={null} />;
+function StoreCategoryLinksFallback({ groups }: { groups: NavGroup[] }) {
+  return <StoreCategoryLinks groups={groups} pathname={usePathname()} view={null} />;
 }
 
-export default function StoreCategoryNav() {
+export default function StoreCategoryNav({ audienceLinks }: { audienceLinks: AudienceNavLinks }) {
+  const groups = navGroups(audienceLinks);
   return (
     // The fallback keeps the category links in the static HTML for crawlers;
     // it knows the route but not the ?view= of the homepage.
-    <Suspense fallback={<StoreCategoryLinksFallback />}>
-      <StoreCategoryLinksFromUrl />
+    <Suspense fallback={<StoreCategoryLinksFallback groups={groups} />}>
+      <StoreCategoryLinksFromUrl groups={groups} />
     </Suspense>
   );
 }

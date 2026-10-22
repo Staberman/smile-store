@@ -21,8 +21,10 @@ const nav: FooterColumn[] = [
   {
     heading: "Colecciones",
     links: [
-      { label: "Lentes de sol", href: "/#catalogo" },
+      { label: "Anteojos de sol", href: "/tienda/anteojos-de-sol" },
+      ...hubLinks("audience", "anteojos-de-sol"),
       { label: "Relojes", href: "/tienda/relojes" },
+      ...hubLinks("audience", "relojes"),
       { label: "Marcas premium", href: "/tienda/marcas/premium" },
       { label: "Scuderia Ferrari", href: "/tienda/marcas/ray-ban/ferrari" },
     ],
