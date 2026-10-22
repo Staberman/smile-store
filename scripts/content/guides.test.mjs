@@ -266,3 +266,14 @@ test("every ready-made guide link points to a published guide", () => {
     assert.ok(guides.some((guide) => guide.path === entry.href), entry.href);
   }
 });
+
+test("the guides are in the sitemap with their own dates and linked from the footer and hubs", () => {
+  const sitemap = read("app/sitemap.ts");
+  assert.match(sitemap, /GUIDES\.map\(/);
+  assert.match(sitemap, /lastModified: guide\.dateModified/);
+  assert.match(sitemap, /GUIDES_INDEX\.path/);
+  assert.match(read("components/layout/Footer.tsx"), /href: "\/guias"/);
+  assert.match(read("app/tienda/marcas/ray-ban/page.tsx"), /GUIDE_LINKS\.rayBanModels/);
+  assert.match(read("app/tienda/marcas/ray-ban/[model]/page.tsx"), /GUIDE_LINKS\.rayBanModels/);
+  assert.match(read("app/tienda/anteojos-de-sol/page.tsx"), /GUIDE_LINKS\.polarized/);
+});

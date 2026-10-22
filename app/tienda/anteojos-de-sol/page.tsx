@@ -7,6 +7,7 @@ import ProductGrid from "@/components/brand/ProductGrid";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { SUNGLASSES_HUB } from "@/lib/collection-hubs.mjs";
+import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import { getHubPage, hubMetadata, hubSchema, hubsOf, indexableHubs } from "@/lib/hub-pages";
 import { toProductSummaries } from "@/lib/product-summary";
 
@@ -45,6 +46,11 @@ export default function SunglassesPage() {
       )}
       <OutOfStockProducts products={page.outOfStock} />
       <FaqSection faqs={page.faqs} title="Preguntas frecuentes sobre anteojos de sol" />
+      <HubLinks
+        eyebrow="Guías de compra"
+        title="Antes de elegir tus anteojos de sol"
+        links={[GUIDE_LINKS.polarized, GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals]}
+      />
       <CollectionLinks current="anteojos-de-sol" />
     </main>
   );

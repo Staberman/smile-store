@@ -8,6 +8,7 @@ import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import ProductGrid from "@/components/brand/ProductGrid";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
+import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import {
   findHubBySlug,
   getHubPage,
@@ -69,6 +70,11 @@ export default function RayBanModelPage({ params }: Props) {
           ...otherModels,
           { label: "Scuderia Ferrari", href: "/tienda/marcas/ray-ban/ferrari" },
         ]}
+      />
+      <HubLinks
+        eyebrow="Guías de compra"
+        title="Antes de elegir tus Ray-Ban"
+        links={[GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals]}
       />
       <CollectionLinks />
     </main>

@@ -9,6 +9,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts } from "@/lib/catalog";
 import { isRayBanProduct } from "@/lib/collection-hubs.mjs";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import { hubsOf, indexableHubs } from "@/lib/hub-pages";
 import { categoryLineHighlight, hubDescription, hubIntro } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
@@ -92,6 +93,11 @@ export default function RayBanPage() {
 
       <ProductGrid products={rayBanSummaries} brandLabel="Colección Ray-Ban" />
       <OutOfStockProducts products={rayBanOutOfStock} />
+      <HubLinks
+        eyebrow="Guías de compra"
+        title="Antes de elegir tus Ray-Ban"
+        links={[GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals]}
+      />
       <CollectionLinks current="ray-ban" />
     </main>
   );

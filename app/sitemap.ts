@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { allProducts, allProductsIncludingOutOfStock } from "@/lib/catalog";
+import { GUIDES, GUIDES_LAST_MODIFIED } from "@/lib/guide-pages";
+import { GUIDES_INDEX } from "@/lib/guides/guides.mjs";
 import { indexableHubs } from "@/lib/hub-pages";
 import { absoluteUrl, productUrl } from "@/lib/seo";
 
@@ -52,6 +54,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: STATIC_ROUTES_LAST_MODIFIED,
       changeFrequency: route === "/" ? "daily" as const : "weekly" as const,
       priority: route === "/" ? 1 : 0.7,
+    })),
+    // Buying guides: each carries its own dateModified; the index changes
+    // whenever one of them does.
+    {
+      url: absoluteUrl(GUIDES_INDEX.path),
+      lastModified: GUIDES_LAST_MODIFIED,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    },
+    ...GUIDES.map((guide) => ({
+      url: absoluteUrl(guide.path),
+      lastModified: guide.dateModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
     })),
     // Include out-of-stock products so their direct URLs stay indexable.
     // No lastModified: the catalog data has no per-product update date.

@@ -42,6 +42,7 @@ const nav: FooterColumn[] = [
   {
     heading: "Información",
     links: [
+      { label: "Guías de compra", href: "/guias" },
       { label: "Guía de estilo", href: "/guia-de-estilo" },
       { label: "Contacto", href: "/contacto" },
     ],
