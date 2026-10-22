@@ -7,11 +7,11 @@ export type BrandSpelling = {
   aliases?: readonly string[];
 };
 
-export const TITLE_SUFFIX: string;
-export const MAX_TITLE_LENGTH: number;
-export const MAX_PAGE_TITLE_LENGTH: number;
-export const META_DESCRIPTION_MIN_LENGTH: number;
-export const META_DESCRIPTION_MAX_LENGTH: number;
+export declare const TITLE_SUFFIX: string;
+export declare const MAX_TITLE_LENGTH: number;
+export declare const MAX_PAGE_TITLE_LENGTH: number;
+export declare const META_DESCRIPTION_MIN_LENGTH: number;
+export declare const META_DESCRIPTION_MAX_LENGTH: number;
 
 export function isGenericSeoText(value: string | null | undefined, productName?: string): boolean;
 export function normalizeEyewearTerms(value: string): string;

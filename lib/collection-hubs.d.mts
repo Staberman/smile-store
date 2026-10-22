@@ -79,14 +79,14 @@ export type HubFacts = {
   genders: { unisex: number; men: number; women: number; unknown: number };
 };
 
-export const MIN_INDEXABLE_PRODUCTS: number;
-export const MIN_IN_STOCK_PRODUCTS: number;
-export const MIN_AUDIENCE_EXCLUSION: number;
+export declare const MIN_INDEXABLE_PRODUCTS: number;
+export declare const MIN_IN_STOCK_PRODUCTS: number;
+export declare const MIN_AUDIENCE_EXCLUSION: number;
 
-export const RAY_BAN_MODEL_HUBS: readonly CollectionHub[];
-export const SUNGLASSES_HUB: CollectionHub;
-export const AUDIENCE_HUBS: readonly CollectionHub[];
-export const COLLECTION_HUBS: readonly CollectionHub[];
+export declare const RAY_BAN_MODEL_HUBS: readonly CollectionHub[];
+export declare const SUNGLASSES_HUB: CollectionHub;
+export declare const AUDIENCE_HUBS: readonly CollectionHub[];
+export declare const COLLECTION_HUBS: readonly CollectionHub[];
 
 /** The Ray-Ban model hub that lists a product, or null. */
 export function modelHubOf(

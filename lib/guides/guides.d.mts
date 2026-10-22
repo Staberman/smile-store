@@ -75,7 +75,7 @@ export type Guide = {
   about: string[];
 };
 
-export const GUIDES_PATH: "/guias";
+export declare const GUIDES_PATH: "/guias";
 export function guidePath(slug: string): string;
 
 type GuideKey =
@@ -85,11 +85,11 @@ type GuideKey =
   | "invictaOriginals"
   | "waterResistance"
   | "watchGift";
-export const GUIDE_SLUGS: Readonly<Record<GuideKey, string>>;
+export declare const GUIDE_SLUGS: Readonly<Record<GuideKey, string>>;
 /** Ready-made links to each guide, for the hubs. */
-export const GUIDE_LINKS: Readonly<Record<GuideKey, { label: string; href: string }>>;
+export declare const GUIDE_LINKS: Readonly<Record<GuideKey, { label: string; href: string }>>;
 
-export const GUIDES_INDEX: {
+export declare const GUIDES_INDEX: {
   path: "/guias";
   title: string;
   h1: string;
@@ -99,7 +99,7 @@ export const GUIDES_INDEX: {
 };
 
 /** Index sections, in display order: every guide belongs to one. */
-export const GUIDE_TOPICS: readonly { key: GuideTopic; label: string }[];
+export declare const GUIDE_TOPICS: readonly { key: GuideTopic; label: string }[];
 /** Guides of one topic, in display order. */
 export function guidesOfTopic<G extends Guide>(guides: readonly G[], topic: GuideTopic): G[];
 
@@ -122,7 +122,7 @@ export function guideAuthoredText(guide: Guide): string;
 /** Blocks built from the products in stock (`catalog: true`), in order. */
 export function catalogBlocks(guide: Guide): GuideBlock[];
 /** Most products a catalog block lists before a "y N más" link to the hub. */
-export const CATALOG_LIST_LIMIT: number;
+export declare const CATALOG_LIST_LIMIT: number;
 /** Internal hrefs the guide body links to (inline links and link lists). */
 export function guideLinks(guide: Guide): string[];
 /** Latest dateModified among the guides. */

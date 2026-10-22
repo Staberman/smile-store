@@ -13,8 +13,8 @@ type HomeCatalogProduct = {
   variants: { available: boolean; stock: number; image?: string | null }[];
 };
 
-export const HOME_GRID_PREVIEW_COUNT: number;
-export const STORE_PRODUCTS_PATH: string;
+export declare const HOME_GRID_PREVIEW_COUNT: number;
+export declare const STORE_PRODUCTS_PATH: string;
 
 export function storeViewProducts<P extends HomeCatalogProduct>(
   products: P[],
@@ -33,7 +33,7 @@ export function homeCatalogPreview<P extends HomeCatalogProduct>(
   },
 ): P[];
 
-export const STORE_PRODUCTS_RETRY_DELAYS_MS: readonly number[];
+export declare const STORE_PRODUCTS_RETRY_DELAYS_MS: readonly number[];
 
 export type StoreProductsLoader<P> = {
   /** The full list once a load has succeeded, else null. */

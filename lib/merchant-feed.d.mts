@@ -76,11 +76,11 @@ export type MerchantChannel = {
   description: string;
 };
 
-export const MERCHANT_CURRENCY: string;
-export const MAX_TITLE_LENGTH: number;
-export const MAX_DESCRIPTION_LENGTH: number;
-export const MAX_ADDITIONAL_IMAGES: number;
-export const GOOGLE_PRODUCT_CATEGORIES: { sunglasses: number; watch: number };
+export declare const MERCHANT_CURRENCY: string;
+export declare const MAX_TITLE_LENGTH: number;
+export declare const MAX_DESCRIPTION_LENGTH: number;
+export declare const MAX_ADDITIONAL_IMAGES: number;
+export declare const GOOGLE_PRODUCT_CATEGORIES: { sunglasses: number; watch: number };
 
 export function defaultVariant<V extends FeedVariant>(product: { variants: V[] }): V | null;
 export function merchantPrice(amount: number): string;
