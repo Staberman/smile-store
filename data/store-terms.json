@@ -1,5 +1,6 @@
 {
   "transferDiscountPercent": 10,
   "interestFreeInstallments": 6,
+  "freeShippingMinimumArs": 200000,
   "source": "https://smiletienda.mitiendanube.com product pages"
 }

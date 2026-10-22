@@ -9,6 +9,7 @@ import {
   getTransferPrice,
 } from "../../lib/storefront.mjs";
 import {
+  MAX_FREE_SHIPPING_MINIMUM_ARS,
   MAX_INTEREST_FREE_INSTALLMENTS,
   MAX_TRANSFER_DISCOUNT_PERCENT,
   STOREFRONT_ORIGIN,
@@ -34,10 +35,7 @@ const announcementBar = erikaPage.slice(
   erikaPage.indexOf('<div id="single-product"'),
 );
 const withoutPaymentsModal = erikaPage.slice(0, erikaPage.indexOf('<div id="installments-modal"'));
-const withoutProductPayments = erikaPage.replace(
-  /<a href="#installments-modal"[\s\S]*?<\/a>\s*<\/form>/,
-  "</form>",
-);
+const withoutProductPayments = erikaPage.replace(/<a href="#installments-modal"[\s\S]*?<\/a>/, "");
 const withoutAnyPayments = withoutProductPayments.slice(
   0,
   withoutProductPayments.indexOf('<div id="installments-modal"'),
@@ -49,38 +47,98 @@ const withConflictingModal = erikaPage.replace(
   "</body>",
   '<div id="info-payment-method-wire_transfer"><strong data-payment-discount="15">$152.915,00</strong></div></body>',
 );
+// The product form's free-shipping block, verbatim from the fixture.
+const freeShippingBlock = erikaPage.slice(
+  erikaPage.indexOf('<div class="js-free-shipping-minimum-message'),
+  erikaPage.indexOf('<input type="hidden" name="add_to_cart"'),
+);
+const withoutFreeShippingBlock = erikaPage.replace(freeShippingBlock, "");
+const withFreeShippingLabel = (text) =>
+  erikaPage.replace("superando los <span>$200.000,00", text);
+const freeShippingMinimumOf = (page) => parseStorefrontPaymentTerms(page).freeShippingMinimumArs;
+// The live home page's services banner (trimmed): owner-written text, not the
+// promotion Tiendanube's checkout applies.
+const homeBanner = `<div class="js-service-item service-item">
+<div class="span10 service-text p-right p-none-xs">
+<h3 class="h6 service-title"><strong>Envios a todo el pais</strong></h3>
+<p>Envios gratis a partir de $200.000</p>
+</div>
+</div>`;
 
-test("storefront product pages yield the transfer discount and interest-free installments", () => {
+test("storefront product pages yield the transfer discount, installments and free-shipping minimum", () => {
   for (const page of [erikaPage, watchPage]) {
     assert.deepEqual(parseStorefrontPaymentTerms(page), {
       transferDiscountPercent: 10,
       interestFreeInstallments: 6,
+      freeShippingMinimumArs: 200000,
     });
   }
 });
 
-test("the announcement bar is never read as payment terms", () => {
-  assert.match(announcementBar, /6 CUOTAS SIN INTERES \+ 20% OFF/);
-  assert.deepEqual(parseStorefrontPaymentTerms(announcementBar), {
+test("the announcement bar and the home banner are never read as store terms", () => {
+  assert.match(announcementBar, /6 CUOTAS SIN INTERES \+ 20% OFF {2}\+ ENVÍO GRATIS/);
+  const nothing = {
     transferDiscountPercent: null,
     interestFreeInstallments: null,
-  });
+    freeShippingMinimumArs: null,
+  };
+  assert.deepEqual(parseStorefrontPaymentTerms(announcementBar), nothing);
+  assert.deepEqual(parseStorefrontPaymentTerms(homeBanner), nothing);
+  // Not even next to a product page without its own free-shipping block.
+  assert.equal(freeShippingMinimumOf(`${homeBanner}${withoutFreeShippingBlock}`), null);
 });
 
 test("missing payment blocks come back as null", () => {
   assert.deepEqual(parseStorefrontPaymentTerms(""), {
     transferDiscountPercent: null,
     interestFreeInstallments: null,
+    freeShippingMinimumArs: null,
   });
   assert.deepEqual(parseStorefrontPaymentTerms(withoutAnyPayments), {
     transferDiscountPercent: null,
     interestFreeInstallments: null,
+    freeShippingMinimumArs: 200000,
   });
   // The modal still carries the transfer discount; installments need the product block.
   assert.deepEqual(parseStorefrontPaymentTerms(withoutProductPayments), {
     transferDiscountPercent: 10,
     interestFreeInstallments: null,
+    freeShippingMinimumArs: 200000,
   });
+});
+
+test("the free-shipping minimum is read from the product form's block, in es-AR pesos", () => {
+  assert.match(freeShippingBlock, /js-shipping-minimum-label/);
+  assert.equal(freeShippingMinimumOf(freeShippingBlock), 200000);
+  assert.equal(freeShippingMinimumOf(withFreeShippingLabel("superando los <span>$1.500.000,00")), 1500000);
+  assert.equal(freeShippingMinimumOf(withFreeShippingLabel("superando los <span>$ 85.000")), 85000);
+  assert.equal(freeShippingMinimumOf(withFreeShippingLabel("superando los <span>$0,00")), 0);
+  // Cents are kept, so the sanity check can refuse them instead of rounding.
+  assert.equal(freeShippingMinimumOf(withFreeShippingLabel("superando los <span>$150.000,50")), 150000.5);
+});
+
+test("a free-shipping block without a readable minimum comes back as null", () => {
+  assert.equal(freeShippingMinimumOf(withoutFreeShippingBlock), null);
+  // A product with its own free shipping: the theme hides the label and drops its class.
+  assert.equal(
+    freeShippingMinimumOf(
+      erikaPage.replace(
+        '<span class="js-shipping-minimum-label">',
+        '<span style="display: none;">',
+      ),
+    ),
+    null,
+  );
+  // Not es-AR grouping: "$200.00" could mean 200 or 20.000.
+  assert.equal(freeShippingMinimumOf(withFreeShippingLabel("superando los <span>$200.00")), null);
+  assert.equal(freeShippingMinimumOf(withFreeShippingLabel("superando los <span>consultar")), null);
+  // Related-product cards carry js-free-shipping-minimum-label, not the message block.
+  assert.equal(
+    freeShippingMinimumOf(
+      '<div class="js-shipping-label-private js-free-shipping-minimum-label label">Envío gratis</div>',
+    ),
+    null,
+  );
 });
 
 test("the transfer method's data-payment-discount wins over the visible text", () => {
@@ -104,6 +162,7 @@ test("a transfer discount that conflicts within the page is rejected as conflict
   assert.deepEqual(conflicting, {
     transferDiscountPercent: null,
     interestFreeInstallments: 6,
+    freeShippingMinimumArs: 200000,
     conflictingTransferDiscounts: [10, 15],
   });
   assert.equal(
@@ -134,17 +193,26 @@ test("installments must be interest-free", () => {
 });
 
 test("storeTermsProblem enforces sane bounds", () => {
-  const terms = (transferDiscountPercent, interestFreeInstallments) => ({
+  const terms = (transferDiscountPercent, interestFreeInstallments, freeShippingMinimumArs = 200000) => ({
     transferDiscountPercent,
     interestFreeInstallments,
+    freeShippingMinimumArs,
   });
 
   assert.equal(storeTermsProblem(terms(10, 6)), null);
   assert.equal(storeTermsProblem(terms(0, 1)), null);
   assert.equal(
-    storeTermsProblem(terms(MAX_TRANSFER_DISCOUNT_PERCENT, MAX_INTEREST_FREE_INSTALLMENTS)),
+    storeTermsProblem(
+      terms(
+        MAX_TRANSFER_DISCOUNT_PERCENT,
+        MAX_INTEREST_FREE_INSTALLMENTS,
+        MAX_FREE_SHIPPING_MINIMUM_ARS,
+      ),
+    ),
     null,
   );
+  // Free shipping on every order is a valid setting, not a missing one.
+  assert.equal(storeTermsProblem(terms(10, 6, 0)), null);
   for (const insane of [
     terms(null, 6),
     terms(-1, 6),
@@ -154,12 +222,32 @@ test("storeTermsProblem enforces sane bounds", () => {
     terms(10, 0),
     terms(10, MAX_INTEREST_FREE_INSTALLMENTS + 1),
     terms(10, 6.5),
+    terms(10, 6, null),
+    { transferDiscountPercent: 10, interestFreeInstallments: 6 },
+    terms(10, 6, -1),
+    terms(10, 6, 150000.5),
+    terms(10, 6, MAX_FREE_SHIPPING_MINIMUM_ARS + 1),
+    terms(10, 6, Number.NaN),
   ]) {
     assert.notEqual(storeTermsProblem(insane), null, JSON.stringify(insane));
   }
   assert.equal(storeTermsProblem(terms(null, 6)), STORE_TERMS_FAILURES.discountMissing);
   assert.equal(storeTermsProblem(terms(10, null)), STORE_TERMS_FAILURES.installmentsMissing);
+  assert.equal(storeTermsProblem(terms(10, 6, null)), STORE_TERMS_FAILURES.freeShippingMissing);
   assert.equal(storeTermsProblem(terms(51, 6)), "descuento por transferencia fuera de rango (51%)");
+  // "$200.000,00" read in cents.
+  assert.equal(
+    storeTermsProblem(terms(10, 6, 20_000_000)),
+    "monto mínimo para envío gratis fuera de rango (20000000)",
+  );
+});
+
+test("a product page without the free-shipping block fails as free shipping missing", () => {
+  assert.equal(
+    storeTermsProblem(parseStorefrontPaymentTerms(withoutFreeShippingBlock)),
+    STORE_TERMS_FAILURES.freeShippingMissing,
+  );
+  assert.equal(storeTermsProblem(parseStorefrontPaymentTerms(erikaPage)), null);
 });
 
 test("the sync reads the same storefront origin the checkout links to", () => {
@@ -173,10 +261,16 @@ test("the sync reads the same storefront origin the checkout links to", () => {
   assert.equal(STOREFRONT_ORIGIN, declared[1]);
 });
 
-const reading = (url, transferDiscountPercent = 10, interestFreeInstallments = 6) => ({
+const reading = (
   url,
-  terms: { transferDiscountPercent, interestFreeInstallments },
+  transferDiscountPercent = 10,
+  interestFreeInstallments = 6,
+  freeShippingMinimumArs = 200000,
+) => ({
+  url,
+  terms: { transferDiscountPercent, interestFreeInstallments, freeShippingMinimumArs },
 });
+const storeTerms = { transferDiscountPercent: 10, interestFreeInstallments: 6, freeShippingMinimumArs: 200000 };
 const failedReading = (url, error = "no se pudo leer la página (HTTP 503, tras 3 intentos)") => ({
   url,
   error,
@@ -188,7 +282,7 @@ test("agreeOnStoreTerms accepts a quorum of sane pages and sets the rest aside",
     agreeOnStoreTerms([reading("a"), reading("b"), reading("c"), reading("d"), reading("e")]),
     {
       ok: true,
-      terms: { transferDiscountPercent: 10, interestFreeInstallments: 6 },
+      terms: storeTerms,
       pages: ["a", "b", "c", "d", "e"],
       setAside: [],
     },
@@ -203,7 +297,7 @@ test("agreeOnStoreTerms accepts a quorum of sane pages and sets the rest aside",
     reading("e"),
   ]);
   assert.equal(degraded.ok, true);
-  assert.deepEqual(degraded.terms, { transferDiscountPercent: 10, interestFreeInstallments: 6 });
+  assert.deepEqual(degraded.terms, storeTerms);
   assert.deepEqual(degraded.pages, ["a", "c", "e"]);
   assert.deepEqual(degraded.setAside, [
     "b: no se pudo leer la página (HTTP 503, tras 3 intentos)",
@@ -240,14 +334,60 @@ test("the transfer discount must be the same on every parsed page", () => {
   });
 });
 
+test("the free-shipping minimum must be the same on every parsed page", () => {
+  const result = agreeOnStoreTerms([
+    reading("a"),
+    reading("b"),
+    reading("c", 10, 6, 150000),
+    reading("d"),
+  ]);
+
+  assert.deepEqual(result, {
+    ok: false,
+    reason:
+      "las páginas no coinciden en el monto mínimo para envío gratis: a dice $ 200.000 y c dice $ 150.000",
+  });
+  assert.ok(result.reason.startsWith(STORE_TERMS_FAILURES.freeShippingConflicting));
+  // A page showing no minimum (0) disagrees with one showing $200.000 just the same.
+  assert.equal(agreeOnStoreTerms([reading("a"), reading("b"), reading("c", 10, 6, 0)]).ok, false);
+});
+
+test("pages without the free-shipping block are set aside, and fail the run below the quorum", () => {
+  const degraded = agreeOnStoreTerms([
+    reading("a"),
+    reading("b", 10, 6, null),
+    reading("c"),
+    reading("d"),
+    reading("e", 10, 6, null),
+  ]);
+  assert.equal(degraded.ok, true);
+  assert.equal(degraded.terms.freeShippingMinimumArs, 200000);
+  assert.deepEqual(degraded.setAside, [
+    "b: no se encontró el monto mínimo para envío gratis",
+    "e: no se encontró el monto mínimo para envío gratis",
+  ]);
+
+  // The promotion switched off (no block anywhere): the run fails, so the
+  // last synced value stays and the alert reports why.
+  const switchedOff = agreeOnStoreTerms(
+    ["a", "b", "c", "d", "e"].map((url) => reading(url, 10, 6, null)),
+  );
+  assert.equal(switchedOff.ok, false);
+  assert.match(switchedOff.reason, /^se leyeron bien 0 de 5 páginas de producto y hacen falta 3; /);
+  assert.match(switchedOff.reason, /a: no se encontró el monto mínimo para envío gratis/);
+});
+
+test("free shipping with no minimum (0) is a valid agreed reading", () => {
+  const result = agreeOnStoreTerms(["a", "b", "c"].map((url) => reading(url, 10, 6, 0)));
+  assert.equal(result.ok, true);
+  assert.equal(result.terms.freeShippingMinimumArs, 0);
+});
+
 const withInstallments = (...values) =>
   values.map((installments, index) => reading(`p${index + 1}`, 10, installments));
 
 test("interest-free installments are the value a quorum of pages shows", () => {
-  assert.deepEqual(agreeOnStoreTerms(withInstallments(6, 6, 6)).terms, {
-    transferDiscountPercent: 10,
-    interestFreeInstallments: 6,
-  });
+  assert.deepEqual(agreeOnStoreTerms(withInstallments(6, 6, 6)).terms, storeTerms);
 
   // A cheaper page (3, minimum installment amount) and a promo page (12)
   // don't move the site-wide value.
@@ -314,6 +454,25 @@ test("pickStorefrontProductUrls spreads its picks across the catalog order", () 
   );
   assert.equal(pickStorefrontProductUrls(catalog.slice(0, 2)).length, 2);
   assert.deepEqual(pickStorefrontProductUrls([]), []);
+});
+
+test("storeTermsFileText writes the terms, the free-shipping minimum included, without a timestamp", () => {
+  assert.equal(
+    storeTermsFileText(storeTerms),
+    `{
+  "transferDiscountPercent": 10,
+  "interestFreeInstallments": 6,
+  "freeShippingMinimumArs": 200000,
+  "source": "https://smiletienda.mitiendanube.com product pages"
+}
+`,
+  );
+  // Same terms, same text: an unchanged reading never produces a commit.
+  assert.equal(storeTermsFileText({ ...storeTerms }), storeTermsFileText(storeTerms));
+  assert.notEqual(
+    storeTermsFileText({ ...storeTerms, freeShippingMinimumArs: 250000 }),
+    storeTermsFileText(storeTerms),
+  );
 });
 
 test("lib/storefront.mjs exposes the synced store terms", () => {

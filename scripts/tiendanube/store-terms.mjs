@@ -1,3 +1,4 @@
+import { formatPrice } from "../../lib/price-format.mjs";
 import { getAvailableVariants } from "../../lib/storefront.mjs";
 import { htmlToText } from "./catalog-utils.mjs";
 
@@ -18,6 +19,9 @@ export const STORE_TERMS_QUORUM = 3;
 export const MAX_TRANSFER_DISCOUNT_PERCENT = 50;
 // Argentine card plans top out at 24 installments.
 export const MAX_INTEREST_FREE_INSTALLMENTS = 24;
+// Fifty times today's $200.000 leaves room for inflation, while an amount read
+// in cents ($200.000,00 -> 20.000.000) is out. 0 is free shipping on every order.
+export const MAX_FREE_SHIPPING_MINIMUM_ARS = 10_000_000;
 
 // Why a page's reading can't be trusted. In Spanish: they reach the alert issue.
 export const STORE_TERMS_FAILURES = Object.freeze({
@@ -25,6 +29,8 @@ export const STORE_TERMS_FAILURES = Object.freeze({
   discountConflicting: "la página muestra descuentos por transferencia distintos",
   installmentsMissing: "no se encontraron las cuotas sin interés",
   installmentsConflicting: "las páginas no coinciden en las cuotas sin interés",
+  freeShippingMissing: "no se encontró el monto mínimo para envío gratis",
+  freeShippingConflicting: "las páginas no coinciden en el monto mínimo para envío gratis",
 });
 
 // "a", "a y b", "a, b y c".
@@ -75,10 +81,39 @@ function structuredTransferDiscounts(html) {
   return [...values].sort((a, b) => a - b);
 }
 
+// "$200.000,00" -> 200000. Only es-AR grouping (dots for thousands, comma for
+// cents) is accepted: "$200.00" could be either convention, so it is null.
+function parseArsAmount(text) {
+  const amount = /^\$\s*(\d{1,3}(?:\.\d{3})*)(?:,(\d{1,2}))?$/.exec(text);
+  return amount ? Number(`${amount[1].replace(/\./g, "")}.${amount[2] ?? "0"}`) : null;
+}
+
+// The product form's "Envío gratis superando los $200.000,00" block, rendered
+// from the store's free-shipping promotion:
+//   <div class="js-free-shipping-minimum-message …"> … <strong>Envío gratis</strong>
+//   <span class="js-shipping-minimum-label">superando los <span>$200.000,00 …
+// Its inner <span> never closes (theme markup), so the amount is read as the
+// text right after the label's start tag rather than from a balanced element.
+// A product with its own free shipping gets the block without the label (no
+// store-wide minimum to read). The theme has no "free shipping with no
+// minimum" wording: a minimum of 0 reads "superando los $0,00".
+// Related-product cards use js-free-shipping-minimum-label, a different class.
+function freeShippingMinimum(html) {
+  const block = /class="[^"]*\bjs-free-shipping-minimum-message\b/.exec(html);
+  const message = block ? elementAt(html, block.index, "div") : null;
+  const label = message && /<[^>]*class="[^"]*\bjs-shipping-minimum-label\b[^>]*>/.exec(message);
+  if (!label) return null;
+
+  const labelText = htmlToText(message.slice(label.index + label[0].length));
+  const amount = /^superando\s+los\s+(\$\s*[\d.,]+)/i.exec(labelText);
+  return amount ? parseArsAmount(amount[1]) : null;
+}
+
 /**
- * Reads the store-wide payment terms from a Tiendanube storefront product page.
- * Never reads the announcement bar: its "20% OFF" is a marketing banner, not
- * the discount Tiendanube's checkout applies. Missing values come back as null.
+ * Reads the store-wide payment terms and free-shipping minimum (ARS) from a
+ * Tiendanube storefront product page. Never reads the announcement bar or the
+ * home banner: their "20% OFF" and "ENVÍO GRATIS" are marketing text, not what
+ * Tiendanube's checkout applies. Missing values come back as null.
  * When the transfer method carries several different discounts the page is
  * ambiguous: `transferDiscountPercent` is null, the visible text is not used as
  * a tie-breaker, and `conflictingTransferDiscounts` lists the values.
@@ -92,12 +127,14 @@ export function parseStorefrontPaymentTerms(html) {
     );
   const installments = /(\d{1,2})\s*cuotas\s+sin\s+inter[eé]s/i.exec(paymentsText);
   const interestFreeInstallments = installments ? Number(installments[1]) : null;
+  const freeShippingMinimumArs = freeShippingMinimum(source);
   const structured = structuredTransferDiscounts(source);
 
   if (structured.length > 1) {
     return {
       transferDiscountPercent: null,
       interestFreeInstallments,
+      freeShippingMinimumArs,
       conflictingTransferDiscounts: structured,
     };
   }
@@ -105,6 +142,7 @@ export function parseStorefrontPaymentTerms(html) {
     transferDiscountPercent:
       structured.length === 1 ? structured[0] : textDiscount ? toNumber(textDiscount[1]) : null,
     interestFreeInstallments,
+    freeShippingMinimumArs,
   };
 }
 
@@ -112,6 +150,7 @@ export function parseStorefrontPaymentTerms(html) {
 export function storeTermsProblem(terms) {
   const discount = terms?.transferDiscountPercent;
   const installments = terms?.interestFreeInstallments;
+  const freeShipping = terms?.freeShippingMinimumArs;
   const conflicting = terms?.conflictingTransferDiscounts ?? [];
 
   if (conflicting.length > 0) {
@@ -134,6 +173,18 @@ export function storeTermsProblem(terms) {
   ) {
     return `cuotas sin interés fuera de rango (${installments})`;
   }
+  if (freeShipping === null || freeShipping === undefined) {
+    return STORE_TERMS_FAILURES.freeShippingMissing;
+  }
+  // Whole pesos only: the site would round a minimum with cents into a
+  // different promise.
+  if (
+    !Number.isInteger(freeShipping) ||
+    freeShipping < 0 ||
+    freeShipping > MAX_FREE_SHIPPING_MINIMUM_ARS
+  ) {
+    return `monto mínimo para envío gratis fuera de rango (${freeShipping})`;
+  }
   return null;
 }
 
@@ -142,7 +193,8 @@ export function storeTermsProblem(terms) {
  * store terms, or says why it can't:
  * - pages that failed to load or didn't yield sane terms are set aside, and at
  *   least `quorum` pages must remain;
- * - the transfer discount is store-wide, so every remaining page must agree;
+ * - the transfer discount and the free-shipping minimum are store-wide, so
+ *   every remaining page must agree on each;
  * - the interest-free installments are the value shown by at least `quorum`
  *   remaining pages. Pages can legitimately differ (a cheaper product gets
  *   fewer installments because of the minimum installment amount; a product
@@ -181,6 +233,16 @@ export function agreeOnStoreTerms(readings, quorum = STORE_TERMS_QUORUM) {
     };
   }
 
+  const otherMinimum = rest.find(
+    (reading) => reading.terms.freeShippingMinimumArs !== first.terms.freeShippingMinimumArs,
+  );
+  if (otherMinimum) {
+    return {
+      ok: false,
+      reason: `${STORE_TERMS_FAILURES.freeShippingConflicting}: ${first.url} dice ${formatPrice(first.terms.freeShippingMinimumArs)} y ${otherMinimum.url} dice ${formatPrice(otherMinimum.terms.freeShippingMinimumArs)}`,
+    };
+  }
+
   const installments = quorumInstallments(parsed, quorum);
   if (!installments.ok) return installments;
 
@@ -189,6 +251,7 @@ export function agreeOnStoreTerms(readings, quorum = STORE_TERMS_QUORUM) {
     terms: {
       transferDiscountPercent: first.terms.transferDiscountPercent,
       interestFreeInstallments: installments.value,
+      freeShippingMinimumArs: first.terms.freeShippingMinimumArs,
     },
     pages: parsed.map((reading) => reading.url),
     setAside,
@@ -263,6 +326,7 @@ export function storeTermsFileText(terms) {
     {
       transferDiscountPercent: terms.transferDiscountPercent,
       interestFreeInstallments: terms.interestFreeInstallments,
+      freeShippingMinimumArs: terms.freeShippingMinimumArs,
       source: STORE_TERMS_SOURCE,
     },
     null,
