@@ -10,22 +10,19 @@ import { DEFAULT_STORE_VIEW, STORE_VIEW_LABELS } from "./storeView";
  * Store catalog for a given view. Pure: it does not read the URL, so it can
  * be server-rendered (e.g. as a Suspense fallback) for crawlers without JS.
  * `products` is the purchasable catalog as slim summaries, or its homepage
- * preview while the full list loads (then `viewCounts` holds each view's full
- * size). The best-sellers order is computed on the server, where the sales
- * ranking lives.
+ * preview while the full list loads. The best-sellers order is computed on
+ * the server, where the sales ranking lives.
  */
 export default function TiendaCatalog({
   view,
   products,
   bestSellerSlugs,
-  viewCounts,
   brands,
   animateEntrance = true,
 }: {
   view: string;
   products: ProductSummary[];
   bestSellerSlugs: string[];
-  viewCounts?: Record<string, number>;
   /** Brand directory, rendered on the server from the full catalog. */
   brands: ReactNode;
   animateEntrance?: boolean;
@@ -50,7 +47,6 @@ export default function TiendaCatalog({
         <ProductGrid
           key={`grid-${view}`}
           products={visibleProducts}
-          totalCount={viewCounts?.[view]}
           brandLabel={label}
           filterBy={view === "premium" ? "brand" : "collection"}
           searchProducts={products}

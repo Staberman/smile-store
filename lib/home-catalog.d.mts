@@ -33,8 +33,18 @@ export function homeCatalogPreview<P extends HomeCatalogProduct>(
   },
 ): P[];
 
-export function storeViewCounts(
-  products: HomeCatalogProduct[],
-  views: readonly string[],
-  bestSellerSlugs?: string[],
-): Record<string, number>;
+export const STORE_PRODUCTS_RETRY_DELAYS_MS: readonly number[];
+
+export type StoreProductsLoader<P> = {
+  /** The full list once a load has succeeded, else null. */
+  readonly loaded: P[] | null;
+  /** Resolves to the list, or to null when every attempt failed. */
+  load(): Promise<P[] | null>;
+};
+
+export function createStoreProductsLoader<P>(options?: {
+  url?: string;
+  retryDelaysMs?: readonly number[];
+  fetch?: (url: string) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
+  wait?: (ms: number) => Promise<void>;
+}): StoreProductsLoader<P>;

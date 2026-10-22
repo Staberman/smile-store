@@ -9,7 +9,7 @@ import WatchesSection, { featuredWatches } from "@/components/store/WatchesSecti
 import { DEFAULT_STORE_VIEW, STORE_VIEW_LABELS } from "@/components/store/storeView";
 import { getAvailableBrandEntries } from "@/lib/brand-directory";
 import { allProducts, getBestSellers } from "@/lib/catalog";
-import { homeCatalogPreview, storeViewCounts } from "@/lib/home-catalog.mjs";
+import { homeCatalogPreview } from "@/lib/home-catalog.mjs";
 import { hubDescription } from "@/lib/hubs";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import { toProductSummaries } from "@/lib/product-summary";
@@ -39,14 +39,12 @@ const homeCollectionSchema = collectionSchema("/", HOME_TITLE, allProducts);
 // sitemap.
 const storeProducts = toProductSummaries(allProducts);
 const bestSellerSlugs = getBestSellers().map((product) => product.slug);
-const storeViews = Object.keys(STORE_VIEW_LABELS);
 const previewProducts = homeCatalogPreview(storeProducts, {
   view: DEFAULT_STORE_VIEW,
-  views: storeViews,
+  views: Object.keys(STORE_VIEW_LABELS),
   pinned: featuredWatches(storeProducts),
   bestSellerSlugs,
 });
-const viewCounts = storeViewCounts(storeProducts, storeViews, bestSellerSlugs);
 // Brands with stock, in brand-directory order (Ray-Ban, Prada, Versace…).
 const intro = storeIntro({
   sunglassesBrands: getAvailableBrandEntries(allProducts, "lentes").map((entry) => entry.name),
@@ -69,7 +67,6 @@ export default function Home() {
       </section>
       <TiendaClient
         previewProducts={previewProducts}
-        viewCounts={viewCounts}
         bestSellerSlugs={bestSellerSlugs}
         brands={<BrandLogoStrip products={storeProducts} />}
       />

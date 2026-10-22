@@ -51,6 +51,15 @@ test("the built homepage server-renders a bounded set of product links", { skip 
   assert.ok(inlineSlugs.length < storeProducts.length / 2, `${inlineSlugs.length} products inline`);
 });
 
+test("the built homepage counts only the grid cards it renders", { skip }, () => {
+  const html = markup(fs.readFileSync(homeFile, "utf8"));
+  const grid = html.slice(html.indexOf('id="catalogo"'), html.indexOf('id="relojes-destacados"'));
+  // React separates text parts with <!-- -->: "16<!-- --> <!-- -->productos".
+  const label = /(\d+)(?:<!-- -->| )+productos?</.exec(grid);
+  assert.ok(label, "the grid shows a product count");
+  assert.equal(Number(label[1]), productLinks(grid).size);
+});
+
 test("every product the homepage loads lazily is linked from a hub it links, and in the sitemap", { skip }, () => {
   const html = fs.readFileSync(homeFile, "utf8");
   const storeProducts = JSON.parse(readBuild("store-products.json.body"));

@@ -21,10 +21,6 @@ interface Props {
    *  out and back in, or when cards arrive without a user action (the rest
    *  of a preview): cards mounted while it is off appear in place. */
   animateEntrance?: boolean;
-  /** Size of the full list when `products` is only its first part (the
-   *  homepage server-renders a preview and loads the rest): the product count
-   *  shows it until a filter or search narrows the grid. */
-  totalCount?: number;
 }
 
 const ACCENT = "#c9a96e";
@@ -224,7 +220,6 @@ export default function ProductGrid({
   searchProducts,
   enableFacets = false,
   animateEntrance = true,
-  totalCount,
 }: Props) {
   const searchableProducts = searchProducts ?? products;
   const getKey = (product: ProductSummary) =>
@@ -381,8 +376,6 @@ export default function ProductGrid({
 
   const activeFacetCount =
     facets.tipo.size + facets.marca.size + facets.genero.size + facets.precio.size;
-  const isNarrowed = normalizedSearch.length > 0 || active !== "Todos" || activeFacetCount > 0;
-  const productCount = totalCount !== undefined && !isNarrowed ? totalCount : filtered.length;
 
   const toggleFacet = (group: keyof FacetSelections, value: string) => {
     setFacets((prev) => {
@@ -610,7 +603,7 @@ export default function ProductGrid({
                   onClick={() => setFiltersOpen(false)}
                   className="inline-flex min-h-11 items-center rounded-full bg-[#c9a96e] px-6 text-[11px] uppercase tracking-[0.2em] text-[#0a0a0a] transition hover:bg-[#e2c989]"
                 >
-                  Ver {productCount} {productCount === 1 ? "producto" : "productos"}
+                  Ver {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
                 </button>
               </div>
             </div>
@@ -620,7 +613,7 @@ export default function ProductGrid({
         {enableFacets && (activeChips.length > 0 || facetGroups.length > 0) && (
           <div className="mb-8 flex flex-wrap items-center gap-2">
             <span className="text-xs text-[#8b8580]">
-              {productCount} {productCount === 1 ? "producto" : "productos"}
+              {filtered.length} {filtered.length === 1 ? "producto" : "productos"}
             </span>
             {activeChips.length > 0 && (
               <span className="mx-1 h-4 w-px bg-[#2a2520]" aria-hidden="true" />
