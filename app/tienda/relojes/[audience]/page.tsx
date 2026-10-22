@@ -8,6 +8,7 @@ import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import ProductGrid from "@/components/brand/ProductGrid";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
+import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import {
   findHubBySlug,
   getHubPage,
@@ -75,6 +76,11 @@ export default function WatchesAudiencePage({ params }: Props) {
           { label: "Invicta", href: "/tienda/marcas/invicta" },
           { label: "OMEGA x Swatch", href: "/tienda/relojes/omega-swatch" },
         ]}
+      />
+      <HubLinks
+        eyebrow="Guías de compra"
+        title="Antes de elegir tu reloj"
+        links={[GUIDE_LINKS.watchGift, GUIDE_LINKS.waterResistance]}
       />
       <CollectionLinks />
     </main>

@@ -502,4 +502,18 @@ test("the guides are in the sitemap with their own dates and linked from the foo
   assert.match(read("app/tienda/marcas/ray-ban/page.tsx"), /GUIDE_LINKS\.rayBanModels/);
   assert.match(read("app/tienda/marcas/ray-ban/[model]/page.tsx"), /GUIDE_LINKS\.rayBanModels/);
   assert.match(read("app/tienda/anteojos-de-sol/page.tsx"), /GUIDE_LINKS\.polarized/);
+  const relojes = read("app/tienda/relojes/page.tsx");
+  for (const key of ["watchGift", "waterResistance", "invictaOriginals"]) {
+    assert.match(relojes, new RegExp(`GUIDE_LINKS\\.${key}`), `/tienda/relojes links ${key}`);
+  }
+  assert.match(read("app/tienda/marcas/invicta/page.tsx"), /GUIDE_LINKS\.invictaOriginals/);
+  for (const page of [
+    "app/tienda/marcas/invicta/page.tsx",
+    "app/tienda/marcas/tommy-hilfiger/page.tsx",
+    "app/tienda/relojes/omega-swatch/page.tsx",
+    "app/tienda/relojes/[audience]/page.tsx",
+  ]) {
+    assert.match(read(page), /GUIDE_LINKS\.watchGift/, page);
+    assert.match(read(page), /GUIDE_LINKS\.waterResistance/, page);
+  }
 });

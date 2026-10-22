@@ -2,11 +2,13 @@ import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import HubHeader from "@/components/brand/HubHeader";
+import HubLinks from "@/components/brand/HubLinks";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import { hubDescription, hubIntro, modelHighlight } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema, pageMetadata } from "@/lib/seo";
@@ -93,6 +95,11 @@ export default function OmegaSwatchPage() {
 
       <ProductGrid products={omegaSwatchSummaries} brandLabel="Omega × Swatch MoonSwatch" />
       <OutOfStockProducts products={omegaSwatchOutOfStock} />
+      <HubLinks
+        eyebrow="Guías de compra"
+        title="Antes de elegir tu reloj"
+        links={[GUIDE_LINKS.watchGift, GUIDE_LINKS.waterResistance]}
+      />
       <CollectionLinks current="omega-swatch" />
     </main>
   );

@@ -9,6 +9,7 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import { hubsOf, indexableHubs } from "@/lib/hub-pages";
 import { brandHighlight, hubDescription, hubIntro } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
@@ -54,6 +55,11 @@ export default function RelojesPage() {
       <TrustHighlights />
       <ProductGrid products={watchSummaries} brandLabel="Relojes premium" filterBy="brand" />
       <OutOfStockProducts products={watchOutOfStock} />
+      <HubLinks
+        eyebrow="Guías de compra"
+        title="Antes de elegir tu reloj"
+        links={[GUIDE_LINKS.watchGift, GUIDE_LINKS.waterResistance, GUIDE_LINKS.invictaOriginals]}
+      />
       <CollectionLinks current="relojes" />
     </main>
   );
