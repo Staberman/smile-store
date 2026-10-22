@@ -5,11 +5,13 @@ import JsonLd from "@/components/seo/JsonLd";
 import StoreShell from "@/components/store/StoreShell";
 import TiendaClient from "@/components/store/TiendaClient";
 import WatchesSection from "@/components/store/WatchesSection";
+import { getAvailableBrandEntries } from "@/lib/brand-directory";
 import { allProducts, getBestSellers } from "@/lib/catalog";
 import { hubDescription } from "@/lib/hubs";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema, pageMetadata } from "@/lib/seo";
+import { storeIntro } from "@/lib/store-intro.mjs";
 
 const HOME_TITLE = "Anteojos de sol y relojes originales en Argentina";
 
@@ -32,12 +34,27 @@ const homeCollectionSchema = collectionSchema("/", HOME_TITLE, allProducts);
 // product, as slim summaries.
 const storeProducts = toProductSummaries(allProducts);
 const bestSellerSlugs = getBestSellers().map((product) => product.slug);
+// Brands with stock, in brand-directory order (Ray-Ban, Prada, Versace…).
+const intro = storeIntro({
+  sunglassesBrands: getAvailableBrandEntries(allProducts, "lentes").map((entry) => entry.name),
+  watchBrands: getAvailableBrandEntries(allProducts, "relojes").map((entry) => entry.name),
+});
 
 export default function Home() {
   return (
     <StoreShell>
       <JsonLd data={homeCollectionSchema} />
-      <h1 className="sr-only">{HOME_TITLE}</h1>
+      {/* Who Smile is, before the carousel and the catalog: the first copy
+          crawlers and AI assistants read. Kept to a short band so the hero
+          stays in the first viewport. */}
+      <section className="border-b border-white/6 bg-[#0a0a0a] px-6 py-5 md:px-12 md:py-6">
+        <div className="mx-auto max-w-7xl">
+          <h1 className="sr-only">{HOME_TITLE}</h1>
+          <p className="max-w-4xl text-[13px] leading-[1.75] text-[#8b8580] md:text-sm">
+            {intro}
+          </p>
+        </div>
+      </section>
       <TiendaClient products={storeProducts} bestSellerSlugs={bestSellerSlugs} />
       <WatchesSection products={storeProducts} />
       <RecentlyViewed />
