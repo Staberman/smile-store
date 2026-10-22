@@ -54,7 +54,7 @@ function fetchProductPage(url) {
 
 async function main() {
   const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
-  const urls = pickStorefrontProductUrls(catalog, 3);
+  const urls = pickStorefrontProductUrls(catalog);
   const readings = await Promise.all(
     urls.map(async (url) => {
       try {
@@ -65,7 +65,7 @@ async function main() {
     }),
   );
 
-  const result = agreeOnStoreTerms(readings, 3);
+  const result = agreeOnStoreTerms(readings);
   if (!result.ok) {
     await fail(result.reason);
     return;
@@ -80,7 +80,15 @@ async function main() {
     await rename(temporaryPath, termsPath);
   }
 
-  console.log(JSON.stringify({ changed, dryRun, ...result.terms, pages: urls }));
+  console.log(
+    JSON.stringify({
+      changed,
+      dryRun,
+      ...result.terms,
+      pages: result.pages,
+      setAside: result.setAside,
+    }),
+  );
   await setStepOutputs("ok");
 }
 

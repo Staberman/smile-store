@@ -13,6 +13,8 @@ import {
   MAX_TRANSFER_DISCOUNT_PERCENT,
   STOREFRONT_ORIGIN,
   STORE_TERMS_FAILURES,
+  STORE_TERMS_QUORUM,
+  STORE_TERMS_SAMPLE_PAGES,
   agreeOnStoreTerms,
   parseStorefrontPaymentTerms,
   pickStorefrontProductUrls,
@@ -160,41 +162,124 @@ test("the sync reads the same storefront origin the checkout links to", () => {
   assert.equal(STOREFRONT_ORIGIN, declared[1]);
 });
 
-test("agreeOnStoreTerms needs three sane readings that agree", () => {
-  const reading = (url, transferDiscountPercent = 10, interestFreeInstallments = 6) => ({
-    url,
-    terms: { transferDiscountPercent, interestFreeInstallments },
-  });
-
-  assert.deepEqual(agreeOnStoreTerms([reading("a"), reading("b"), reading("c")]), {
-    ok: true,
-    terms: { transferDiscountPercent: 10, interestFreeInstallments: 6 },
-  });
-
-  const disagreement = agreeOnStoreTerms([reading("a"), reading("b"), reading("c", 15)]);
-  assert.equal(disagreement.ok, false);
-  assert.match(disagreement.reason, /a dice 10% \/ 6 cuotas y c dice 15% \/ 6 cuotas/);
-
-  const failedFetch = agreeOnStoreTerms([reading("a"), { url: "b", error: "HTTP 503" }, reading("c")]);
-  assert.deepEqual(failedFetch, { ok: false, reason: "b: HTTP 503" });
-
-  assert.equal(agreeOnStoreTerms([reading("a"), reading("b", null), reading("c")]).ok, false);
-  assert.equal(agreeOnStoreTerms([reading("a"), reading("b")]).ok, false);
+const reading = (url, transferDiscountPercent = 10, interestFreeInstallments = 6) => ({
+  url,
+  terms: { transferDiscountPercent, interestFreeInstallments },
+});
+const failedReading = (url, error = "no se pudo leer la página (HTTP 503, tras 3 intentos)") => ({
+  url,
+  error,
 });
 
-test("pickStorefrontProductUrls maps purchasable products to the Tiendanube storefront", () => {
-  const product = (handle, available) => ({
-    sourceUrl: `https://www.smiletiendaimp.com.ar/productos/${handle}/`,
-    variants: [{ id: 1, price: 1000, promotionalPrice: null, stock: available ? 1 : 0, available }],
-  });
-  const catalog = ["a", "b", "c", "d", "e", "f"].map((handle) => product(handle, handle !== "a"));
+test("agreeOnStoreTerms accepts a quorum of sane pages and sets the rest aside", () => {
+  assert.equal(STORE_TERMS_QUORUM, 3);
+  assert.deepEqual(
+    agreeOnStoreTerms([reading("a"), reading("b"), reading("c"), reading("d"), reading("e")]),
+    {
+      ok: true,
+      terms: { transferDiscountPercent: 10, interestFreeInstallments: 6 },
+      pages: ["a", "b", "c", "d", "e"],
+      setAside: [],
+    },
+  );
 
-  const urls = pickStorefrontProductUrls(catalog, 3);
-  assert.equal(urls.length, 3);
-  assert.equal(new Set(urls).size, 3);
-  for (const url of urls) {
-    assert.match(url, /^https:\/\/smiletienda\.mitiendanube\.com\/productos\/[b-f]\/$/);
-  }
+  // Two unreachable or unreadable pages out of five don't fail the run.
+  const degraded = agreeOnStoreTerms([
+    reading("a"),
+    failedReading("b"),
+    reading("c"),
+    reading("d", null),
+    reading("e"),
+  ]);
+  assert.equal(degraded.ok, true);
+  assert.deepEqual(degraded.terms, { transferDiscountPercent: 10, interestFreeInstallments: 6 });
+  assert.deepEqual(degraded.pages, ["a", "c", "e"]);
+  assert.deepEqual(degraded.setAside, [
+    "b: no se pudo leer la página (HTTP 503, tras 3 intentos)",
+    "d: no se encontró el descuento por transferencia",
+  ]);
+});
+
+test("agreeOnStoreTerms fails below the quorum and lists every page it set aside", () => {
+  const result = agreeOnStoreTerms([
+    reading("a"),
+    failedReading("b"),
+    reading("c", 10, null),
+    failedReading("d", "no se pudo leer la página (HTTP 404)"),
+    reading("e"),
+  ]);
+
+  assert.deepEqual(result, {
+    ok: false,
+    reason:
+      "se leyeron bien 2 de 5 páginas de producto y hacen falta 3; " +
+      "b: no se pudo leer la página (HTTP 503, tras 3 intentos); " +
+      "c: no se encontraron las cuotas sin interés; " +
+      "d: no se pudo leer la página (HTTP 404)",
+  });
+  assert.equal(agreeOnStoreTerms([]).ok, false);
+});
+
+test("the transfer discount must be the same on every parsed page", () => {
+  const result = agreeOnStoreTerms([reading("a"), reading("b"), reading("c", 15), reading("d")]);
+
+  assert.deepEqual(result, {
+    ok: false,
+    reason: "las páginas no coinciden en el descuento por transferencia: a dice 10% y c dice 15%",
+  });
+});
+
+test("interest-free installments are the best plan any parsed page shows", () => {
+  // A cheaper product can show fewer installments (minimum installment
+  // amount): that is not a disagreement, and the store's plan is the maximum.
+  const result = agreeOnStoreTerms([reading("a", 10, 3), reading("b"), reading("c", 10, 1)]);
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.terms, { transferDiscountPercent: 10, interestFreeInstallments: 6 });
+});
+
+test("pickStorefrontProductUrls samples in-stock products at or above the median price", () => {
+  const product = (handle, price, { available = true, promotionalPrice = null } = {}) => ({
+    sourceUrl: `https://www.smiletiendaimp.com.ar/productos/${handle}/`,
+    variants: [{ id: 1, price, promotionalPrice, stock: available ? 1 : 0, available }],
+  });
+  const catalog = [
+    product("cheap-1", 10_000),
+    product("mid-1", 50_000),
+    product("sold-out", 900_000, { available: false }),
+    product("cheap-2", 20_000),
+    product("high-1", 80_000),
+    product("on-sale", 90_000, { promotionalPrice: 15_000 }),
+    product("mid-2", 60_000),
+    product("cheap-3", 30_000),
+    product("high-2", 70_000),
+    { ...product("not-a-product", 99_000), sourceUrl: "https://www.smiletiendaimp.com.ar/contacto/" },
+    product("at-median", 40_000),
+  ];
+
+  // In stock with a product URL: 10k 15k 20k 30k 40k 50k 60k 70k 80k -> median 40k.
+  const urls = pickStorefrontProductUrls(catalog);
+  assert.equal(STORE_TERMS_SAMPLE_PAGES, 5);
+  assert.deepEqual(
+    urls,
+    ["mid-1", "high-1", "mid-2", "high-2", "at-median"].map(
+      (handle) => `https://smiletienda.mitiendanube.com/productos/${handle}/`,
+    ),
+  );
+});
+
+test("pickStorefrontProductUrls spreads its picks across the catalog order", () => {
+  const catalog = Array.from({ length: 20 }, (_, index) => ({
+    sourceUrl: `https://www.smiletiendaimp.com.ar/productos/p${index}/`,
+    variants: [{ id: 1, price: 1000, promotionalPrice: null, stock: 1, available: true }],
+  }));
+
+  assert.deepEqual(
+    pickStorefrontProductUrls(catalog).map((url) => new URL(url).pathname),
+    ["/productos/p0/", "/productos/p4/", "/productos/p8/", "/productos/p12/", "/productos/p16/"],
+  );
+  assert.equal(pickStorefrontProductUrls(catalog.slice(0, 2)).length, 2);
+  assert.deepEqual(pickStorefrontProductUrls([]), []);
 });
 
 test("lib/storefront.mjs exposes the synced store terms", () => {

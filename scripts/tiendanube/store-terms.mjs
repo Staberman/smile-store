@@ -7,6 +7,11 @@ import { htmlToText } from "./catalog-utils.mjs";
 export const STOREFRONT_ORIGIN = "https://smiletienda.mitiendanube.com";
 export const STORE_TERMS_SOURCE = `${STOREFRONT_ORIGIN} product pages`;
 
+// Product pages read on each run, and how many of them must parse for the run
+// to count: two pages may be unreachable or unreadable without failing it.
+export const STORE_TERMS_SAMPLE_PAGES = 5;
+export const STORE_TERMS_QUORUM = 3;
+
 // Sanity bounds: a reading outside them is a misread, not a store setting.
 // 0% is a transfer discount switched off in the admin; more than half the price
 // off for paying by transfer is beyond any discount the store would run.
@@ -126,37 +131,44 @@ export function storeTermsProblem(terms) {
   return null;
 }
 
-function describeTerms(terms) {
-  return `${terms.transferDiscountPercent}% / ${terms.interestFreeInstallments} cuotas`;
-}
-
 /**
- * Accepts the readings (`{ url, terms }` or `{ url, error }`) only when there
- * are at least `minimumPages`, every one is sane and they all agree.
+ * Combines the page readings (`{ url, terms }` or `{ url, error }`) into the
+ * store terms, or says why it can't:
+ * - pages that failed to load or didn't yield sane terms are set aside, and at
+ *   least `quorum` pages must remain;
+ * - the transfer discount is store-wide, so every remaining page must agree;
+ * - the interest-free installments are the most any remaining page offers.
+ *   The store setting is its best plan, but Tiendanube offers fewer
+ *   installments on a product whose installment would fall below the minimum
+ *   installment amount, so a cheaper page can legitimately show fewer.
  */
-export function agreeOnStoreTerms(readings, minimumPages = 3) {
-  if (readings.length < minimumPages) {
+export function agreeOnStoreTerms(readings, quorum = STORE_TERMS_QUORUM) {
+  const parsed = [];
+  const setAside = [];
+  for (const reading of readings) {
+    const problem = reading.error ?? storeTermsProblem(reading.terms);
+    if (problem) setAside.push(`${reading.url}: ${problem}`);
+    else parsed.push(reading);
+  }
+
+  if (parsed.length < quorum) {
     return {
       ok: false,
-      reason: `se revisaron ${readings.length} de ${minimumPages} páginas de producto`,
+      reason: [
+        `se leyeron bien ${parsed.length} de ${readings.length} páginas de producto y hacen falta ${quorum}`,
+        ...setAside,
+      ].join("; "),
     };
   }
 
-  for (const reading of readings) {
-    const problem = reading.error ?? storeTermsProblem(reading.terms);
-    if (problem) return { ok: false, reason: `${reading.url}: ${problem}` };
-  }
-
-  const [first, ...rest] = readings;
+  const [first, ...rest] = parsed;
   const different = rest.find(
-    (reading) =>
-      reading.terms.transferDiscountPercent !== first.terms.transferDiscountPercent ||
-      reading.terms.interestFreeInstallments !== first.terms.interestFreeInstallments,
+    (reading) => reading.terms.transferDiscountPercent !== first.terms.transferDiscountPercent,
   );
   if (different) {
     return {
       ok: false,
-      reason: `las páginas no coinciden: ${first.url} dice ${describeTerms(first.terms)} y ${different.url} dice ${describeTerms(different.terms)}`,
+      reason: `las páginas no coinciden en el descuento por transferencia: ${first.url} dice ${first.terms.transferDiscountPercent}% y ${different.url} dice ${different.terms.transferDiscountPercent}%`,
     };
   }
 
@@ -164,26 +176,49 @@ export function agreeOnStoreTerms(readings, minimumPages = 3) {
     ok: true,
     terms: {
       transferDiscountPercent: first.terms.transferDiscountPercent,
-      interestFreeInstallments: first.terms.interestFreeInstallments,
+      interestFreeInstallments: Math.max(
+        ...parsed.map((reading) => reading.terms.interestFreeInstallments),
+      ),
     },
+    pages: parsed.map((reading) => reading.url),
+    setAside,
   };
 }
 
-// Up to `count` purchasable products spread across the catalog, as storefront URLs.
-export function pickStorefrontProductUrls(catalog, count = 3) {
-  const urls = catalog
-    .filter((product) => getAvailableVariants(product).length > 0)
-    .map((product) => {
-      try {
-        const { pathname } = new URL(product.sourceUrl);
-        return pathname.startsWith("/productos/") ? `${STOREFRONT_ORIGIN}${pathname}` : null;
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
-  const step = Math.max(1, Math.floor(urls.length / count));
-  return urls.filter((_, index) => index % step === 0).slice(0, count);
+function storefrontUrl(sourceUrl) {
+  try {
+    const { pathname } = new URL(sourceUrl);
+    return pathname.startsWith("/productos/") ? `${STOREFRONT_ORIGIN}${pathname}` : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Up to `count` storefront URLs of in-stock products priced at or above the
+ * median in-stock price (cheapest purchasable variant), spread across the
+ * catalog order. Those products clear Tiendanube's minimum installment amount,
+ * so their pages show the store's full interest-free plan.
+ */
+export function pickStorefrontProductUrls(catalog, count = STORE_TERMS_SAMPLE_PAGES) {
+  const candidates = catalog.flatMap((product) => {
+    const prices = getAvailableVariants(product).map((variant) =>
+      Number(variant.promotionalPrice ?? variant.price),
+    );
+    const url = storefrontUrl(product.sourceUrl);
+    return prices.length > 0 && url ? [{ url, price: Math.min(...prices) }] : [];
+  });
+  if (candidates.length === 0) return [];
+
+  // Lower median, so at least half of the in-stock products qualify.
+  const sortedPrices = candidates.map((candidate) => candidate.price).sort((a, b) => a - b);
+  const median = sortedPrices[Math.floor((sortedPrices.length - 1) / 2)];
+  const pool = candidates.filter((candidate) => candidate.price >= median);
+  const picks = Math.min(count, pool.length);
+  return Array.from(
+    { length: picks },
+    (_, index) => pool[Math.floor((index * pool.length) / picks)].url,
+  );
 }
 
 // No timestamp on purpose: the file only changes (and gets committed) when
