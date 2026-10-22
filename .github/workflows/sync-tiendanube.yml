@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   sync:
@@ -43,6 +44,7 @@ jobs:
       # public storefront. On failure it keeps the last values and warns; it
       # never blocks the stock and price sync.
       - name: Actualizar condiciones de pago
+        id: terms
         continue-on-error: true
         run: npm run sync:terms
 
@@ -71,3 +73,16 @@ jobs:
           git add data/tiendanube-catalog.json data/store-terms.json
           git commit -m "chore: sync Tiendanube stock, prices and payment terms"
           git push
+
+      # A warning on a green run emails nobody: open (or comment on, at most
+      # daily) an issue while the payment terms can't be read, and close it
+      # once they can. Runs last and never fails the run.
+      - name: Avisar si fallan las condiciones de pago
+        if: ${{ !cancelled() && steps.terms.outcome != 'skipped' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TERMS_STATUS: ${{ steps.terms.outputs.status || 'failed' }}
+          TERMS_REASON: ${{ steps.terms.outputs.reason || 'el paso de condiciones de pago terminó sin resultado' }}
+        run: node scripts/tiendanube/report-store-terms.mjs

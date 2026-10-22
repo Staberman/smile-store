@@ -1,4 +1,4 @@
-import { readFile, rename, writeFile } from "node:fs/promises";
+import { appendFile, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -16,12 +16,23 @@ const termsPath = path.join(projectRoot, "data/store-terms.json");
 const temporaryPath = `${termsPath}.tmp`;
 const dryRun = process.argv.includes("--dry-run");
 
+// Step outputs for the workflow's alert step, which opens or closes the
+// GitHub issue. No-op outside GitHub Actions.
+async function setStepOutputs(status, reason = "") {
+  if (!process.env.GITHUB_OUTPUT) return;
+  await appendFile(
+    process.env.GITHUB_OUTPUT,
+    `status=${status}\nreason=${reason.replace(/\s+/g, " ")}\n`,
+  );
+}
+
 // Shows up as an annotation on the GitHub Actions run. This step never fails
 // the job: the stock and price sync must keep publishing.
-function warn(message) {
+async function fail(reason) {
   console.log(
-    `::warning title=Condiciones de pago::${message} Se mantiene data/store-terms.json sin cambios.`,
+    `::warning title=Condiciones de pago::No se actualizaron las condiciones de pago: ${reason}. Se mantiene data/store-terms.json sin cambios.`,
   );
+  await setStepOutputs("failed", reason);
 }
 
 async function fetchProductPage(url) {
@@ -52,7 +63,7 @@ async function main() {
 
   const result = agreeOnStoreTerms(readings, 3);
   if (!result.ok) {
-    warn(`No se actualizaron las condiciones de pago: ${result.reason}.`);
+    await fail(result.reason);
     return;
   }
 
@@ -66,8 +77,11 @@ async function main() {
   }
 
   console.log(JSON.stringify({ changed, dryRun, ...result.terms, pages: urls }));
+  await setStepOutputs("ok");
 }
 
-main().catch((error) => {
-  warn(`Error al sincronizar las condiciones de pago: ${error.message}.`);
-});
+main().catch((error) =>
+  fail(`error inesperado (${error.message})`).catch((outputError) => {
+    console.error(`No se pudo escribir la salida del paso: ${outputError.message}`);
+  }),
+);
