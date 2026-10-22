@@ -24,7 +24,13 @@ export const STORE_TERMS_FAILURES = Object.freeze({
   discountMissing: "no se encontró el descuento por transferencia",
   discountConflicting: "la página muestra descuentos por transferencia distintos",
   installmentsMissing: "no se encontraron las cuotas sin interés",
+  installmentsConflicting: "las páginas no coinciden en las cuotas sin interés",
 });
+
+// "a", "a y b", "a, b y c".
+function listInSpanish(items) {
+  return items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} y ${items.at(-1)}`;
+}
 
 // Returns the whole element (balanced by tag name) whose start tag contains
 // `index`, or null when it never closes.
@@ -109,7 +115,7 @@ export function storeTermsProblem(terms) {
   const conflicting = terms?.conflictingTransferDiscounts ?? [];
 
   if (conflicting.length > 0) {
-    const values = conflicting.map((value) => `${value}%`).join(" y ");
+    const values = listInSpanish(conflicting.map((value) => `${value}%`));
     return `${STORE_TERMS_FAILURES.discountConflicting} (${values})`;
   }
   if (discount === null || discount === undefined) {
@@ -137,10 +143,13 @@ export function storeTermsProblem(terms) {
  * - pages that failed to load or didn't yield sane terms are set aside, and at
  *   least `quorum` pages must remain;
  * - the transfer discount is store-wide, so every remaining page must agree;
- * - the interest-free installments are the most any remaining page offers.
- *   The store setting is its best plan, but Tiendanube offers fewer
- *   installments on a product whose installment would fall below the minimum
- *   installment amount, so a cheaper page can legitimately show fewer.
+ * - the interest-free installments are the value shown by at least `quorum`
+ *   remaining pages. Pages can legitimately differ (a cheaper product gets
+ *   fewer installments because of the minimum installment amount; a product
+ *   can carry a bank promo with more), so unanimity would flap. Taking the
+ *   maximum would let one promo page raise the cuotas advertised on every
+ *   product; requiring a quorum means a single outlier page, cheaper or
+ *   promo, can't move the site-wide value.
  */
 export function agreeOnStoreTerms(readings, quorum = STORE_TERMS_QUORUM) {
   const parsed = [];
@@ -172,16 +181,42 @@ export function agreeOnStoreTerms(readings, quorum = STORE_TERMS_QUORUM) {
     };
   }
 
+  const installments = quorumInstallments(parsed, quorum);
+  if (!installments.ok) return installments;
+
   return {
     ok: true,
     terms: {
       transferDiscountPercent: first.terms.transferDiscountPercent,
-      interestFreeInstallments: Math.max(
-        ...parsed.map((reading) => reading.terms.interestFreeInstallments),
-      ),
+      interestFreeInstallments: installments.value,
     },
     pages: parsed.map((reading) => reading.url),
     setAside,
+  };
+}
+
+// The installments shown by the most pages, if that is at least `quorum` pages
+// and no other value ties with it.
+function quorumInstallments(parsed, quorum) {
+  const pagesByValue = new Map();
+  for (const { terms } of parsed) {
+    const value = terms.interestFreeInstallments;
+    pagesByValue.set(value, (pagesByValue.get(value) ?? 0) + 1);
+  }
+  const ranked = [...pagesByValue].sort(
+    ([valueA, pagesA], [valueB, pagesB]) => pagesB - pagesA || valueA - valueB,
+  );
+  const [[value, pages], runnerUp] = ranked;
+
+  if (pages >= quorum && runnerUp?.[1] !== pages) return { ok: true, value };
+
+  const seen = ranked.map(
+    ([seenValue, seenPages]) =>
+      `${seenValue} en ${seenPages} ${seenPages === 1 ? "página" : "páginas"}`,
+  );
+  return {
+    ok: false,
+    reason: `${STORE_TERMS_FAILURES.installmentsConflicting}: hace falta que al menos ${quorum} páginas muestren la misma cantidad, más que cualquier otra (${listInSpanish(seen)})`,
   };
 }
 

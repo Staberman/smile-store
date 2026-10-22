@@ -5,6 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import {
   PREVIOUS_RUNS_TO_CHECK,
+  STORE_TERMS_ALERT_PROBLEM_TITLE,
   STORE_TERMS_ISSUE_TITLE,
   planStoreTermsAlert,
   previousTermsVerdict,
@@ -104,10 +105,11 @@ async function previousRunFailed() {
       `repos/{owner}/{repo}/actions/workflows/${workflowFile()}/runs?${query}`,
     );
     const earlier = runs.filter((run) => String(run.id) !== GITHUB_RUN_ID);
+    // No earlier verdict (null) deliberately defers too, just like after an ok run.
     return (await previousTermsVerdict(earlier, runAnnotations)) === "failed";
   } catch (error) {
     console.log(
-      `::warning title=Aviso de condiciones de pago::No se pudo consultar la ejecución anterior (${error.message}); se avisa sin esperar una segunda falla.`,
+      `::warning title=${STORE_TERMS_ALERT_PROBLEM_TITLE}::No se pudo consultar la ejecución anterior (${error.message}); se avisa sin esperar una segunda falla.`,
     );
     return null;
   }
@@ -159,6 +161,6 @@ async function main() {
 
 main().catch((error) => {
   console.log(
-    `::warning title=Aviso de condiciones de pago::No se pudo actualizar el issue de alerta: ${error.message}`,
+    `::warning title=${STORE_TERMS_ALERT_PROBLEM_TITLE}::No se pudo actualizar el issue de alerta: ${error.message}`,
   );
 });

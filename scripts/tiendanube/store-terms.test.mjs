@@ -117,6 +117,17 @@ test("a transfer discount that conflicts within the page is rejected as conflict
   assert.notEqual(STORE_TERMS_FAILURES.discountConflicting, STORE_TERMS_FAILURES.discountMissing);
 });
 
+test("three or more conflicting discounts are listed as a Spanish series", () => {
+  assert.equal(
+    storeTermsProblem({
+      transferDiscountPercent: null,
+      interestFreeInstallments: 6,
+      conflictingTransferDiscounts: [10, 15, 20],
+    }),
+    "la página muestra descuentos por transferencia distintos (10%, 15% y 20%)",
+  );
+});
+
 test("installments must be interest-free", () => {
   const withInterest = erikaPage.replace(/cuotas\s+sin interés/, "cuotas");
   assert.equal(parseStorefrontPaymentTerms(withInterest).interestFreeInstallments, null);
@@ -229,13 +240,36 @@ test("the transfer discount must be the same on every parsed page", () => {
   });
 });
 
-test("interest-free installments are the best plan any parsed page shows", () => {
-  // A cheaper product can show fewer installments (minimum installment
-  // amount): that is not a disagreement, and the store's plan is the maximum.
-  const result = agreeOnStoreTerms([reading("a", 10, 3), reading("b"), reading("c", 10, 1)]);
+const withInstallments = (...values) =>
+  values.map((installments, index) => reading(`p${index + 1}`, 10, installments));
 
-  assert.equal(result.ok, true);
-  assert.deepEqual(result.terms, { transferDiscountPercent: 10, interestFreeInstallments: 6 });
+test("interest-free installments are the value a quorum of pages shows", () => {
+  assert.deepEqual(agreeOnStoreTerms(withInstallments(6, 6, 6)).terms, {
+    transferDiscountPercent: 10,
+    interestFreeInstallments: 6,
+  });
+
+  // A cheaper page (3, minimum installment amount) and a promo page (12)
+  // don't move the site-wide value.
+  const outliers = agreeOnStoreTerms(withInstallments(6, 6, 6, 3, 12));
+  assert.equal(outliers.ok, true);
+  assert.equal(outliers.terms.interestFreeInstallments, 6);
+});
+
+test("installments that no quorum of pages agrees on fail as conflicting", () => {
+  const result = agreeOnStoreTerms(withInstallments(6, 6, 3, 12), 3);
+
+  assert.deepEqual(result, {
+    ok: false,
+    reason:
+      "las páginas no coinciden en las cuotas sin interés: hace falta que al menos 3 páginas " +
+      "muestren la misma cantidad, más que cualquier otra " +
+      "(6 en 2 páginas, 3 en 1 página y 12 en 1 página)",
+  });
+  assert.ok(result.reason.startsWith(STORE_TERMS_FAILURES.installmentsConflicting));
+
+  // Two values that both reach the quorum are just as ambiguous.
+  assert.equal(agreeOnStoreTerms(withInstallments(6, 6, 6, 12, 12, 12), 3).ok, false);
 });
 
 test("pickStorefrontProductUrls samples in-stock products at or above the median price", () => {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  STORE_TERMS_ALERT_PROBLEM_TITLE,
   STORE_TERMS_ANNOTATION_TITLE,
   STORE_TERMS_ISSUE_TITLE,
   planStoreTermsAlert,
@@ -153,10 +154,12 @@ test("termsVerdict ignores annotations other than the payment-terms verdict", ()
     termsVerdict([
       annotation("warning", ""),
       annotation("failure", ""),
-      annotation("warning", "Aviso de condiciones de pago"),
+      // The alert step's own problems never count as a failed sync.
+      annotation("warning", STORE_TERMS_ALERT_PROBLEM_TITLE),
     ]),
     null,
   );
+  assert.notEqual(STORE_TERMS_ALERT_PROBLEM_TITLE, STORE_TERMS_ANNOTATION_TITLE);
   assert.equal(
     termsVerdict([annotation("notice", ""), annotation("warning", STORE_TERMS_ANNOTATION_TITLE)]),
     "failed",

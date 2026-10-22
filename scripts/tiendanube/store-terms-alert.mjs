@@ -11,6 +11,11 @@ const COMMENT_INTERVAL_MS = 24 * 60 * 60 * 1000;
 // reads it back through the GitHub API to know whether the previous run failed.
 export const STORE_TERMS_ANNOTATION_TITLE = "Condiciones de pago";
 
+// Title for problems of the alert step itself (lookup or issue update failed).
+// It must differ from STORE_TERMS_ANNOTATION_TITLE: termsVerdict would read
+// such a warning as a failed sync and open the issue after one real failure.
+export const STORE_TERMS_ALERT_PROBLEM_TITLE = "Aviso de condiciones de pago";
+
 // Runs that skip the terms step (sync paused, catalog sync failed, cancelled)
 // leave no verdict, so the lookup goes back this many completed runs at most.
 export const PREVIOUS_RUNS_TO_CHECK = 5;
