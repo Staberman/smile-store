@@ -1,4 +1,5 @@
 import JsonLd from "@/components/seo/JsonLd";
+import { INTEREST_FREE_INSTALLMENTS } from "@/lib/storefront.mjs";
 
 export type FaqItem = {
   question: string;
@@ -14,7 +15,7 @@ const DEFAULT_FAQS: FaqItem[] = [
   {
     question: "¿Cómo se hace el pago?",
     answer:
-      "El pago se realiza a través del checkout seguro de Tiendanube, con tarjeta de crédito, débito, transferencia o Mercado Pago. También ofrecemos hasta 6 cuotas sin interés.",
+      `El pago se realiza a través del checkout seguro de Tiendanube, con tarjeta de crédito, débito, transferencia o Mercado Pago. También ofrecemos hasta ${INTEREST_FREE_INSTALLMENTS} cuotas sin interés.`,
   },
   {
     question: "¿Hacen envíos a todo el país?",

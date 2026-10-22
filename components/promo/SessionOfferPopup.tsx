@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { INTEREST_FREE_INSTALLMENTS, TRANSFER_DISCOUNT_PERCENT } from "@/lib/storefront.mjs";
 
 const STORAGE_KEY = "smile-session-offer-seen";
 // Shown once per session, only after the visitor engages with the page: never
@@ -112,8 +113,8 @@ function OfferBanner({ entered, onClose }: { entered: boolean; onClose: () => vo
             Lentes originales y premium
           </p>
           <p className="mt-1 text-[11px] leading-snug text-[#b8b0a4]">
-            20% OFF efectivo / transferencia · Hasta 6 cuotas sin interés · Envío gratis a todo
-            el país
+            {TRANSFER_DISCOUNT_PERCENT}% OFF por transferencia · Hasta {INTEREST_FREE_INSTALLMENTS}{" "}
+            cuotas sin interés · Envío gratis a todo el país
           </p>
         </div>
         <button
@@ -201,7 +202,7 @@ function OfferModal({ entered, onClose }: { entered: boolean; onClose: () => voi
             </p>
 
             <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] uppercase tracking-[0.2em] text-[#c9a96e]">
-              <span>Hasta 6 cuotas sin interés</span>
+              <span>Hasta {INTEREST_FREE_INSTALLMENTS} cuotas sin interés</span>
               <span>Envío gratis a todo el país</span>
               <span>Garantía y asesoramiento</span>
             </div>
@@ -228,17 +229,17 @@ function OfferModal({ entered, onClose }: { entered: boolean; onClose: () => voi
             <div className="absolute inset-6 rounded-full border border-[#c9a96e]/25" />
             <div className="flex h-full min-h-[21rem] flex-col items-center justify-center px-6 text-center">
               <p className="font-display text-[4.8rem] font-light leading-none text-[#c9a96e]">
-                20%
+                {TRANSFER_DISCOUNT_PERCENT}%
               </p>
               <p className="mt-2 text-[1.25rem] font-semibold uppercase tracking-[0.14em] text-[#f0ece4]">
                 OFF
               </p>
               <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-[#8b8580]">
-                efectivo / transferencia
+                por transferencia
               </p>
               <div className="mt-6 h-px w-20 bg-[#c9a96e]/35" />
               <p className="mt-6 max-w-[10rem] text-[11px] uppercase leading-[1.8] tracking-[0.2em] text-[#f0ece4]">
-                6 cuotas sin interés
+                {INTEREST_FREE_INSTALLMENTS} cuotas sin interés
               </p>
             </div>
           </div>

@@ -23,6 +23,7 @@ import {
   getDisplayPrice,
   getInstallmentPrice,
   getTransferPrice,
+  INTEREST_FREE_INSTALLMENTS,
   isWatch,
   stockUrgencyLabel,
 } from "@/lib/storefront.mjs";
@@ -315,7 +316,7 @@ export default function ProductDetailClient({
               {formatPrice(transferPrice)} por transferencia
             </p>
             <p className="mt-1 text-xs text-[#6a6560]">
-              6 cuotas sin interés de {formatPrice(installmentPrice)}
+              {INTEREST_FREE_INSTALLMENTS} cuotas sin interés de {formatPrice(installmentPrice)}
             </p>
 
             <div className="my-6 h-px bg-white/8" />

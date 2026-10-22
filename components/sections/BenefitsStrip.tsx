@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { INTEREST_FREE_INSTALLMENTS, TRANSFER_DISCOUNT_PERCENT } from "@/lib/storefront.mjs";
 
 type Benefit = {
   key: string;
@@ -22,7 +23,7 @@ const stroke = {
 const benefits: Benefit[] = [
   {
     key: "transferencia",
-    label: "20% OFF",
+    label: `${TRANSFER_DISCOUNT_PERCENT}% OFF`,
     detail: "pagando por transferencia",
     accent: true,
     icon: (
@@ -34,7 +35,7 @@ const benefits: Benefit[] = [
   },
   {
     key: "cuotas",
-    label: "Hasta 6 cuotas",
+    label: `Hasta ${INTEREST_FREE_INSTALLMENTS} cuotas`,
     detail: "sin interés",
     accent: true,
     icon: (

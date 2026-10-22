@@ -12,6 +12,7 @@ import {
   getDisplayPrice,
   getInstallmentPrice,
   getTransferPrice,
+  INTEREST_FREE_INSTALLMENTS,
   stockUrgencyLabel,
 } from "@/lib/storefront.mjs";
 
@@ -168,7 +169,7 @@ export default function ProductCard({
                   {formatPrice(transferPrice)} por transferencia
                 </p>
                 <p className="mt-0.5 text-[11px] text-[#b8b0a4]">
-                  6 cuotas de {formatPrice(installmentPrice)}
+                  {INTEREST_FREE_INSTALLMENTS} cuotas de {formatPrice(installmentPrice)}
                 </p>
               </>
             )}
