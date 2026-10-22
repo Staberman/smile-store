@@ -56,7 +56,6 @@ const intro = storeIntro({
 export default function Home() {
   return (
     <StoreShell>
-      <JsonLd data={homeCollectionSchema} />
       {/* Who Smile is, before the carousel and the catalog: the first copy
           crawlers and AI assistants read. Kept to a short band so the hero
           stays in the first viewport. */}
@@ -77,6 +76,9 @@ export default function Home() {
       <WatchesSection products={storeProducts} />
       <RecentlyViewed />
       <FaqSection />
+      {/* After the visible copy: crawlers that truncate the page read the
+          intro and the FAQ first. */}
+      <JsonLd data={homeCollectionSchema} />
     </StoreShell>
   );
 }
