@@ -1,4 +1,5 @@
 import { allProducts } from "@/lib/catalog";
+import { GUIDES } from "@/lib/guide-pages";
 import { llmsHubs } from "@/lib/llms-hubs";
 import { llmsSummary } from "@/lib/llms-text.mjs";
 import { absoluteUrl, SITE_NAME } from "@/lib/seo";
@@ -41,6 +42,7 @@ function buildLlmsTxt(): string {
     "",
     "## Guías",
     "",
+    ...GUIDES.map((guide) => link(guide.h1, guide.path, guide.description)),
     link(
       "Cómo elegir tus lentes según la forma de tu rostro",
       "/guia-de-estilo",

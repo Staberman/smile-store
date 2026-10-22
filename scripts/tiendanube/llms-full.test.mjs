@@ -106,6 +106,28 @@ test("llms-full.txt opens with the llms.txt summary, then facts, hubs, catalog a
   }
 });
 
+test("guides are listed between the collections and the catalog only when given", () => {
+  const guides = [{ name: "Guía de prueba", path: "/guias/prueba", description: "Una guía." }];
+  const withGuides = buildLlmsFull({
+    siteUrl: SITE_URL,
+    store: STORE,
+    contact: CONTACT,
+    hubs: HUBS,
+    guides,
+    entries: entriesFor(catalog.slice(0, 3)),
+  });
+  const sections = withGuides.split("\n").filter((line) => line.startsWith("## "));
+  assert.deepEqual(sections, [
+    "## Datos de la tienda",
+    "## Colecciones",
+    "## Guías",
+    "## Catálogo",
+    "## Preguntas frecuentes",
+  ]);
+  assert.ok(withGuides.includes(`- [Guía de prueba](${SITE_URL}/guias/prueba): Una guía.\n`));
+  assert.ok(!text.includes("## Guías"), "no guides section without guides");
+});
+
 test("store facts come from the shared payment, shipping, pickup and contact values", () => {
   const facts = text.slice(text.indexOf("## Datos de la tienda"), text.indexOf("## Colecciones"));
   for (const phrase of [

@@ -1,4 +1,5 @@
 import { allProductsIncludingOutOfStock, hasPurchasableStock } from "@/lib/catalog";
+import { GUIDES } from "@/lib/guide-pages";
 import { llmsHubs } from "@/lib/llms-hubs";
 import { buildLlmsFull } from "@/lib/llms-text.mjs";
 import { getProductSeo } from "@/lib/product-meta";
@@ -27,6 +28,7 @@ export function GET() {
       instagramUrl: INSTAGRAM_URL,
     },
     hubs: llmsHubs(),
+    guides: GUIDES.map((guide) => ({ name: guide.h1, path: guide.path, description: guide.description })),
     entries: allProductsIncludingOutOfStock.map((product) => {
       const seo = getProductSeo(product);
       return {

@@ -79,6 +79,8 @@ export function buildLlmsFull(input: {
   store: LlmsStore;
   contact: LlmsContact;
   hubs: readonly LlmsHub[];
+  /** Buying guides, listed after the collections when present. */
+  guides?: readonly LlmsHub[];
   entries: readonly LlmsEntry[];
   faqs?: readonly { question: string; answer: string }[];
 }): string;
