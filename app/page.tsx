@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AboutSection from "@/components/brand/AboutSection";
 import BrandLogoStrip from "@/components/brand/BrandLogoStrip";
 import FaqSection from "@/components/brand/FaqSection";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
@@ -54,17 +55,9 @@ const intro = storeIntro({
 export default function Home() {
   return (
     <StoreShell>
-      {/* Who Smile is, before the carousel and the catalog: the first copy
-          crawlers and AI assistants read. Kept to a short band so the hero
-          stays in the first viewport. */}
-      <section className="border-b border-white/6 bg-[#0a0a0a] px-6 py-5 md:px-12 md:py-6">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="sr-only">{HOME_TITLE}</h1>
-          <p className="max-w-4xl text-[13px] leading-[1.75] text-[#8b8580] md:text-sm">
-            {intro}
-          </p>
-        </div>
-      </section>
+      {/* The page's only H1, first in the markup for crawlers and screen
+          readers; visually hidden so the hero carousel opens the page. */}
+      <h1 className="sr-only">{HOME_TITLE}</h1>
       <TiendaClient
         previewProducts={previewProducts}
         bestSellerSlugs={bestSellerSlugs}
@@ -72,9 +65,12 @@ export default function Home() {
       />
       <WatchesSection products={storeProducts} />
       <RecentlyViewed />
+      {/* Who Smile is, after the catalog and right before the FAQ, which
+          answers the payment, warranty and returns questions it leaves out. */}
+      <AboutSection intro={intro} />
       <FaqSection />
       {/* After the visible copy: crawlers that truncate the page read the
-          intro and the FAQ first. */}
+          intro and the FAQ before this product list. */}
       <JsonLd data={homeCollectionSchema} />
     </StoreShell>
   );

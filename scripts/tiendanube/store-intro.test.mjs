@@ -69,16 +69,29 @@ test("the intro states no payment, warranty or returns terms and no storefront",
   assert.doesNotMatch(intro, /\blocal\b|showroom|horario|direcci[oó]n/i);
 });
 
-test("the homepage renders the intro right under its only H1, terms from constants", () => {
+test("the homepage opens with its only H1 and renders the intro in Sobre Smile before the FAQ, terms from constants", () => {
   const page = read("app/page.tsx");
+  const about = read("components/brand/AboutSection.tsx");
+
+  // One H1, visually hidden, first inside StoreShell with no band around it.
   assert.equal((page.match(/<h1\b/g) ?? []).length, 1);
-  assert.match(page, /<h1 className="sr-only">\{HOME_TITLE\}<\/h1>\s*<p\b[^>]*>\s*\{intro\}\s*<\/p>/);
+  assert.equal((about.match(/<h1\b/g) ?? []).length, 0);
+  assert.match(
+    page,
+    /<StoreShell>\s*(?:\{\/\*[\s\S]*?\*\/\}\s*)?<h1 className="sr-only">\{HOME_TITLE\}<\/h1>/,
+  );
+
+  // The intro is the "Sobre Smile" section, right before the FAQ.
   assert.match(page, /storeIntro\(/);
+  assert.match(page, /<AboutSection intro=\{intro\} \/>\s*<FaqSection \/>/);
+  assert.match(about, /id="sobre-smile"/);
+  assert.match(about, />\s*Sobre Smile\s*</);
+  assert.match(about, /<p\b[^>]*>\s*\{intro\}\s*<\/p>/);
 
   // Payment, shipping and pickup wording only through lib/store-copy.mjs.
   const handWritten =
     /\$\s?\d|cuotas sin inter|% off|por transferencia|env[ií]o gratis|Puerto Norte|checkout seguro/i;
-  for (const file of ["app/page.tsx", "lib/store-intro.mjs"]) {
+  for (const file of ["app/page.tsx", "components/brand/AboutSection.tsx", "lib/store-intro.mjs"]) {
     assert.doesNotMatch(read(file), handWritten, file);
   }
 });

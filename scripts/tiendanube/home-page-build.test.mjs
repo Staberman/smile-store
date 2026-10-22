@@ -3,6 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { HOME_GRID_PREVIEW_COUNT } from "../../lib/home-catalog.mjs";
+import { STORE_LOCATION } from "../../lib/store-copy.mjs";
+
+// The first words of lib/store-intro.mjs's paragraph, whatever brands have stock.
+const INTRO_START = `Smile es una tienda online de ${STORE_LOCATION.locality}`;
 
 // Checks the prerendered homepage of the last `npm run build`. Skipped when
 // there is none (test:catalog runs before the build in CI); every file read
@@ -22,16 +26,30 @@ const hubLinks = (html) =>
     [...markup(html).matchAll(/href="(\/tienda\/(?!productos\/)[^"#?]+)"/g)].map((m) => m[1]),
   );
 
-test("the built homepage stays short and puts its intro and FAQ early", { skip }, () => {
+test("the built homepage stays short, puts its H1 early and its intro between the catalog and the FAQ", { skip }, () => {
   const html = fs.readFileSync(homeFile, "utf8");
   const bytes = Buffer.byteLength(html);
   const offset = (text) => Buffer.byteLength(html.slice(0, html.indexOf(text)));
 
   assert.ok(bytes < 350_000, `homepage HTML is ${bytes} bytes`);
   assert.equal((markup(html).match(/<h1\b/g) ?? []).length, 1);
-  assert.ok(offset('<h1 class="sr-only"') < 20_000, "intro within the first 20 KB");
+  assert.ok(offset('<h1 class="sr-only"') < 20_000, "H1 within the first 20 KB");
   assert.ok(html.includes("Preguntas frecuentes"));
   assert.ok(offset("Preguntas frecuentes") < 200_000, "FAQ within the first 200 KB");
+
+  // Order in the markup (the inline RSC payload repeats the text): catalog,
+  // then the "Sobre Smile" section with the intro, then the FAQ.
+  const page = markup(html);
+  const at = (text) => {
+    const index = page.indexOf(text);
+    assert.ok(index >= 0, `${text} is in the homepage markup`);
+    return index;
+  };
+  const intro = at(INTRO_START);
+  assert.ok(at('id="catalogo"') < intro, "intro after the catalog");
+  assert.ok(at('id="relojes-destacados"') < intro, "intro after the featured watches");
+  assert.ok(at('id="sobre-smile"') < intro, "intro inside the Sobre Smile section");
+  assert.ok(intro < at("Preguntas frecuentes"), "intro before the FAQ");
 
   const jsonLd = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
   const types = jsonLd.map(([, body]) => JSON.parse(body)).map((data) => data["@type"] ?? "graph");
