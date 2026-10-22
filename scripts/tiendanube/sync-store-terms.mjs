@@ -2,6 +2,7 @@ import { appendFile, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { RETRY_DELAYS_MS, fetchTextWithRetry } from "./fetch-retry.mjs";
 import {
   agreeOnStoreTerms,
   parseStorefrontPaymentTerms,
@@ -35,17 +36,20 @@ async function fail(reason) {
   await setStepOutputs("failed", reason);
 }
 
-async function fetchProductPage(url) {
-  const response = await fetch(url, {
+// One transient 503/429/timeout must not fail the read (and open an issue that
+// the next run closes), so each page gets a few short retries.
+function fetchProductPage(url) {
+  return fetchTextWithRetry(url, {
     headers: {
       "User-Agent":
         process.env.TIENDANUBE_USER_AGENT?.trim() ||
         "Smile Stock Sync (smiletiendaimp.com.ar)",
     },
-    signal: AbortSignal.timeout(20_000),
+    onRetry: ({ attempt, reason, delayMs }) =>
+      console.log(
+        `${url}: ${reason}; intento ${attempt + 1} de ${RETRY_DELAYS_MS.length + 1} en ${delayMs / 1000} s`,
+      ),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.text();
 }
 
 async function main() {
