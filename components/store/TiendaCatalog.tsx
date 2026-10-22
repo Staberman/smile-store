@@ -1,43 +1,37 @@
+import type { ReactNode } from "react";
 import ProductGrid from "@/components/brand/ProductGrid";
 import BrandCarousel from "@/components/brand/BrandCarousel";
-import BrandLogoStrip from "@/components/brand/BrandLogoStrip";
 import TrustHighlights from "@/components/brand/TrustHighlights";
+import { storeViewProducts } from "@/lib/home-catalog.mjs";
 import type { ProductSummary } from "@/lib/product-summary";
-import { filterStorefrontProducts } from "@/lib/storefront.mjs";
-import { DEFAULT_STORE_VIEW } from "./storeView";
-
-const VIEW_LABELS: Record<string, string> = {
-  lentes: "Lentes de sol",
-  "ray-ban": "Ray-Ban originales",
-  ferrari: "Scuderia Ferrari Collection",
-  premium: "Marcas premium",
-  relojes: "Relojes",
-  "best-sellers": "Más vendidos",
-  offers: "Ofertas",
-};
+import { DEFAULT_STORE_VIEW, STORE_VIEW_LABELS } from "./storeView";
 
 /**
  * Store catalog for a given view. Pure: it does not read the URL, so it can
  * be server-rendered (e.g. as a Suspense fallback) for crawlers without JS.
- * `products` is the purchasable catalog as slim summaries; the best-sellers
- * order is computed on the server, where the sales ranking lives.
+ * `products` is the purchasable catalog as slim summaries, or its homepage
+ * preview while the full list loads (then `viewCounts` holds each view's full
+ * size). The best-sellers order is computed on the server, where the sales
+ * ranking lives.
  */
 export default function TiendaCatalog({
   view,
   products,
   bestSellerSlugs,
+  viewCounts,
+  brands,
   animateEntrance = true,
 }: {
   view: string;
   products: ProductSummary[];
   bestSellerSlugs: string[];
+  viewCounts?: Record<string, number>;
+  /** Brand directory, rendered on the server from the full catalog. */
+  brands: ReactNode;
   animateEntrance?: boolean;
 }) {
-  const visibleProducts =
-    view === "best-sellers"
-      ? getBestSellers(products, bestSellerSlugs)
-      : filterStorefrontProducts(products, view);
-  const label = VIEW_LABELS[view] ?? VIEW_LABELS[DEFAULT_STORE_VIEW];
+  const visibleProducts = storeViewProducts(products, view, bestSellerSlugs);
+  const label = STORE_VIEW_LABELS[view] ?? STORE_VIEW_LABELS[DEFAULT_STORE_VIEW];
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f0ece4]">
@@ -50,12 +44,13 @@ export default function TiendaCatalog({
       />
 
       <TrustHighlights />
-      <BrandLogoStrip products={products} />
+      {brands}
 
       <div id="catalogo">
         <ProductGrid
           key={`grid-${view}`}
           products={visibleProducts}
+          totalCount={viewCounts?.[view]}
           brandLabel={label}
           filterBy={view === "premium" ? "brand" : "collection"}
           searchProducts={products}
@@ -65,9 +60,4 @@ export default function TiendaCatalog({
       </div>
     </main>
   );
-}
-
-function getBestSellers(products: ProductSummary[], slugs: string[]): ProductSummary[] {
-  const bySlug = new Map(products.map((product) => [product.slug, product]));
-  return slugs.flatMap((slug) => bySlug.get(slug) ?? []);
 }

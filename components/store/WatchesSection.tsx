@@ -7,7 +7,10 @@ import { isWatch } from "@/lib/storefront.mjs";
 const FEATURED_WATCH_COUNT = 8;
 
 /** Up to `count` watches, taking one per brand in turn so no brand fills the row. */
-function pickFeaturedWatches(products: ProductSummary[], count: number): ProductSummary[] {
+export function featuredWatches(
+  products: ProductSummary[],
+  count = FEATURED_WATCH_COUNT,
+): ProductSummary[] {
   const queues = new Map<string, ProductSummary[]>();
   for (const product of products.filter(isWatch)) {
     const brand = canonicalBrand(product.brand);
@@ -25,12 +28,12 @@ function pickFeaturedWatches(products: ProductSummary[], count: number): Product
 
 /**
  * Server-rendered watch showcase for the homepage, below the main catalog.
- * `products` must be the purchasable catalog summaries the page already
- * passes to the catalog, so the RSC payload references them instead of
- * repeating them.
+ * `products` must be the purchasable catalog summaries the page builds the
+ * catalog preview from: the preview pins the featured watches, so the RSC
+ * payload references the same objects instead of repeating them.
  */
 export default function WatchesSection({ products }: { products: ProductSummary[] }) {
-  const watches = pickFeaturedWatches(products, FEATURED_WATCH_COUNT);
+  const watches = featuredWatches(products);
   if (watches.length === 0) return null;
 
   const brands = new Intl.ListFormat("es", { type: "conjunction" }).format(

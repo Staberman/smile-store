@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import BrandLogoStrip from "@/components/brand/BrandLogoStrip";
 import FaqSection from "@/components/brand/FaqSection";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import JsonLd from "@/components/seo/JsonLd";
 import StoreShell from "@/components/store/StoreShell";
 import TiendaClient from "@/components/store/TiendaClient";
-import WatchesSection from "@/components/store/WatchesSection";
+import WatchesSection, { featuredWatches } from "@/components/store/WatchesSection";
+import { DEFAULT_STORE_VIEW, STORE_VIEW_LABELS } from "@/components/store/storeView";
 import { getAvailableBrandEntries } from "@/lib/brand-directory";
 import { allProducts, getBestSellers } from "@/lib/catalog";
+import { homeCatalogPreview, storeViewCounts } from "@/lib/home-catalog.mjs";
 import { hubDescription } from "@/lib/hubs";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import { toProductSummaries } from "@/lib/product-summary";
@@ -30,10 +33,20 @@ export const metadata: Metadata = {
 };
 
 const homeCollectionSchema = collectionSchema("/", HOME_TITLE, allProducts);
-// The client catalog filters these per ?view=, so it gets every purchasable
-// product, as slim summaries.
+// Every purchasable product, as slim summaries. The client catalog gets only
+// a preview of them in the page and loads the full list after first paint
+// (lib/home-catalog.mjs); each product is also linked from the hubs and the
+// sitemap.
 const storeProducts = toProductSummaries(allProducts);
 const bestSellerSlugs = getBestSellers().map((product) => product.slug);
+const storeViews = Object.keys(STORE_VIEW_LABELS);
+const previewProducts = homeCatalogPreview(storeProducts, {
+  view: DEFAULT_STORE_VIEW,
+  views: storeViews,
+  pinned: featuredWatches(storeProducts),
+  bestSellerSlugs,
+});
+const viewCounts = storeViewCounts(storeProducts, storeViews, bestSellerSlugs);
 // Brands with stock, in brand-directory order (Ray-Ban, Prada, Versace…).
 const intro = storeIntro({
   sunglassesBrands: getAvailableBrandEntries(allProducts, "lentes").map((entry) => entry.name),
@@ -55,7 +68,12 @@ export default function Home() {
           </p>
         </div>
       </section>
-      <TiendaClient products={storeProducts} bestSellerSlugs={bestSellerSlugs} />
+      <TiendaClient
+        previewProducts={previewProducts}
+        viewCounts={viewCounts}
+        bestSellerSlugs={bestSellerSlugs}
+        brands={<BrandLogoStrip products={storeProducts} />}
+      />
       <WatchesSection products={storeProducts} />
       <RecentlyViewed />
       <FaqSection />
