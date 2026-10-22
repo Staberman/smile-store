@@ -14,7 +14,7 @@ import {
 } from "@/lib/store-facts";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contacto",
+  title: "Contacto en Rosario: WhatsApp, email e Instagram",
   description:
     "Contacto de Smile, tienda de anteojos de sol y relojes en Rosario, Santa Fe. Consultas por stock, medios de pago, envíos y seguimiento de compras.",
   path: "/contacto",
