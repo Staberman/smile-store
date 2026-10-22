@@ -120,12 +120,14 @@ function Block({ block }: { block: GuideBlock }) {
   }
 }
 
-/** A buying guide: header with the direct answer, sections, FAQ, sources and the other guides. */
+/**
+ * A buying guide: header with the direct answer, sections, FAQ, sources and
+ * the other guides, those on the same topic first.
+ */
 export default function GuideArticle({ guide }: { guide: Guide }) {
-  const otherGuides = GUIDES.filter((other) => other.slug !== guide.slug).map((other) => ({
-    label: other.h1,
-    href: other.path,
-  }));
+  const otherGuides = GUIDES.filter((other) => other.slug !== guide.slug)
+    .sort((a, b) => Number(b.topic === guide.topic) - Number(a.topic === guide.topic))
+    .map((other) => ({ label: other.h1, href: other.path }));
   const faqs = guideFaqs(guide);
 
   return (

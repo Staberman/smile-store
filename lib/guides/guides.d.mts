@@ -42,8 +42,12 @@ export type GuideSource = {
 
 export type GuideFaq = { question: string; answer: string };
 
+/** Index section a guide belongs to. */
+export type GuideTopic = "anteojos" | "relojes";
+
 export type Guide = {
   slug: string;
+  topic: GuideTopic;
   /** Site-relative URL, also the canonical. */
   path: string;
   /** <title> without the " | Smile" suffix. */
@@ -71,7 +75,13 @@ export type Guide = {
 export const GUIDES_PATH: "/guias";
 export function guidePath(slug: string): string;
 
-type GuideKey = "rayBanOriginals" | "rayBanModels" | "polarized";
+type GuideKey =
+  | "rayBanOriginals"
+  | "rayBanModels"
+  | "polarized"
+  | "invictaOriginals"
+  | "waterResistance"
+  | "watchGift";
 export const GUIDE_SLUGS: Readonly<Record<GuideKey, string>>;
 /** Ready-made links to each guide, for the hubs. */
 export const GUIDE_LINKS: Readonly<Record<GuideKey, { label: string; href: string }>>;
@@ -85,12 +95,19 @@ export const GUIDES_INDEX: {
   crumb: string;
 };
 
+/** Index sections, in display order: every guide belongs to one. */
+export const GUIDE_TOPICS: readonly { key: GuideTopic; label: string }[];
+/** Guides of one topic, in display order. */
+export function guidesOfTopic<G extends Guide>(guides: readonly G[], topic: GuideTopic): G[];
+
 export function inlineSegments(text: string): { text: string; href?: string }[];
 export function stripLinks(text: string): string;
 export function inlineHrefs(text: string): string[];
 
 /** Sunglasses the catalog names as polarized ("Aviador Polarizado 3025"). */
 export function isPolarizedProduct(product: Pick<HubProduct, "name" | "categories">): boolean;
+/** Invicta watches, by catalog brand. */
+export function isInvictaProduct(product: Pick<HubProduct, "brand" | "categories">): boolean;
 
 /** Every guide, resolved against the catalog, in display order. */
 export function buildGuides<P extends GuideProduct>(context: GuideContext<P>): Guide[];

@@ -3,22 +3,31 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import {
+  AUDIENCE_HUBS,
   COLLECTION_HUBS,
   countWords,
   hubFacts,
   isIndexableHub,
+  priceRange,
   RAY_BAN_MODEL_HUBS,
   SUNGLASSES_HUB,
 } from "../../lib/collection-hubs.mjs";
+import { descriptionLines, productKind, splitDescription } from "../../lib/product-copy.mjs";
 import {
   buildGuides,
   GUIDE_LINKS,
+  GUIDE_SLUGS,
+  GUIDE_TOPICS,
   GUIDES_INDEX,
   guideLinks,
+  guidesOfTopic,
   guideText,
+  isInvictaProduct,
   isPolarizedProduct,
   stripLinks,
 } from "../../lib/guides/guides.mjs";
+import { waterUse } from "../../lib/guides/resistencia-al-agua.mjs";
+import { pesosRange, waterResistance } from "../../lib/guides/watch-facts.mjs";
 import {
   META_DESCRIPTION_MAX_LENGTH,
   META_DESCRIPTION_MIN_LENGTH,
@@ -47,12 +56,22 @@ const inStock = catalog.filter(isPurchasable);
 const context = { catalog, inStock, displayName: (product) => product.name };
 const guides = buildGuides(context);
 
+/** The guide built for a GUIDE_SLUGS key, from these guides or a rebuilt set. */
+const guideOf = (key, list = guides) => list.find((guide) => guide.slug === GUIDE_SLUGS[key]);
+const blocksOf = (guide) => guide.sections.flatMap((section) => section.blocks);
+const sectionOf = (guide, id) => guide.sections.find((section) => section.id === id);
+const isWatch = (product) => productKind(product) === "watch";
+
+// Each watch hub is its own route (app/tienda/marcas/*, app/tienda/relojes/*).
+const WATCH_BRAND_HUB_PATHS = ["/tienda/marcas/invicta", "/tienda/marcas/tommy-hilfiger", "/tienda/relojes/omega-swatch"];
+
 const hubPaths = new Set([
   ...COLLECTION_HUBS.filter((hub) => isIndexableHub(catalog.filter(hub.matches).length)).map((hub) => hub.path),
   "/tienda/marcas/ray-ban",
   "/tienda/marcas/ray-ban/ferrari",
   "/tienda/marcas/premium",
   "/tienda/relojes",
+  ...WATCH_BRAND_HUB_PATHS,
 ]);
 const productPaths = new Set(catalog.map((product) => `/tienda/productos/${product.slug}`));
 const knownPaths = new Set([
@@ -77,13 +96,64 @@ const guideSourceFiles = fs
   .filter((file) => file.endsWith(".mjs"))
   .map((file) => `lib/guides/${file}`);
 
-test("there are three guides with unique slugs, titles, headings and descriptions", () => {
-  assert.equal(guides.length, 3);
+/**
+ * Checks that hold for any catalog: direct answers within 40-60 words,
+ * question headings, internal links that resolve, no hand-written terms and
+ * no warranty or authorized-dealer claims. Run on the real guides and on
+ * every fallback variant built from an altered catalog.
+ */
+function assertGuideRules(guide) {
+  const leadWords = countWords(stripLinks(guide.lead));
+  assert.ok(leadWords >= 25 && leadWords <= 60, `${guide.slug}: lead has ${leadWords} words`);
+  for (const section of guide.sections) {
+    const words = countWords(stripLinks(section.answer));
+    assert.ok(words >= 40 && words <= 60, `${guide.slug} / ${section.id}: answer has ${words} words`);
+    assert.match(section.heading, /^¿.+\?$/, section.heading);
+  }
+  for (const href of guideLinks(guide)) {
+    assert.ok(knownPaths.has(href.split("#")[0]), `${guide.slug} links to unknown ${href}`);
+  }
+  const text = handWritten(guideText(guide));
+  assert.doesNotMatch(text, /%/, `${guide.slug} writes a percentage by hand`);
+  assert.doesNotMatch(text, /\bcuotas?\b/i, `${guide.slug} writes installments by hand`);
+  assert.doesNotMatch(text, /\$/, `${guide.slug} writes a price by hand`);
+  assert.doesNotMatch(text, /env[ií]os? gratis/i, `${guide.slug} promises free shipping by hand`);
+  assert.doesNotMatch(text, /garant[ií]a/i, guide.slug);
+  assert.doesNotMatch(text, /devoluci[oó]n|devolver|reembolso/i, guide.slug);
+  for (const sentence of text.split(/(?<=[.!?])\s+/).filter((entry) => /\bSmile\b/.test(entry))) {
+    assert.doesNotMatch(sentence, /autorizad|oficial|certificad/i, `${guide.slug}: "${sentence}"`);
+  }
+}
+
+test("the guides are the six published ones, with unique slugs, titles, headings and descriptions", () => {
+  assert.deepEqual(new Set(guides.map((guide) => guide.slug)), new Set(Object.values(GUIDE_SLUGS)));
+  assert.equal(guides.length, 6);
   for (const field of ["slug", "path", "title", "h1", "description", "crumb"]) {
     const values = guides.map((guide) => guide[field]);
     assert.equal(new Set(values).size, values.length, `duplicate ${field}`);
   }
   assert.ok(!guides.some((guide) => guide.title === GUIDES_INDEX.title));
+});
+
+test("the index groups every guide under one topic, sunglasses and watches alike", () => {
+  const topics = GUIDE_TOPICS.map((topic) => topic.key);
+  assert.deepEqual(topics, ["anteojos", "relojes"]);
+  for (const guide of guides) assert.ok(topics.includes(guide.topic), `${guide.slug} has topic ${guide.topic}`);
+  assert.deepEqual(
+    guidesOfTopic(guides, "relojes").map((guide) => guide.slug),
+    [GUIDE_SLUGS.invictaOriginals, GUIDE_SLUGS.waterResistance, GUIDE_SLUGS.watchGift],
+  );
+  assert.equal(guidesOfTopic(guides, "anteojos").length, 3);
+  // Display order follows the topics, so the index never interleaves them.
+  assert.deepEqual(
+    guides.map((guide) => guide.topic),
+    GUIDE_TOPICS.flatMap((topic) => guidesOfTopic(guides, topic.key).map(() => topic.key)),
+  );
+  for (const field of ["title", "description", "intro"]) {
+    assert.match(GUIDES_INDEX[field], /anteojos de sol/i, `index ${field} names sunglasses`);
+    assert.match(GUIDES_INDEX[field], /reloj/i, `index ${field} names watches`);
+  }
+  assert.match(read("app/guias/page.tsx"), /GUIDE_TOPICS\.map\(/);
 });
 
 test("titles fit 60 characters with the site suffix and descriptions fit 140-155", () => {
@@ -163,13 +233,33 @@ test("every internal link resolves to a published, indexable page", () => {
   }
 });
 
-test("each guide links to at least one hub and to the other guides", () => {
+test("in-page anchors point to a section of the linked guide", () => {
   for (const guide of guides) {
-    const links = new Set(guideLinks(guide));
+    for (const href of guideLinks(guide).filter((entry) => entry.includes("#"))) {
+      const [target, anchor] = href.split("#");
+      const linked = guides.find((entry) => entry.path === target);
+      assert.ok(linked?.sections.some((section) => section.id === anchor), `${guide.slug} links to ${href}`);
+    }
+  }
+});
+
+test("each guide links to at least one hub and to the other guides of its topic", () => {
+  for (const guide of guides) {
+    const links = new Set(guideLinks(guide).map((href) => href.split("#")[0]));
     assert.ok([...links].some((href) => hubPaths.has(href)), `${guide.slug} links to no hub`);
-    for (const other of guides.filter((entry) => entry.slug !== guide.slug)) {
+    for (const other of guidesOfTopic(guides, guide.topic).filter((entry) => entry.slug !== guide.slug)) {
       assert.ok(links.has(other.path), `${guide.slug} does not link to ${other.slug}`);
     }
+  }
+});
+
+test("the watch guides link the watch hubs they are about", () => {
+  const linksOf = (key) => new Set(guideLinks(guideOf(key)).map((href) => href.split("#")[0]));
+  assert.ok(linksOf("invictaOriginals").has("/tienda/marcas/invicta"));
+  assert.ok(linksOf("waterResistance").has("/tienda/relojes"));
+  const gift = linksOf("watchGift");
+  for (const hubPath of ["/tienda/relojes", ...WATCH_BRAND_HUB_PATHS, ...AUDIENCE_HUBS.filter((hub) => hub.kind === "watch").map((hub) => hub.path)]) {
+    assert.ok(gift.has(hubPath), `the gift guide does not link ${hubPath}`);
   }
 });
 
@@ -188,6 +278,8 @@ test("payment and shipping terms only come from the shared phrases", () => {
     assert.doesNotMatch(source, /\d\s*%/, file);
     // Peso amounts ("$ 200.000", "$15000"), not regex backreferences ("$1").
     assert.doesNotMatch(source, /\$\s?\d{1,3}(?:\.\d{3})+|\$\s?\d{4,}/, file);
+    // Nor peso amounts in words ("306.900 pesos"): prices come from the catalog.
+    assert.doesNotMatch(source, /\d{1,3}(?:\.\d{3})+\s*pesos/i, file);
     assert.doesNotMatch(source, /env[ií]os? gratis/i, file);
   }
 });
@@ -211,9 +303,8 @@ test("guides make no warranty, returns or authorized-dealer claims", () => {
 });
 
 test("the polarized guide links only in-stock models the catalog names polarized", () => {
-  const guide = guides.find((entry) => entry.slug === "anteojos-polarizados-que-son-y-cuando-conviene");
-  const linked = guide.sections
-    .flatMap((section) => section.blocks)
+  const guide = guideOf("polarized");
+  const linked = blocksOf(guide)
     .filter((block) => block.type === "links")
     .flatMap((block) => block.items.map((item) => item.href));
   const expected = inStock.filter(isPolarizedProduct).map((product) => `/tienda/productos/${product.slug}`);
@@ -222,9 +313,8 @@ test("the polarized guide links only in-stock models the catalog names polarized
 });
 
 test("without polarized models in stock, the polarized guide points to the sunglasses hub", () => {
-  const [, , guide] = buildGuides({ ...context, inStock: inStock.filter((product) => !isPolarizedProduct(product)) });
-  const blocks = guide.sections.flatMap((section) => section.blocks);
-  assert.ok(!blocks.some((block) => block.type === "links"), "no product links");
+  const guide = guideOf("polarized", buildGuides({ ...context, inStock: inStock.filter((product) => !isPolarizedProduct(product)) }));
+  assert.ok(!blocksOf(guide).some((block) => block.type === "links"), "no product links");
   assert.ok(guideLinks(guide).includes(SUNGLASSES_HUB.path));
 });
 
@@ -238,8 +328,7 @@ test("polarized means named polarized: the store-wide SEO tag does not count", (
 });
 
 test("the Ray-Ban comparison links every model hub and reads frame materials from the catalog", () => {
-  const guide = guides.find((entry) => entry.slug === "ray-ban-aviador-wayfarer-round-cual-elegir");
-  const table = guide.sections.flatMap((section) => section.blocks).find((block) => block.type === "table");
+  const table = blocksOf(guideOf("rayBanModels")).find((block) => block.type === "table");
   assert.ok(table, "the guide has a comparison table");
   for (const hub of RAY_BAN_MODEL_HUBS) {
     const row = table.rows.find((cells) => cells[0].includes(`](${hub.path})`));
@@ -255,10 +344,147 @@ test("the Ray-Ban comparison links every model hub and reads frame materials fro
 
 test("a model without frame specs in the catalog says so instead of guessing", () => {
   const withoutSpecs = catalog.map((product) => ({ ...product, descriptionHtml: "" }));
-  const [, guide] = buildGuides({ ...context, catalog: withoutSpecs });
-  const table = guide.sections.flatMap((section) => section.blocks).find((block) => block.type === "table");
+  const guide = guideOf("rayBanModels", buildGuides({ ...context, catalog: withoutSpecs }));
+  const table = blocksOf(guide).find((block) => block.type === "table");
   const column = table.head.indexOf("Armazón en Smile");
   for (const row of table.rows) assert.equal(row[column], "Sin dato en las fichas");
+});
+
+// --- Watch guides -------------------------------------------------------------
+
+/** "Resistencia al agua" as the catalog's spec parser reads it, or undefined. */
+const waterSpec = (product) =>
+  splitDescription(descriptionLines(product.descriptionHtml)).specs.find((spec) => spec.name === "Resistencia al agua")
+    ?.value;
+const productHref = (product) => `/tienda/productos/${product.slug}`;
+const tableHrefs = (table) => table.rows.map((row) => row[0].match(/\]\(([^)]+)\)/)[1]);
+
+test("water-resistance specs parse into metres and atmospheres", () => {
+  const sheet = (value) => ({ descriptionHtml: `<p>Resistencia al agua: ${value}</p>` });
+  assert.deepEqual(waterResistance(sheet("100 metros (10 ATM), apto para nadar")), { atm: 10, meters: 100 });
+  assert.deepEqual(waterResistance(sheet("200 metros (20 ATM), apto para buceo ligero")), { atm: 20, meters: 200 });
+  assert.deepEqual(waterResistance(sheet("50 m")), { atm: 5, meters: 50 });
+  assert.deepEqual(waterResistance(sheet("3 bar")), { atm: 3, meters: 30 });
+  assert.equal(waterResistance(sheet("Sí")), null, "a line without a figure states nothing");
+  assert.equal(waterResistance({ descriptionHtml: "<p>Movimiento: Cuarzo</p>" }), null);
+  // Uses follow the table in the guide, and point to the brand off it.
+  assert.match(waterUse(3), /no para nadar/);
+  assert.match(waterUse(5), /natación/);
+  assert.match(waterUse(20), /no para buceo con tanque/);
+  assert.match(waterUse(30), /tabla de la marca/);
+});
+
+test("the water guide lists exactly the in-stock watches whose sheet states water resistance", () => {
+  const guide = guideOf("waterResistance");
+  const table = sectionOf(guide, "relojes-en-smile").blocks.find((block) => block.type === "table");
+  const expected = inStock.filter((product) => isWatch(product) && waterSpec(product));
+  assert.ok(expected.length > 0, "the catalog has watches with a water-resistance spec in stock");
+  assert.ok(table, "the store section has a table");
+  assert.deepEqual(new Set(tableHrefs(table)), new Set(expected.map(productHref)));
+  for (const product of expected) {
+    const row = table.rows.find((cells) => cells[0].includes(`](${productHref(product)})`));
+    const { meters, atm } = waterResistance(product);
+    // The rating is the sheet's own figure, and the use follows the guide's table.
+    assert.ok(waterSpec(product).includes(String(meters)), `${product.name}: ${waterSpec(product)}`);
+    assert.equal(row[1], `${meters} m (${atm} ATM)`);
+    assert.equal(row[2], waterUse(atm));
+  }
+});
+
+test("without water-resistance specs in stock, the water guide falls back to the watches hub", () => {
+  const stripped = inStock.map((product) => (isWatch(product) ? { ...product, descriptionHtml: "" } : product));
+  const guide = guideOf("waterResistance", buildGuides({ ...context, inStock: stripped }));
+  const store = sectionOf(guide, "relojes-en-smile");
+  assert.ok(!store.blocks.some((block) => block.type === "table"), "no product table");
+  assert.match(stripLinks(store.answer), /ningún reloj con stock en Smile indica la resistencia al agua/);
+  assert.ok(guideLinks(guide).includes("/tienda/relojes"));
+  assert.ok(!guideLinks(guide).some((href) => href.startsWith("/tienda/productos/")), "no product links");
+  assertGuideRules(guide);
+  // The table explaining each rating does not depend on the catalog.
+  assert.equal(sectionOf(guide, "que-significa-cada-indicacion").blocks[0].rows.length, 5);
+});
+
+test("the Invicta guide tabulates exactly the Invicta watches in stock, from their sheets", () => {
+  const guide = guideOf("invictaOriginals");
+  const table = sectionOf(guide, "invicta-en-smile").blocks.find((block) => block.type === "table");
+  const expected = inStock.filter(isInvictaProduct);
+  assert.ok(expected.length > 0, "the catalog has Invicta watches in stock");
+  assert.deepEqual(new Set(tableHrefs(table)), new Set(expected.map(productHref)));
+  for (const product of expected) {
+    const row = table.rows.find((cells) => cells[0].includes(`](${productHref(product)})`));
+    const specs = new Map(
+      splitDescription(descriptionLines(product.descriptionHtml)).specs.map((spec) => [spec.name, spec.value]),
+    );
+    const movement = (specs.get("Movimiento") ?? "").toLowerCase();
+    const expectedMovement = movement.includes("automático") ? "Automático" : movement.includes("cuarzo") ? "Cuarzo" : "Sin dato en la ficha";
+    assert.equal(row[table.head.indexOf("Movimiento")], expectedMovement, product.name);
+    const diameter = specs.get("Diámetro de la caja")?.match(/\d+/)?.[0];
+    assert.equal(row[table.head.indexOf("Diámetro de la caja")], diameter ? `${diameter} mm` : "Sin dato en la ficha");
+  }
+  // The line summary follows the sheets of the whole Invicta catalog.
+  const text = guideText(guide);
+  assert.match(text, /la línea Pro Diver tiene modelos de cuarzo y automáticos/);
+});
+
+test("without Invicta watches in stock, the Invicta guide points to the Invicta hub", () => {
+  const guide = guideOf("invictaOriginals", buildGuides({ ...context, inStock: inStock.filter((product) => !isInvictaProduct(product)) }));
+  const store = sectionOf(guide, "invicta-en-smile");
+  assert.ok(!store.blocks.some((block) => block.type === "table"), "no product table");
+  assert.match(stripLinks(store.answer), /no hay relojes Invicta con stock/);
+  assert.ok(guideLinks(guide).includes("/tienda/marcas/invicta"));
+  assertGuideRules(guide);
+});
+
+test("the gift guide's budget table follows the catalog's stock and prices per brand and audience", () => {
+  const guide = guideOf("watchGift");
+  const table = sectionOf(guide, "presupuesto").blocks.find((block) => block.type === "table");
+  const watches = inStock.filter(isWatch);
+  const rowFor = (href) => table.rows.find((cells) => cells[0].includes(`](${href})`));
+  const expectRow = (href, products) => {
+    const row = rowFor(href);
+    assert.ok(row, `the table has a row for ${href}`);
+    assert.equal(row[1], String(products.length), href);
+    const range = priceRange(products);
+    assert.equal(row[2], products.length === 0 ? "Sin stock por el momento" : pesosRange(range), href);
+  };
+  expectRow("/tienda/marcas/invicta", watches.filter((product) => product.brand === "Invicta"));
+  expectRow("/tienda/marcas/tommy-hilfiger", watches.filter((product) => product.brand === "Tommy Hilfiger"));
+  expectRow("/tienda/relojes/omega-swatch", watches.filter((product) => product.brand === "OMEGA x Swatch"));
+  for (const hub of AUDIENCE_HUBS.filter((entry) => entry.kind === "watch")) expectRow(hub.path, watches.filter(hub.matches));
+  assert.match(stripLinks(sectionOf(guide, "presupuesto").answer), new RegExp(`Hoy hay ${watches.length} relojes con stock`));
+});
+
+test("gift-guide prices are read from the catalog, not written in the guide", () => {
+  const doubled = inStock.map((product) =>
+    product.brand === "Invicta"
+      ? { ...product, price: product.price * 2, promotionalPrice: product.promotionalPrice && product.promotionalPrice * 2 }
+      : product,
+  );
+  const before = sectionOf(guideOf("watchGift"), "presupuesto").blocks.find((block) => block.type === "table");
+  const after = sectionOf(guideOf("watchGift", buildGuides({ ...context, inStock: doubled })), "presupuesto").blocks.find(
+    (block) => block.type === "table",
+  );
+  const invicta = (table) => table.rows.find((cells) => cells[0].includes("](/tienda/marcas/invicta)"))[2];
+  assert.notEqual(invicta(after), invicta(before));
+  assert.equal(invicta(after), pesosRange(priceRange(doubled.filter((product) => isInvictaProduct(product) && isPurchasable(product)))));
+});
+
+test("without watches in stock, the gift guide keeps its advice and points to the watches hub", () => {
+  const guide = guideOf("watchGift", buildGuides({ ...context, inStock: inStock.filter((product) => !isWatch(product)) }));
+  const budget = sectionOf(guide, "presupuesto");
+  assert.ok(!budget.blocks.some((block) => block.type === "table"), "no price table");
+  assert.match(stripLinks(budget.answer), /no hay relojes con stock en Smile/);
+  assert.ok(guideLinks(guide).includes("/tienda/relojes"));
+  assertGuideRules(guide);
+});
+
+test("each guide keeps the same rules on any catalog", () => {
+  const variants = [
+    buildGuides(context),
+    buildGuides({ ...context, inStock: [] }),
+    buildGuides({ ...context, catalog: catalog.map((product) => ({ ...product, descriptionHtml: "" })), inStock: inStock.map((product) => ({ ...product, descriptionHtml: "" })) }),
+  ];
+  for (const variant of variants) for (const guide of variant) assertGuideRules(guide);
 });
 
 test("every ready-made guide link points to a published guide", () => {
