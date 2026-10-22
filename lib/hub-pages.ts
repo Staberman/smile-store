@@ -9,6 +9,7 @@ import {
 import {
   buildHubPage,
   COLLECTION_HUBS,
+  modelHubOf,
   type CollectionHub,
   type HubCopyContext,
 } from "@/lib/collection-hubs.mjs";
@@ -91,6 +92,15 @@ export function hubsOf(
  */
 export function indexableHubs(hubs: readonly CollectionHub[] = COLLECTION_HUBS): CollectionHub[] {
   return hubs.filter((hub) => getHubPage(hub).indexable);
+}
+
+/**
+ * The Ray-Ban model hub a product page's breadcrumb goes through ("Inicio >
+ * Ray-Ban > Aviador"): the product's model hub, when that hub is indexed.
+ */
+export function productModelHub(product: CatalogProduct): CollectionHub | null {
+  const hub = modelHubOf(product);
+  return hub && getHubPage(hub).indexable ? hub : null;
 }
 
 /** Title, description, self-canonical and robots of a hub page. */

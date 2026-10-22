@@ -89,15 +89,24 @@ export function premiumBrandTrail(slug: PremiumBrandSlug): Crumb[] {
 /**
  * Trail from home to the collection a product belongs to (the product itself
  * is not included). Products without a collection page get only "Inicio".
+ * Product pages pass the product's indexed Ray-Ban model hub
+ * (lib/hub-pages productModelHub) and the trail goes through it: "Inicio >
+ * Ray-Ban > Aviador". Scuderia Ferrari products keep their own collection.
  */
-export function getProductTrail(product: CatalogProduct): Crumb[] {
+export function getProductTrail(
+  product: CatalogProduct,
+  modelHub: CollectionHub | null = null,
+): Crumb[] {
   const brand = product.brand.trim().toLowerCase();
   const isRayBan = brand === "ray ban" || brand === "ray-ban" || brand === "rayban";
   const isFerrari =
     product.categories.join(" ").toLowerCase().includes("ferrari") ||
     product.name.toLowerCase().includes("ferrari");
 
-  if (isRayBan) return isFerrari ? COLLECTION_TRAILS.ferrari : COLLECTION_TRAILS["ray-ban"];
+  if (isRayBan) {
+    if (isFerrari) return COLLECTION_TRAILS.ferrari;
+    return modelHub ? collectionHubTrail(modelHub) : COLLECTION_TRAILS["ray-ban"];
+  }
   if (brand === "invicta") return COLLECTION_TRAILS.invicta;
   if (brand === "tommy hilfiger") return COLLECTION_TRAILS["tommy-hilfiger"];
   if (brand === "omega x swatch") return COLLECTION_TRAILS["omega-swatch"];

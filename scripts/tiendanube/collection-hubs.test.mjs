@@ -9,8 +9,10 @@ import {
   countWords,
   isDistinctFromParent,
   isIndexableHub,
+  isRayBanProduct,
   MIN_AUDIENCE_EXCLUSION,
   MIN_INDEXABLE_PRODUCTS,
+  modelHubOf,
   productGender,
   RAY_BAN_MODEL_HUBS,
   SUNGLASSES_HUB,
@@ -112,6 +114,53 @@ test("a Scuderia Ferrari Hexagonal is in both the Hexagonal and the Ferrari hubs
   );
   assert.ok(ferrariHexagonal.length >= 2);
   assert.ok(ferrariHexagonal.some(inStock));
+});
+
+test("product breadcrumbs go through the product's Ray-Ban model hub when it is indexed", () => {
+  const bySlug = (slug) => catalog.find((product) => product.slug === slug);
+  const crumbOf = (hub) => hub && { parent: hub.parent, name: hub.crumb, href: hub.path };
+
+  // Aviador (both catalog spellings) and Wayfarer products: their model hub,
+  // which is indexed. lib/collections' collectionHubTrail puts it under the
+  // parent's trail: Inicio > Ray-Ban > Aviador.
+  for (const [slug, expected] of [
+    ["aviador-classic-dorado-verde1", { parent: "ray-ban", name: "Aviador", href: "/tienda/marcas/ray-ban/aviador" }],
+    ["aviator-outdoorsman-craft-3422", { parent: "ray-ban", name: "Aviador", href: "/tienda/marcas/ray-ban/aviador" }],
+    ["wayfarer-2140", { parent: "ray-ban", name: "Wayfarer", href: "/tienda/marcas/ray-ban/wayfarer" }],
+  ]) {
+    const hub = modelHubOf(bySlug(slug));
+    assert.deepEqual(crumbOf(hub), expected, slug);
+    assert.equal(pageOf(hub).indexable, true, `${hub.path} is indexed`);
+  }
+
+  // A Ray-Ban model without a hub, and premium brands: no model hub, so their
+  // trails stay "Inicio > Ray-Ban" and "Inicio > Marcas premium > Prada".
+  assert.equal(modelHubOf(bySlug("clubmaster-classic-3016")), null);
+  assert.equal(modelHubOf(bySlug("prada-symbole-spr23ws")), null);
+  assert.ok(catalog.filter((product) => !isRayBanProduct(product)).every((product) => !modelHubOf(product)));
+  // Exactly the hub that lists the product.
+  for (const product of catalog) {
+    const hub = modelHubOf(product);
+    assert.deepEqual(RAY_BAN_MODEL_HUBS.filter((entry) => entry.matches(product)), hub ? [hub] : []);
+  }
+
+  // Wiring: product pages pass the model hub only when it is indexed;
+  // Scuderia Ferrari products keep the Ferrari collection; the catalog-facts
+  // description keeps the plain trail.
+  const read = (relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8");
+  assert.match(
+    read("lib/hub-pages.ts"),
+    /const hub = modelHubOf\(product\);\s*return hub && getHubPage\(hub\)\.indexable \? hub : null;/,
+  );
+  assert.match(
+    read("lib/collections.ts"),
+    /if \(isFerrari\) return COLLECTION_TRAILS\.ferrari;\s*return modelHub \? collectionHubTrail\(modelHub\) : COLLECTION_TRAILS\["ray-ban"\];/,
+  );
+  assert.match(
+    read("app/tienda/productos/[slug]/page.tsx"),
+    /\.\.\.getProductTrail\(product, productModelHub\(product\)\),/,
+  );
+  assert.match(read("lib/product-meta.ts"), /getProductTrail\(product\)\n/);
 });
 
 test("hubs are indexed by catalog count, so stock changes never flip them", () => {

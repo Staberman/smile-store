@@ -13,6 +13,7 @@ import { getProductCopy, getProductDescription, getProductSeo } from "@/lib/prod
 import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import { getProductTrail } from "@/lib/collections";
+import { productModelHub } from "@/lib/hub-pages";
 import {
   absoluteUrl,
   breadcrumbSchema,
@@ -62,10 +63,11 @@ export default function ProductPage({ params }: Props) {
   const complements = getComplementaryProducts(product, allProducts, 4);
 
   const seo = getProductSeo(product);
-  // Collection trail plus the product itself: drives both the visible
-  // breadcrumbs and the BreadcrumbList below.
+  // Collection trail, through the product's indexed Ray-Ban model hub, plus
+  // the product itself: drives both the visible breadcrumbs and the
+  // BreadcrumbList below.
   const breadcrumbs = [
-    ...getProductTrail(product),
+    ...getProductTrail(product, productModelHub(product)),
     { name: seo.displayName, href: `/tienda/productos/${product.slug}` },
   ];
   const productLink = productUrl(product);

@@ -88,6 +88,10 @@ export const SUNGLASSES_HUB: CollectionHub;
 export const AUDIENCE_HUBS: readonly CollectionHub[];
 export const COLLECTION_HUBS: readonly CollectionHub[];
 
+/** The Ray-Ban model hub that lists a product, or null. */
+export function modelHubOf(
+  product: Pick<HubProduct, "name" | "brand" | "categories">,
+): CollectionHub | null;
 export function isIndexableHub(catalogCount: number): boolean;
 export function isDistinctFromParent(catalogCount: number, parentCount: number): boolean;
 export function isRayBanProduct(product: Pick<HubProduct, "brand" | "categories">): boolean;
