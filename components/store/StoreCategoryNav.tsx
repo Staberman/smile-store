@@ -30,7 +30,10 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
         label: "Ray-Ban",
         view: "ray-ban",
         href: "/tienda/marcas/ray-ban",
-        isCurrentRoute: (pathname) => pathname === "/tienda/marcas/ray-ban",
+        // The Ray-Ban hub and its model hubs; Ferrari has its own item.
+        isCurrentRoute: (pathname) =>
+          isUnder(pathname, "/tienda/marcas/ray-ban") &&
+          !isUnder(pathname, "/tienda/marcas/ray-ban/ferrari"),
       },
       {
         label: "Scuderia Ferrari",

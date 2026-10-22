@@ -1,8 +1,9 @@
 import { canonicalBrand } from "@/lib/brand-directory";
 import type { CatalogProduct } from "@/lib/catalog";
+import { hubMetaDescription } from "@/lib/collection-hubs.mjs";
 import { formatPrice } from "@/lib/format";
 import { getProductSeo } from "@/lib/product-meta";
-import { fitDescription, listPhrase } from "@/lib/product-seo.mjs";
+import { listPhrase } from "@/lib/product-seo.mjs";
 import {
   CHECKOUT_PHRASE,
   INSTALLMENTS_PHRASE,
@@ -193,15 +194,8 @@ export function hubIntro({
 
 /**
  * Hub meta description: a hand-written lead plus the store's payment
- * benefits, fitted to 140-155 characters.
+ * benefits, fitted to 140-155 characters (lib/collection-hubs.mjs).
  */
 export function hubDescription(leads: string[]): string {
-  return fitDescription({
-    leads,
-    offers: [
-      `Comprá en Smile en ${INSTALLMENTS_PHRASE} o con ${TRANSFER_DISCOUNT_PHRASE}.`,
-      `${INSTALLMENTS_PHRASE} o ${TRANSFER_DISCOUNT_PHRASE} en Smile.`,
-    ],
-    extras: ["Checkout seguro de Tiendanube.", "Atención personalizada por WhatsApp."],
-  });
+  return hubMetaDescription(leads);
 }

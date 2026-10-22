@@ -5,6 +5,7 @@ import {
   PREMIUM_BRANDS,
   type CollectionKey,
 } from "@/lib/collections";
+import { indexableHubs } from "@/lib/hub-pages";
 import { absoluteUrl, SITE_NAME } from "@/lib/seo";
 import {
   CHECKOUT_PHRASE,
@@ -45,6 +46,9 @@ function buildLlmsTxt(): string {
     const crumb = COLLECTION_TRAILS[key][COLLECTION_TRAILS[key].length - 1];
     return link(crumb.name, crumb.href, COLLECTION_SUMMARIES[key]);
   });
+  // Ray-Ban model hubs, same rule as the sitemap: only those with enough
+  // products in the catalog.
+  const collectionHubs = indexableHubs().map((hub) => link(hub.linkLabel, hub.path, hub.summary));
   // Same rule as the sitemap: premium brands without stock are not indexed.
   const premiumBrands = PREMIUM_BRANDS.filter((brand) =>
     allProducts.some((product) => product.brand === brand.catalogBrand),
@@ -63,6 +67,7 @@ function buildLlmsTxt(): string {
     "",
     link("Inicio", "/", "Catálogo completo de anteojos de sol y relojes con stock."),
     ...hubs,
+    ...collectionHubs,
     ...premiumBrands,
     "",
     "## Guías",

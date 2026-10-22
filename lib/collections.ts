@@ -1,4 +1,5 @@
 import type { CatalogProduct } from "./catalog";
+import type { CollectionHub } from "./collection-hubs.mjs";
 
 // Site hierarchy for breadcrumbs. Visible breadcrumbs and BreadcrumbList
 // JSON-LD are both built from these trails, so they always agree.
@@ -62,6 +63,14 @@ export const PREMIUM_BRANDS = [
 ] as const;
 
 export type PremiumBrandSlug = (typeof PREMIUM_BRANDS)[number]["slug"];
+
+/**
+ * Trail of a hub from lib/collection-hubs: its parent section's trail plus
+ * the hub ("Inicio > Ray-Ban > Aviador").
+ */
+export function collectionHubTrail(hub: CollectionHub): Crumb[] {
+  return [...COLLECTION_TRAILS[hub.parent], { name: hub.crumb, href: hub.path }];
+}
 
 export function premiumBrandTrail(slug: PremiumBrandSlug): Crumb[] {
   const brand = PREMIUM_BRANDS.find((entry) => entry.slug === slug);

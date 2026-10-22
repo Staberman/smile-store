@@ -8,3 +8,6 @@ export const STORE_LOCATION: {
   readonly countryCode: "AR";
   readonly label: "Rosario, Santa Fe, Argentina";
 };
+
+/** "retiro coordinado por WhatsApp en Puerto Norte", inside a sentence. */
+export const STORE_PICKUP_PHRASE: string;

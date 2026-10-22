@@ -2,12 +2,13 @@
 // llms.txt. Keep claims here factual: no shipping times, costs or warranty
 // terms the owner has not confirmed.
 
-// Payment phrases and location live in lib/store-copy.mjs, where the
-// node:test suites can read them too.
+// Payment phrases, location and the pickup point live in lib/store-copy.mjs,
+// where the node:test suites can read them too.
 export {
   CHECKOUT_PHRASE,
   INSTALLMENTS_PHRASE,
   STORE_LOCATION,
+  STORE_PICKUP_PHRASE,
   TRANSFER_DISCOUNT_PHRASE,
 } from "@/lib/store-copy.mjs";
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { hubsOf, indexableHubs } from "@/lib/hub-pages";
 import {
   CONSUMER_DEFENSE_URL,
   ORDER_CANCELLATION_URL,
@@ -7,6 +8,11 @@ import {
 
 type FooterLink = { label: string; href: string; target?: "_blank" };
 type FooterColumn = { heading: string; links: FooterLink[] };
+
+/** Indexable hubs of a group as footer links (noindex hubs are left out). */
+function hubLinks(...args: Parameters<typeof hubsOf>): FooterLink[] {
+  return indexableHubs(hubsOf(...args)).map((hub) => ({ label: hub.linkLabel, href: hub.path }));
+}
 
 // Every link points to an indexable destination or, under "Ayuda", to the
 // consumer-protection forms required for online sales in Argentina. Each
@@ -25,6 +31,7 @@ const nav: FooterColumn[] = [
     heading: "Marcas",
     links: [
       { label: "Ray-Ban", href: "/tienda/marcas/ray-ban" },
+      ...hubLinks("model", "ray-ban"),
       { label: "Invicta", href: "/tienda/marcas/invicta" },
       { label: "Tommy Hilfiger", href: "/tienda/marcas/tommy-hilfiger" },
       { label: "OMEGA x Swatch", href: "/tienda/relojes/omega-swatch" },

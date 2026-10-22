@@ -2,11 +2,14 @@ import BrandCarousel from "@/components/brand/BrandCarousel";
 import ProductGrid from "@/components/brand/ProductGrid";
 import CollectionLinks from "@/components/brand/CollectionLinks";
 import HubHeader from "@/components/brand/HubHeader";
+import HubLinks from "@/components/brand/HubLinks";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
-import { allProducts, outOfStockProducts, type CatalogProduct } from "@/lib/catalog";
+import { allProducts, outOfStockProducts } from "@/lib/catalog";
+import { isRayBanProduct } from "@/lib/collection-hubs.mjs";
 import { COLLECTION_TRAILS } from "@/lib/collections";
+import { hubsOf, indexableHubs } from "@/lib/hub-pages";
 import { categoryLineHighlight, hubDescription, hubIntro } from "@/lib/hubs";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema, pageMetadata } from "@/lib/seo";
@@ -21,10 +24,6 @@ export const metadata = pageMetadata({
   path: "/tienda/marcas/ray-ban",
 });
 
-const isRayBanProduct = (product: CatalogProduct) => {
-  const values = [product.brand, ...product.categories];
-  return values.some((value) => value.toLowerCase().includes("ray ban"));
-};
 const rayBanProducts = allProducts.filter(isRayBanProduct);
 const rayBanOutOfStock = outOfStockProducts.filter(isRayBanProduct);
 const rayBanSchema = collectionSchema(
@@ -46,12 +45,19 @@ const intro = hubIntro({
   ]),
 });
 
+// Model hubs with enough products in the catalog to be indexed.
+const modelLinks = indexableHubs(hubsOf("model", "ray-ban")).map((hub) => ({
+  label: hub.name,
+  href: hub.path,
+}));
+
 export default function RayBanPage() {
   return (
     <main className="bg-[#0a0a0a]">
       <JsonLd data={rayBanSchema} />
       <Breadcrumbs trail={COLLECTION_TRAILS["ray-ban"]} />
       <HubHeader eyebrow="Colección Ray-Ban" title="Anteojos de sol Ray-Ban" intro={intro} />
+      <HubLinks eyebrow="Por modelo" title="Modelos Ray-Ban" links={modelLinks} />
       <BrandCarousel
         products={rayBanSummaries}
         brand="Ray-Ban"

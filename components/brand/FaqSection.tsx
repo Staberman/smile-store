@@ -71,7 +71,8 @@ export default function FaqSection({
           {faqs.map((faq) => (
             <details key={faq.question} className="group py-3">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[13px] text-[#b8b0a4] transition-colors hover:text-[#f0ece4]">
-                {faq.question}
+                {/* Each question is a heading under the section's H2. */}
+                <h3>{faq.question}</h3>
                 <span
                   className="shrink-0 text-[#4a4540] transition-transform duration-200 group-open:rotate-45"
                   aria-hidden="true"

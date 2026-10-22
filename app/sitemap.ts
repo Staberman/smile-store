@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { allProducts, allProductsIncludingOutOfStock } from "@/lib/catalog";
+import { indexableHubs } from "@/lib/hub-pages";
 import { absoluteUrl, productUrl } from "@/lib/seo";
 
 // Date of the last content change to the static routes below. Hardcoded on
@@ -38,8 +39,12 @@ const availablePremiumBrandRoutes = premiumBrandRoutes
   .filter(([brand]) => allProducts.some((product) => product.brand === brand))
   .map(([, route]) => route);
 
+// Model and audience hubs (lib/collection-hubs.mjs) with enough products in
+// the catalog to be indexed; the rest render noindex.
+const indexableHubRoutes = indexableHubs().map((hub) => hub.path);
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const indexableRoutes = [...staticRoutes, ...availablePremiumBrandRoutes];
+  const indexableRoutes = [...staticRoutes, ...indexableHubRoutes, ...availablePremiumBrandRoutes];
 
   return [
     ...indexableRoutes.map((route) => ({
