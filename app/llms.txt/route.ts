@@ -1,41 +1,21 @@
 import { allProducts } from "@/lib/catalog";
-import {
-  COLLECTION_SUMMARIES,
-  COLLECTION_TRAILS,
-  PREMIUM_BRANDS,
-  type CollectionKey,
-} from "@/lib/collections";
-import { indexableHubs } from "@/lib/hub-pages";
+import { llmsHubs } from "@/lib/llms-hubs";
+import { llmsSummary } from "@/lib/llms-text.mjs";
 import { absoluteUrl, SITE_NAME } from "@/lib/seo";
 import {
-  CHECKOUT_PHRASE,
-  FREE_SHIPPING_PHRASE,
   INSTAGRAM_URL,
-  INSTALLMENTS_PHRASE,
   PHONE_DISPLAY,
   STORE_ALTERNATE_NAME,
   STORE_EMAIL,
   STORE_LOCATION,
-  STORE_PICKUP_PHRASE,
-  TRANSFER_DISCOUNT_PHRASE,
   WHATSAPP_URL,
 } from "@/lib/store-facts";
 import { isWatch } from "@/lib/storefront.mjs";
 
 // llms.txt (https://llmstxt.org): a plain-text map of the site for language
 // models. Hubs come from lib/collections, so new collections show up here.
+// /llms-full.txt opens with the same summary and adds the whole catalog.
 export const dynamic = "force-static";
-
-const HUB_ORDER: CollectionKey[] = [
-  "anteojos-de-sol",
-  "ray-ban",
-  "ferrari",
-  "premium",
-  "relojes",
-  "invicta",
-  "tommy-hilfiger",
-  "omega-swatch",
-];
 
 function link(name: string, path: string, description: string): string {
   return `- [${name}](${absoluteUrl(path)}): ${description}`;
@@ -45,35 +25,19 @@ function buildLlmsTxt(): string {
   const sunglasses = allProducts.filter((product) => !isWatch(product)).length;
   const watches = allProducts.length - sunglasses;
 
-  const hubs = HUB_ORDER.map((key) => {
-    const crumb = COLLECTION_TRAILS[key][COLLECTION_TRAILS[key].length - 1];
-    return link(crumb.name, crumb.href, COLLECTION_SUMMARIES[key]);
-  });
-  // Model and audience hubs, same rule as the sitemap: only those with enough
-  // products in the catalog. The sunglasses hub is in HUB_ORDER.
-  const collectionHubs = indexableHubs()
-    .filter((hub) => hub.group !== "category")
-    .map((hub) => link(hub.linkLabel, hub.path, hub.summary));
-  // Same rule as the sitemap: premium brands without stock are not indexed.
-  const premiumBrands = PREMIUM_BRANDS.filter((brand) =>
-    allProducts.some((product) => product.brand === brand.catalogBrand),
-  ).map((brand) =>
-    link(brand.name, `/tienda/marcas/premium/${brand.slug}`, `Anteojos de sol ${brand.name}.`),
-  );
-
   return [
     `# ${SITE_NAME}`,
     "",
-    `> ${SITE_NAME} (${STORE_ALTERNATE_NAME}) es una tienda online de ${STORE_LOCATION.label}, que vende anteojos de sol y relojes originales: Ray-Ban (incluida la Scuderia Ferrari Collection), marcas premium como Prada, Christian Dior, Versace, Gucci y Louis Vuitton, y relojes Invicta, Tommy Hilfiger y OMEGA x Swatch. Las compras se confirman en el ${CHECKOUT_PHRASE}; se puede pagar en ${INSTALLMENTS_PHRASE} o con ${TRANSFER_DISCOUNT_PHRASE}. Envíos a todo el país y ${STORE_PICKUP_PHRASE}, ${STORE_LOCATION.locality}. ${FREE_SHIPPING_PHRASE}.`,
+    `> ${llmsSummary({ name: SITE_NAME, alternateName: STORE_ALTERNATE_NAME })}`,
     "",
     `El catálogo tiene ${sunglasses} modelos de anteojos de sol y ${watches} relojes con stock. Stock y precios se sincronizan con Tiendanube cada hora; los modelos agotados siguen publicados con la etiqueta "Sin stock". Precios en pesos argentinos (ARS).`,
+    "",
+    `Versión completa: ${absoluteUrl("/llms-full.txt")}`,
     "",
     "## Tienda",
     "",
     link("Inicio", "/", "Catálogo completo de anteojos de sol y relojes con stock."),
-    ...hubs,
-    ...collectionHubs,
-    ...premiumBrands,
+    ...llmsHubs().map((hub) => link(hub.name, hub.path, hub.description)),
     "",
     "## Guías",
     "",

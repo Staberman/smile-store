@@ -290,7 +290,10 @@ test("hub routes render one H1, list only indexable hubs and redirect legacy URL
     assert.match(source, /dynamicParams = false|getHubPage\(SUNGLASSES_HUB\)/);
   }
   assert.match(read("app/sitemap.ts"), /indexableHubs\(\)/);
-  assert.match(read("app/llms.txt/route.ts"), /indexableHubs\(\)/);
+  // llms.txt and llms-full.txt list the hubs from lib/llms-hubs.
+  assert.match(read("lib/llms-hubs.ts"), /indexableHubs\(\)/);
+  assert.match(read("app/llms.txt/route.ts"), /llmsHubs\(\)/);
+  assert.match(read("app/llms-full.txt/route.ts"), /llmsHubs\(\)/);
 
   // Navigation links only indexed audience hubs: the nav gets them from the
   // server (StoreShell) instead of hardcoding URLs, and the footer and the

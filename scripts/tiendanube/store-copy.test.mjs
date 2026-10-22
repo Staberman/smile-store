@@ -59,7 +59,8 @@ test("free-shipping claims are never written by hand", () => {
   }
 
   for (const file of [
-    "app/llms.txt/route.ts",
+    // The llms.txt / llms-full.txt summary and store facts.
+    "lib/llms-text.mjs",
     "components/promo/SessionOfferPopup.tsx",
     "lib/store-faqs.mjs",
   ]) {

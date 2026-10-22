@@ -63,7 +63,8 @@ test("the pickup point is named only through STORE_PICKUP_PHRASE, once per page"
     assert.doesNotMatch(source, /streetAddress|openingHours/, file);
   }
 
-  for (const file of ["app/contacto/page.tsx", "app/llms.txt/route.ts", "components/brand/PickupNote.tsx"]) {
+  // lib/llms-text.mjs: the llms.txt / llms-full.txt summary and store facts.
+  for (const file of ["app/contacto/page.tsx", "lib/llms-text.mjs", "components/brand/PickupNote.tsx"]) {
     assert.match(read(file), /STORE_PICKUP_PHRASE/, `${file} mentions the pickup point`);
   }
   // Product pages add the pickup line to the trust block. The homepage renders
