@@ -1,39 +1,12 @@
 import JsonLd from "@/components/seo/JsonLd";
-import { INTEREST_FREE_INSTALLMENTS } from "@/lib/storefront.mjs";
+import { STORE_FAQS } from "@/lib/store-faqs.mjs";
 
 export type FaqItem = {
   question: string;
   answer: string;
 };
 
-const DEFAULT_FAQS: FaqItem[] = [
-  {
-    question: "¿Los productos son originales?",
-    answer:
-      "Sí. Todos los relojes y lentes de Smile son 100% originales e importados, con la garantía oficial de cada marca.",
-  },
-  {
-    question: "¿Cómo se hace el pago?",
-    answer:
-      `El pago se realiza a través del checkout seguro de Tiendanube, con tarjeta de crédito, débito, transferencia o Mercado Pago. También ofrecemos hasta ${INTEREST_FREE_INSTALLMENTS} cuotas sin interés.`,
-  },
-  {
-    question: "¿Hacen envíos a todo el país?",
-    answer:
-      "Sí, hacemos envíos gratis a todo el país, sin monto mínimo de compra. Solo completás tus datos en el checkout y listo.",
-  },
-  {
-    question: "¿Puedo cambiar o devolver un producto?",
-    answer:
-      "Sí, contás con derecho a cambio o devolución dentro de los primeros 10 días de recibido el producto, siempre que esté en su empaque original.",
-  },
-  {
-    question: "¿Cómo sé si un producto tiene stock?",
-    answer:
-      "El stock de la tienda se sincroniza con Tiendanube cada hora. Los modelos agotados siguen publicados con la etiqueta «Sin stock» y no se pueden comprar hasta que se reponen; podés consultarnos por WhatsApp por su reposición.",
-  },
-];
-
+// The visible list and the FAQPage JSON-LD come from the same items.
 function faqPageSchema(faqs: FaqItem[]) {
   return {
     "@context": "https://schema.org",
@@ -50,7 +23,7 @@ function faqPageSchema(faqs: FaqItem[]) {
 }
 
 export default function FaqSection({
-  faqs = DEFAULT_FAQS,
+  faqs = STORE_FAQS,
   title = "Preguntas frecuentes",
 }: {
   faqs?: FaqItem[];

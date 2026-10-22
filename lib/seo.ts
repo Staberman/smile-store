@@ -107,6 +107,8 @@ export function organizationSchema() {
     email: STORE_EMAIL,
     telephone: PHONE_E164,
     sameAs: [INSTAGRAM_URL],
+    // City only. The pickup point is arranged over WhatsApp and has no public
+    // street address or opening hours, so neither belongs here.
     address: {
       "@type": "PostalAddress",
       addressLocality: STORE_LOCATION.locality,

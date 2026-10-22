@@ -10,6 +10,7 @@ import {
   PHONE_E164,
   STORE_EMAIL,
   STORE_LOCATION,
+  STORE_PICKUP_PHRASE,
   WHATSAPP_URL,
 } from "@/lib/store-facts";
 
@@ -43,6 +44,13 @@ const contactItems: ContactItem[] = [
   { label: "Email", value: STORE_EMAIL, href: `mailto:${STORE_EMAIL}` },
   { label: "Instagram", value: instagramHandle, href: INSTAGRAM_URL, external: true },
   { label: "Ubicación", value: STORE_LOCATION.label },
+  // The pickup is arranged over WhatsApp, so the item links there.
+  {
+    label: "Retiro",
+    value: `Ofrecemos ${STORE_PICKUP_PHRASE}, ${STORE_LOCATION.locality}.`,
+    href: WHATSAPP_URL,
+    external: true,
+  },
   {
     label: "Consultas",
     value: "Stock, medios de pago, envíos y seguimiento de compra.",

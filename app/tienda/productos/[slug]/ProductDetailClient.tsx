@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TiendanubeCheckoutForm from "@/components/checkout/TiendanubeCheckoutForm";
+import PickupNote from "@/components/brand/PickupNote";
 import TrustHighlights from "@/components/brand/TrustHighlights";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import FavoriteButton from "@/components/product/FavoriteButton";
@@ -558,7 +559,9 @@ export default function ProductDetailClient({
         <RecentlyViewed excludeSlug={product.slug} />
       </div>
 
-      <TrustHighlights />
+      <TrustHighlights>
+        <PickupNote />
+      </TrustHighlights>
 
       {zoomOpen && (
         <div

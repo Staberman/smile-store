@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 const highlights = [
   {
     title: "Checkout seguro",
@@ -17,7 +19,10 @@ const highlights = [
   },
 ];
 
-export default function TrustHighlights() {
+// `children` is an optional line under the grid (the product page's
+// PickupNote). The homepage renders this block in its client catalog, so the
+// line is passed in rather than imported here.
+export default function TrustHighlights({ children }: { children?: ReactNode }) {
   return (
     <section className="border-y border-white/6 bg-[#080808] px-6 py-8 text-[#f0ece4] md:px-12">
       <div className="mx-auto grid max-w-7xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -32,6 +37,7 @@ export default function TrustHighlights() {
           </div>
         ))}
       </div>
+      {children}
     </section>
   );
 }
