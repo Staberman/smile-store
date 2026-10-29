@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { publishedOnly } from "../../lib/catalog-published.mjs";
 import { isRayBanProduct, RAY_BAN_MODEL_HUBS } from "../../lib/collection-hubs.mjs";
 import { buildLlmsFull, llmsSummary } from "../../lib/llms-text.mjs";
 import { formatPrice } from "../../lib/price-format.mjs";
@@ -19,7 +20,8 @@ import { getAvailableVariants, getDisplayPrice } from "../../lib/storefront.mjs"
 
 const projectRoot = process.cwd();
 const read = (relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8");
-const catalog = JSON.parse(read("data/tiendanube-catalog.json"));
+// The products the site lists (lib/catalog.ts drops unpublished ones).
+const catalog = publishedOnly(JSON.parse(read("data/tiendanube-catalog.json")));
 
 const SITE_URL = "https://smiletiendaimp.com.ar";
 const STORE = { name: "Smile", alternateName: "Smile Tienda" };

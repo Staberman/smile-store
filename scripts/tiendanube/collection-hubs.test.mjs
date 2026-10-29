@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { publishedOnly } from "../../lib/catalog-published.mjs";
 import {
   AUDIENCE_HUBS,
   buildHubPage,
@@ -26,8 +27,9 @@ import {
 } from "../../lib/store-copy.mjs";
 
 const projectRoot = process.cwd();
-const catalog = JSON.parse(
-  fs.readFileSync(path.join(projectRoot, "data/tiendanube-catalog.json"), "utf8"),
+// The products the site lists (lib/catalog.ts drops unpublished ones).
+const catalog = publishedOnly(
+  JSON.parse(fs.readFileSync(path.join(projectRoot, "data/tiendanube-catalog.json"), "utf8")),
 );
 
 // Same rule as lib/catalog.ts (hasPurchasableStock).

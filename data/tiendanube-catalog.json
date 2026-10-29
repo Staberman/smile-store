@@ -720,7 +720,8 @@
     ],
     "importWarnings": [
       "Descripción generada desde marca, modelo y categoría por falta de descripción en Tiendanube."
-    ]
+    ],
+    "published": false
   },
   {
     "id": "329813678",
@@ -1173,7 +1174,8 @@
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/5b616e7c-bbec-4da3-aa26-a101df01898e-ddb35bca450dcdc69c17631209163382-1024-1024.webp"
       }
     ],
-    "importWarnings": []
+    "importWarnings": [],
+    "published": false
   },
   {
     "id": "307254154",
@@ -1210,7 +1212,8 @@
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/b9e37c90-e734-46d8-937f-4b3d1bf3d1f5-201f329eff155ad99a17631207983157-1024-1024.webp"
       }
     ],
-    "importWarnings": []
+    "importWarnings": [],
+    "published": false
   },
   {
     "id": "307253967",

@@ -93,6 +93,48 @@ test("zero stock and unpublished products become unavailable", () => {
   assert.equal(unpublished.stock, 0);
 });
 
+test("unpublished products are flagged and the flag goes away once published again", () => {
+  const original = catalogProduct();
+  const published = mergeCatalogWithTiendanube([original], [apiProduct()]).catalog[0];
+  // Published products carry no field, so syncs leave their entries alone.
+  assert.equal("published" in published, false);
+
+  const unpublished = mergeCatalogWithTiendanube([original], [apiProduct({ published: false })]);
+  assert.equal(unpublished.catalog[0].published, false);
+  assert.equal(unpublished.summary.unpublishedProducts, 1);
+  // Last key, where the catalog file keeps it.
+  assert.equal(Object.keys(unpublished.catalog[0]).at(-1), "published");
+
+  // Still unpublished: the entry is left as is.
+  const again = mergeCatalogWithTiendanube(unpublished.catalog, [apiProduct({ published: false })]);
+  assert.deepEqual(again.catalog, unpublished.catalog);
+  assert.equal(again.summary.changedProducts, 0);
+
+  const republished = mergeCatalogWithTiendanube(unpublished.catalog, [apiProduct()]);
+  assert.deepEqual(republished.catalog[0], published);
+  assert.equal(republished.summary.unpublishedProducts, 0);
+});
+
+test("products missing from the API response keep their published state", () => {
+  const products = Array.from({ length: 4 }, (_, index) =>
+    catalogProduct({
+      id: String(index + 1),
+      tiendanubeProductId: index + 1,
+      ...(index === 3 ? { published: false } : {}),
+    }),
+  );
+  const result = mergeCatalogWithTiendanube(products, [
+    apiProduct({ id: 1 }),
+    apiProduct({ id: 2 }),
+  ]);
+
+  assert.equal(result.summary.missingProducts, 2);
+  // A short response neither unpublishes nor republishes anything.
+  assert.equal("published" in result.catalog[2], false);
+  assert.equal(result.catalog[3].published, false);
+  assert.equal(result.catalog[3].variants[0].available, false);
+});
+
 test("unmanaged stock remains purchasable", () => {
   const result = mergeCatalogWithTiendanube(
     [catalogProduct()],

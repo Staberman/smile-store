@@ -1,5 +1,6 @@
 import catalog from "@/data/tiendanube-catalog.json";
 import salesRankingData from "@/data/tiendanube-sales-ranking.json";
+import { publishedOnly } from "@/lib/catalog-published.mjs";
 
 export type CatalogVariant = {
   id: number | null;
@@ -31,6 +32,8 @@ export type CatalogProduct = {
   sourceUrl: string;
   variants: CatalogVariant[];
   importWarnings: string[];
+  /** Absent while published; `false` once Tiendanube unpublishes it (sync). */
+  published?: boolean;
 };
 
 export type CategoryNode = {
@@ -41,7 +44,12 @@ export type CategoryNode = {
   children: CategoryNode[];
 };
 
-const importedProducts = catalog as CatalogProduct[];
+// The site only knows published products. A product unpublished in Tiendanube
+// (its storefront page is gone) is dropped here, before every list and lookup
+// below: no product page (a real 404), no sitemap, feed, llms, hub, guide,
+// search or related-products entry. Once it is published again, the next sync
+// brings all of that back.
+const publishedProducts = publishedOnly(catalog as CatalogProduct[]);
 
 export function hasPurchasableStock(product: CatalogProduct): boolean {
   return product.variants.some(
@@ -57,17 +65,18 @@ export function isPurchasable(product: CatalogProduct): boolean {
   return hasPurchasableStock(product);
 }
 
-// Full set: every catalog product, including out-of-stock ones. The import step
-// already excludes anything hidden from the store ("Mostrar en tienda" != "SI"),
-// so out-of-stock products here stay listable-by-URL and indexable.
-export const allProductsIncludingOutOfStock = importedProducts;
+// Full set: every published catalog product, including out-of-stock ones. The
+// import step already excludes anything hidden from the store ("Mostrar en
+// tienda" != "SI") and unpublished products are dropped above, so
+// out-of-stock products here stay listable-by-URL and indexable.
+export const allProductsIncludingOutOfStock = publishedProducts;
 
 // Purchasable-only set used by every listing/grid, brand and collection page.
-export const allProducts = importedProducts.filter(hasPurchasableStock);
+export const allProducts = publishedProducts.filter(hasPurchasableStock);
 
 // Listed by URL but not purchasable: collection hubs link them in a separate
 // "Sin stock por ahora" section so their pages are reachable by crawlers.
-export const outOfStockProducts = importedProducts.filter(
+export const outOfStockProducts = publishedProducts.filter(
   (product) => !hasPurchasableStock(product),
 );
 

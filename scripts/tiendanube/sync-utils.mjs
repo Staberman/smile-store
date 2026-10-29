@@ -49,6 +49,15 @@ function disableVariant(variant) {
   };
 }
 
+// Product-level published state, stored only while unpublished: the site drops
+// products with `published: false` (lib/catalog-published.mjs), and the field
+// goes away once Tiendanube publishes the product again. Published products
+// carry no field, so a sync only rewrites the ones whose state changed.
+function withPublishedState(product, published) {
+  const { published: _previous, ...rest } = product;
+  return published ? rest : { ...rest, published: false };
+}
+
 function aggregateProduct(product, variants) {
   const prices = variants
     .map((variant) => variant.price)
@@ -105,6 +114,7 @@ export function mergeCatalogWithTiendanube(catalog, apiProducts) {
   let changedProducts = 0;
   let missingProducts = 0;
   let missingVariants = 0;
+  let unpublishedProducts = 0;
 
   const mergedCatalog = catalog.map((product) => {
     const apiProduct = apiProductsById.get(Number(product.tiendanubeProductId));
@@ -139,10 +149,18 @@ export function mergeCatalogWithTiendanube(catalog, apiProducts) {
       });
     }
 
-    const mergedProduct = aggregateProduct(product, variants);
+    const mergedProduct = aggregateProduct(
+      // A product missing from the response keeps its last published state:
+      // a short response must not unpublish it.
+      apiProduct
+        ? withPublishedState(product, apiProduct.published !== false)
+        : product,
+      variants,
+    );
     if (JSON.stringify(mergedProduct) !== JSON.stringify(product)) {
       changedProducts += 1;
     }
+    if (mergedProduct.published === false) unpublishedProducts += 1;
     return mergedProduct;
   });
 
@@ -155,6 +173,7 @@ export function mergeCatalogWithTiendanube(catalog, apiProducts) {
       changedProducts,
       missingProducts,
       missingVariants,
+      unpublishedProducts,
     },
   };
 }
