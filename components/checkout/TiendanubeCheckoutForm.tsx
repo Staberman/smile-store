@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { pageview } from "@vercel/analytics";
 import type { CatalogVariant } from "@/lib/catalog";
 import type { ProductDetail } from "@/lib/product-summary";
+import { buyEvent } from "@/lib/visitor-events.mjs";
 
 type Props = {
-  product: Pick<ProductDetail, "tiendanubeProductId" | "storefrontUrl">;
+  product: Pick<ProductDetail, "slug" | "tiendanubeProductId" | "storefrontUrl">;
   variant: Pick<CatalogVariant, "id" | "available" | "stock"> | null;
   disabled?: boolean;
   label?: string;
@@ -34,6 +36,14 @@ export default function TiendanubeCheckoutForm({
 
   const handleClick = async () => {
     if (!canBuy || loading || !variant?.id) return;
+
+    // Recorded before the checkout request. The analytics script posts it with
+    // a keepalive fetch, which can outlive the redirect below.
+    try {
+      pageview(buyEvent(product.slug));
+    } catch {
+      // Analytics is best effort: it must never stop the purchase.
+    }
 
     setLoading(true);
     setError(null);
