@@ -97,7 +97,9 @@ test("the full product list is a static route outside /api/", () => {
   assert.match(route, /export const dynamic = "force-static"/);
   assert.match(route, /toProductSummaries\(allProducts\)/);
   assert.ok(!STORE_PRODUCTS_PATH.startsWith("/api/"), "robots.txt disallows /api/");
-  assert.match(read("components/store/TiendaClient.tsx"), /createStoreProductsLoader/);
+  // One loader, shared by the homepage catalog and the site search overlay.
+  assert.match(read("components/search/search-data.ts"), /createStoreProductsLoader/);
+  assert.match(read("components/store/TiendaClient.tsx"), /storeProductsLoader\.load\(\)/);
 });
 
 // --- Loading the full list: retries with backoff, one request at a time ---

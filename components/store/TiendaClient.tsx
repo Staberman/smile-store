@@ -2,7 +2,8 @@
 
 import { type ReactNode, Suspense, startTransition, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { createStoreProductsLoader } from "@/lib/home-catalog.mjs";
+import { storeProductsLoader } from "@/components/search/search-data";
+import { CATALOG_QUERY_PARAM } from "@/lib/search-overlay.mjs";
 import type { ProductSummary } from "@/lib/product-summary";
 import TiendaCatalog from "./TiendaCatalog";
 import { DEFAULT_STORE_VIEW } from "./storeView";
@@ -14,9 +15,9 @@ type CatalogProps = {
   animateEntrance: boolean;
 };
 
-// Every purchasable product, loaded once per page load (with retries) and
-// reused when the homepage is visited again through client-side navigation.
-const storeProductsLoader = createStoreProductsLoader<ProductSummary>();
+// Every purchasable product (storeProductsLoader) is loaded once per page load,
+// with retries, and reused when the homepage is visited again through
+// client-side navigation and by the site search overlay.
 
 /** The full product list, or null while the catalog shows its preview. */
 function useStoreProducts(): ProductSummary[] | null {
@@ -51,7 +52,9 @@ function useStoreProducts(): ProductSummary[] | null {
 function TiendaCatalogFromUrl(props: CatalogProps) {
   const searchParams = useSearchParams();
   const view = searchParams.get("view") ?? DEFAULT_STORE_VIEW;
-  return <TiendaCatalog view={view} {...props} />;
+  // The site search overlay links its results here as /?q=…#catalogo.
+  const query = searchParams.get(CATALOG_QUERY_PARAM) ?? "";
+  return <TiendaCatalog view={view} query={query} {...props} />;
 }
 
 /**

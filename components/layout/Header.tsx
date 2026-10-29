@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import SearchButton from "@/components/search/SearchButton";
 import { useFavorites } from "@/lib/browser-lists";
 
 export default function Header() {
@@ -45,6 +46,8 @@ export default function Header() {
           >
             Tienda
           </a>
+
+          <SearchButton className="h-10 w-10 border-white/12 text-white/80 hover:border-white/40 hover:text-white" />
 
           <FavoritesLink />
         </nav>

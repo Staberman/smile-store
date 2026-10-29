@@ -4,8 +4,10 @@ import { Analytics } from "@vercel/analytics/next";
 import WhatsAppClickTracker from "@/components/analytics/WhatsAppClickTracker";
 import WhatsAppFloatingButton from "@/components/contact/WhatsAppFloatingButton";
 import SessionOfferPopup from "@/components/promo/SessionOfferPopup";
+import SiteSearchProvider from "@/components/search/SiteSearchProvider";
 import JsonLd from "@/components/seo/JsonLd";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
+import { featuredSearchRows } from "@/lib/search-featured";
 import {
   ORGANIZATION_ID,
   organizationSchema,
@@ -80,7 +82,8 @@ export default function RootLayout({
     <html lang="es-AR" className={`${cormorant.variable} ${inter.variable}`}>
       <body>
         <JsonLd data={websiteSchema} />
-        {children}
+        {/* The header search button of every page opens this overlay. */}
+        <SiteSearchProvider featured={featuredSearchRows}>{children}</SiteSearchProvider>
         <WhatsAppFloatingButton />
         <SessionOfferPopup />
         <Analytics />

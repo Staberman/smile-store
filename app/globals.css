@@ -50,3 +50,30 @@ body {
 .animate-scrollLine {
   animation: scrollLine 2.2s ease-in-out infinite;
 }
+
+/* Site search overlay (components/search/SearchOverlay.tsx): slides down from
+   the top and back up. Reduced motion shows and hides it without moving. */
+@keyframes searchSheetIn {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes searchSheetOut {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+
+.animate-searchSheetIn {
+  animation: searchSheetIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-searchSheetOut {
+  animation: searchSheetOut 0.24s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-searchSheetIn,
+  .animate-searchSheetOut {
+    animation: none;
+  }
+}

@@ -43,6 +43,17 @@ export function getDisplayPrice(
   product: PriceFields,
   variant?: PriceFields | null,
 ): number | null;
+/** The variant a product card selects first: first purchasable, else first, else null. */
+export function defaultVariant<V extends StockVariant>(
+  product: ProductWithVariants<V>,
+): V | null;
+/** The price a product card shows before a variant is picked. */
+export function cardPrice(product: PriceFields & ProductWithVariants): number | null;
+/** By card price, "asc" or "desc"; no price last, ties in input order. New array. */
+export function sortByCardPrice<P extends PriceFields & ProductWithVariants>(
+  products: readonly P[],
+  order: "asc" | "desc",
+): P[];
 export declare const TRANSFER_DISCOUNT_PERCENT: number;
 export declare const INTEREST_FREE_INSTALLMENTS: number;
 /** Order total (ARS) above which checkout ships for free; 0 = every order. */

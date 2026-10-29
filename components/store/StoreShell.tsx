@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
+import SearchButton from "@/components/search/SearchButton";
 import StoreCategoryNav, { type AudienceNavLinks } from "@/components/store/StoreCategoryNav";
 import type { HubParent } from "@/lib/collection-hubs.mjs";
 import { hubsOf, indexableHubs } from "@/lib/hub-pages";
@@ -23,7 +24,8 @@ const audienceLinks: AudienceNavLinks = {
 
 /**
  * Store chrome shared by the homepage ("/") and every /tienda/* route:
- * sticky header with logo, category navigation and store link, plus footer.
+ * sticky header with logo, category navigation, search and store link, plus
+ * footer.
  */
 export default function StoreShell({
   children,
@@ -54,6 +56,7 @@ export default function StoreShell({
             </div>
 
             <nav className="flex shrink-0 items-center gap-2">
+            <SearchButton className="h-11 w-11 border-white/25 bg-white/8 text-white backdrop-blur hover:border-white hover:bg-white hover:text-black" />
             <Link
               href="/"
               className="flex min-h-11 cursor-pointer items-center rounded-full border border-white/25 bg-white/8 px-4 text-[10px] uppercase tracking-[0.2em] text-white backdrop-blur transition hover:border-white hover:bg-white hover:text-black"

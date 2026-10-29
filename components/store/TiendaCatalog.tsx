@@ -15,12 +15,15 @@ import { DEFAULT_STORE_VIEW, STORE_VIEW_LABELS } from "./storeView";
  */
 export default function TiendaCatalog({
   view,
+  query = "",
   products,
   bestSellerSlugs,
   brands,
   animateEntrance = true,
 }: {
   view: string;
+  /** Catalog search from the address (`?q=`), e.g. a link from the site search. */
+  query?: string;
   products: ProductSummary[];
   bestSellerSlugs: string[];
   /** Brand directory, rendered on the server from the full catalog. */
@@ -43,13 +46,16 @@ export default function TiendaCatalog({
       <TrustHighlights />
       {brands}
 
-      <div id="catalogo">
+      {/* Scroll margin: links to #catalogo (the header, the site search) land
+          with the search field below the sticky store header. */}
+      <div id="catalogo" className="scroll-mt-24 md:scroll-mt-6">
         <ProductGrid
           key={`grid-${view}`}
           products={visibleProducts}
           brandLabel={label}
           filterBy={view === "premium" ? "brand" : "collection"}
           searchProducts={products}
+          initialSearch={query}
           enableFacets
           animateEntrance={animateEntrance}
         />

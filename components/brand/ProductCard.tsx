@@ -8,6 +8,7 @@ import { canonicalBrand } from "@/lib/brand-directory";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
 import {
+  defaultVariant,
   getAvailableVariants,
   getDisplayPrice,
   getInstallmentPrice,
@@ -44,16 +45,16 @@ export default function ProductCard({
   outOfStock?: boolean;
 }) {
   const availableVariants = getAvailableVariants(product);
+  // The variant shown before the visitor picks one; grids sort by its price
+  // (sortByCardPrice in lib/storefront.mjs), so both use the same choice.
+  const initialVariant = defaultVariant(product);
   const [hovered, setHovered] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
-    availableVariants[0]?.id ?? product.variants[0]?.id ?? null
+    initialVariant?.id ?? null
   );
 
   const selectedVariant =
-    product.variants.find((variant) => variant.id === selectedVariantId) ??
-    availableVariants[0] ??
-    product.variants[0] ??
-    null;
+    product.variants.find((variant) => variant.id === selectedVariantId) ?? initialVariant;
 
   const image = selectedVariant?.image ?? product.image;
   const price = getDisplayPrice(product, selectedVariant);
