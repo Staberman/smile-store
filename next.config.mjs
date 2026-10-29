@@ -6,7 +6,11 @@ const nextConfig = {
   // in its last redirect, after the legacy Tiendanube rules.
   skipTrailingSlashRedirect: true,
   images: {
-    formats: ["image/avif", "image/webp"],
+    // No Vercel image optimization: once the Hobby quota runs out, every
+    // variant it has not cached fails with 402 and the photo shows empty.
+    // lib/image-loader.mjs asks Tiendanube's CDN for the size instead.
+    loader: "custom",
+    loaderFile: "./lib/image-loader.mjs",
     remotePatterns: [
       { protocol: "https", hostname: "dcdn-us.mitiendanube.com" },
       { protocol: "https", hostname: "d1a9qnv764bsoo.cloudfront.net" },
