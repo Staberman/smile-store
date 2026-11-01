@@ -8794,7 +8794,7 @@
     "descriptionText": "Los anteojos de sol Round Double Bridge 3647N son la pieza perfecta para mejorar tu visión y tu look. Son 100% originales, hechos con materiales de altísima calidad. Características: Formato: Redondos. Género: Hombre y Mujer (Unisex). Talles Disponibles: Mediano. Lentes Disponibles: Clásicos, Degrades, Espejados. Protección: 100% de los rayos UV dañinos. Material del Lente: Policarbonato. Material del Marco: Metal. Peso: Normal. Formato de Cara Recomendado: Redonda, ovalada, rectangular. Los RB3647N Round Double Bridge son ideales para todos los días, y también para esas ocasiones tan especiales. Combinan estilo, comodidad y un rendimiento excepcional. Encuentra tus gafas de sol favoritas en Argentina, como si estuvieras en USA.",
     "price": 210105,
     "promotionalPrice": 182700,
-    "stock": 8,
+    "stock": 7,
     "images": [
       "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-doradoverde-2-6432ae88318b58da5717157460485998-1024-1024.webp",
       "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-doradoverde-1-89bb48777ae768524817157460466672-1024-1024.webp",
@@ -8850,8 +8850,8 @@
         ],
         "price": 210105,
         "promotionalPrice": 182700,
-        "stock": 1,
-        "available": true,
+        "stock": 0,
+        "available": false,
         "image": "https://dcdn-us.mitiendanube.com/stores/003/759/046/products/round-double-bridge-doradoazul-degrade-1-e85bde0aa46226376d17157460462939-1024-1024.webp"
       },
       {
