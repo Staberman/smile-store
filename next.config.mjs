@@ -5,6 +5,19 @@ const nextConfig = {
   // then the legacy rule). vercel.json strips trailing slashes itself instead,
   // in its last redirect, after the legacy Tiendanube rules.
   skipTrailingSlashRedirect: true,
+  // "/tienda/productos/<slug>.md" is the Markdown copy of a product. The
+  // product page is a dynamic segment, so the rewrite runs before the
+  // filesystem routes (beforeFiles) and hands those URLs to a route handler.
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/tienda/productos/:slug([^/]+)\\.md",
+          destination: "/tienda/productos-markdown/:slug",
+        },
+      ],
+    };
+  },
   images: {
     // No Vercel image optimization: once the Hobby quota runs out, every
     // variant it has not cached fails with 402 and the photo shows empty.
