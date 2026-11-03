@@ -131,6 +131,18 @@ export function hubAlternatives<P extends HubProduct>(
   limit?: number,
 ): P[];
 
+export type HubPriceBlock = {
+  heading: string;
+  facts: { label: string; value: string }[];
+};
+
+/** Price range and cheapest-item payment terms of a hub's in-stock products, or null. */
+export function hubPriceBlock(
+  hub: CollectionHub,
+  inStock: readonly HubProduct[],
+  formatPrice: (value: number) => string,
+): HubPriceBlock | null;
+
 export function buildHubPage<P extends HubProduct>(
   hub: CollectionHub,
   input: HubPageInput<P>,
@@ -144,4 +156,6 @@ export function buildHubPage<P extends HubProduct>(
   faqs: FaqEntry[];
   /** In-stock products of the parent section, while the hub has few in stock. */
   alternatives: P[];
+  /** Null while nothing is in stock: the page omits the block. */
+  priceBlock: HubPriceBlock | null;
 };

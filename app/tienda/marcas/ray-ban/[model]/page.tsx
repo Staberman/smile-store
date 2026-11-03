@@ -4,6 +4,7 @@ import FaqSection from "@/components/brand/FaqSection";
 import HubAlternatives from "@/components/brand/HubAlternatives";
 import HubHeader from "@/components/brand/HubHeader";
 import HubLinks from "@/components/brand/HubLinks";
+import HubPriceBlock from "@/components/brand/HubPriceBlock";
 import OutOfStockProducts from "@/components/brand/OutOfStockProducts";
 import ProductGrid from "@/components/brand/ProductGrid";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
@@ -52,6 +53,7 @@ export default function RayBanModelPage({ params }: Props) {
       {page.catalogCount > 0 && <JsonLd data={hubSchema(page)} />}
       <Breadcrumbs trail={page.trail} />
       <HubHeader eyebrow={hub.eyebrow} title={hub.h1} intro={page.intro} />
+      {page.priceBlock && <HubPriceBlock block={page.priceBlock} />}
       {page.inStock.length > 0 && (
         <ProductGrid products={toProductSummaries(page.inStock)} brandLabel={hub.gridLabel} />
       )}
