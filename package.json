@@ -8,7 +8,7 @@
     "lint": "next lint",
     "sync:catalog": "node scripts/tiendanube/sync-stock-prices.mjs",
     "sync:terms": "node scripts/tiendanube/sync-store-terms.mjs",
-    "test:catalog": "node --test scripts/tiendanube/*.test.mjs scripts/content/*.test.mjs scripts/analytics/*.test.mjs",
+    "test:catalog": "node --test scripts/tiendanube/*.test.mjs scripts/content/*.test.mjs scripts/analytics/*.test.mjs scripts/seo/*.test.mjs",
     "seo:indexnow": "node scripts/seo/indexnow.mjs"
   },
   "dependencies": {

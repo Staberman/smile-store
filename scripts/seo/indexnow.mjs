@@ -3,16 +3,33 @@
 // IndexNow. The key is public by design: engines verify it by fetching the
 // key file served from public/.
 //
-//   node scripts/seo/indexnow.mjs                 every URL in the sitemap
+//   node scripts/seo/indexnow.mjs                 every URL in the sitemap, plus
+//                                                 the .md copy of each product
 //   node scripts/seo/indexnow.mjs <url> [<url>…]  only those URLs
 import process from "node:process";
+import { pathToFileURL } from "node:url";
 
-const SITE_URL = "https://smiletiendaimp.com.ar";
+export const SITE_URL = "https://smiletiendaimp.com.ar";
 const INDEXNOW_KEY = "9ada441fddd4d2d1a6dbc325c889aa0a";
 const KEY_LOCATION = `${SITE_URL}/${INDEXNOW_KEY}.txt`;
 const ENDPOINT = "https://api.indexnow.org/indexnow";
 // IndexNow accepts up to 10,000 URLs per request.
 const BATCH_SIZE = 10_000;
+
+const PRODUCT_URL = new RegExp(`^${SITE_URL}/tienda/productos/([^/?#]+)$`);
+
+/**
+ * The sitemap URLs plus the Markdown copy of every product page
+ * (/tienda/productos/<slug> -> /tienda/productos/<slug>.md). The .md URLs are
+ * not in the sitemap, so this is the only place they are announced.
+ */
+export function withMarkdownUrls(urls) {
+  const markdown = urls
+    .map((url) => PRODUCT_URL.exec(url))
+    .filter((match) => match && !match[1].endsWith(".md"))
+    .map((match) => `${match[0]}.md`);
+  return [...new Set([...urls, ...markdown])];
+}
 
 async function sitemapUrls() {
   const response = await fetch(`${SITE_URL}/sitemap.xml`);
@@ -47,9 +64,8 @@ async function submit(urlList) {
   return response.status;
 }
 
-async function main() {
-  const requested = process.argv.slice(2);
-  const urls = requested.length > 0 ? requested : await sitemapUrls();
+export async function main(requested = process.argv.slice(2)) {
+  const urls = requested.length > 0 ? requested : withMarkdownUrls(await sitemapUrls());
   const foreign = urls.filter((url) => !url.startsWith(`${SITE_URL}/`) && url !== SITE_URL);
   if (foreign.length > 0) throw new Error(`URLs de otro dominio: ${foreign.join(", ")}`);
   if (urls.length === 0) throw new Error("No hay URLs para enviar.");
@@ -62,7 +78,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
