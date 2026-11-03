@@ -8,17 +8,20 @@ import {
   buildHubPage,
   COLLECTION_HUBS,
   countWords,
+  hubPriceBlock,
   isDistinctFromParent,
   isIndexableHub,
   isRayBanProduct,
   MIN_AUDIENCE_EXCLUSION,
   MIN_INDEXABLE_PRODUCTS,
   modelHubOf,
+  priceRange,
   productGender,
   RAY_BAN_MODEL_HUBS,
   SUNGLASSES_HUB,
 } from "../../lib/collection-hubs.mjs";
 import { MAX_TITLE_LENGTH, TITLE_SUFFIX } from "../../lib/product-seo.mjs";
+import { getInstallmentPrice, getTransferPrice } from "../../lib/storefront.mjs";
 import {
   INSTALLMENTS_PHRASE,
   STORE_LOCATION,
@@ -361,4 +364,57 @@ test("hub routes render one H1, list only indexable hubs and redirect legacy URL
   const legacy = redirects.find((entry) => entry.source === "/lentes-de-sol{/}?");
   assert.equal(legacy?.destination, "/tienda/anteojos-de-sol");
   assert.ok(!redirects.some((entry) => /\(lentes-de-sol\|/.test(entry.source)));
+});
+
+test("Ray-Ban model hubs name the price in their title and meta description, within 60 characters", () => {
+  assert.ok(RAY_BAN_MODEL_HUBS.length >= 5);
+  for (const hub of RAY_BAN_MODEL_HUBS) {
+    assert.equal(hub.title, `Ray-Ban ${hub.name}: precio en Argentina`);
+    assert.ok(`${hub.title}${TITLE_SUFFIX}`.length <= MAX_TITLE_LENGTH, `${hub.path} title too long`);
+    assert.match(pageOf(hub).description, new RegExp(`^Ray-Ban ${hub.name} precio en Argentina`), hub.path);
+  }
+});
+
+test("the price block is the in-stock range, with the cheapest item's transfer price and installment", () => {
+  const hub = model("aviador");
+  const products = [
+    { price: 200000, promotionalPrice: null },
+    { price: 300000, promotionalPrice: 250000 },
+    { price: 180000, promotionalPrice: null },
+  ];
+  const block = hubPriceBlock(hub, products, context.formatPrice);
+  const text = JSON.stringify(block);
+  assert.equal(block.heading, "Precio de Ray-Ban Aviador en Argentina");
+  assert.ok(text.includes(context.formatPrice(180000)));
+  assert.ok(text.includes(context.formatPrice(250000)), "uses the promotional price");
+  assert.ok(!text.includes(context.formatPrice(300000)), "ignores the list price of a discounted item");
+  assert.ok(text.includes(context.formatPrice(getTransferPrice(180000))));
+  assert.ok(text.includes(context.formatPrice(getInstallmentPrice(180000))));
+  assert.ok(text.includes(INSTALLMENTS_PHRASE) && text.includes(TRANSFER_DISCOUNT_PHRASE));
+
+  const single = hubPriceBlock(hub, [products[0]], context.formatPrice);
+  assert.equal(single.facts[0].label, "Precio");
+  assert.equal(single.facts[0].value, context.formatPrice(200000));
+});
+
+test("a hub without products in stock has no price block", () => {
+  const hub = model("aviador");
+  assert.equal(hubPriceBlock(hub, [], context.formatPrice), null);
+  assert.equal(pageOf(hub, soldOut(hub)).priceBlock, null);
+});
+
+test("every model hub's price block agrees with its intro and the page lists the same products", () => {
+  for (const hub of RAY_BAN_MODEL_HUBS) {
+    const page = pageOf(hub);
+    const range = priceRange(catalog.filter(hub.matches).filter(inStock));
+    if (!range) {
+      assert.equal(page.priceBlock, null, hub.path);
+      continue;
+    }
+    assert.ok(page.priceBlock.facts[0].value.includes(context.formatPrice(range.min)), hub.path);
+    assert.ok(page.priceBlock.facts[0].value.includes(context.formatPrice(range.max)), hub.path);
+    assert.ok(page.intro.includes(`desde ${context.formatPrice(range.min)}`), hub.path);
+  }
+  const route = fs.readFileSync(path.join(projectRoot, "app/tienda/marcas/ray-ban/[model]/page.tsx"), "utf8");
+  assert.match(route, /page\.priceBlock && <HubPriceBlock block=\{page\.priceBlock\} \/>/);
 });

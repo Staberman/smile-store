@@ -47,12 +47,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const seo = getProductSeo(product);
   const image = product.images[0];
 
-  return pageMetadata({
+  const path = `/tienda/productos/${product.slug}`;
+  const metadata = pageMetadata({
     title: seo.title,
     description: seo.description,
-    path: `/tienda/productos/${product.slug}`,
+    path,
     image: image ? { url: absoluteUrl(image), alt: seo.displayName } : undefined,
   });
+  // The Markdown copy of the page (next.config.mjs serves it).
+  return {
+    ...metadata,
+    alternates: { ...metadata.alternates, types: { "text/markdown": `${path}.md` } },
+  };
 }
 
 export default function ProductPage({ params }: Props) {

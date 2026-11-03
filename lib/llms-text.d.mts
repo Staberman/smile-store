@@ -51,6 +51,8 @@ export type LlmsEntry<P extends LlmsCatalogProduct = LlmsCatalogProduct> = {
     brand: string;
     /** lib/catalog's hasPurchasableStock. */
     purchasable: boolean;
+    /** Manufacturer model code (lib/product-seo's extractModelCode), if reliable. */
+    mpn?: string | null;
   };
 };
 
@@ -62,6 +64,11 @@ export type LlmsProduct = {
   kind: ProductKind;
   /** As the product page displays it, e.g. "$ 182.700". */
   price: string;
+  /** The page's transfer price, e.g. "$ 164.430"; null without a price. */
+  transferPrice: string | null;
+  /** One interest-free installment, e.g. "$ 30.450"; null without a price. */
+  installmentPrice: string | null;
+  mpn: string | null;
   inStock: boolean;
   specs: ProductSpec[];
   /** The Ray-Ban model hub that lists the product, if any. */
@@ -72,6 +79,16 @@ export type LlmsProduct = {
 export function llmsSummary(store: LlmsStore): string;
 
 export function llmsProduct(entry: LlmsEntry, siteUrl: string): LlmsProduct;
+
+/** The Markdown copy of one product page (/tienda/productos/<slug>.md). */
+export function buildProductMarkdown(input: {
+  siteUrl: string;
+  entry: LlmsEntry;
+  /** The collection the page's breadcrumb goes through, with a site-relative path. */
+  collection?: { name: string; path: string } | null;
+  /** Description prose, as the page shows it. */
+  paragraphs?: readonly string[];
+}): string;
 
 /** The /llms-full.txt document. */
 export function buildLlmsFull(input: {
