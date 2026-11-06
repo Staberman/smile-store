@@ -9,6 +9,8 @@ import {
   countWords,
   hubFacts,
   isIndexableHub,
+  isRayBanProduct,
+  isSunglassesProduct,
   priceRange,
   RAY_BAN_MODEL_HUBS,
   SUNGLASSES_HUB,
@@ -190,9 +192,9 @@ function assertGuideRules(guide, label = "") {
   }
 }
 
-test("the guides are the six published ones, with unique slugs, titles, headings and descriptions", () => {
+test("the guides are the seven published ones, with unique slugs, titles, headings and descriptions", () => {
   assert.deepEqual(new Set(guides.map((guide) => guide.slug)), new Set(Object.values(GUIDE_SLUGS)));
-  assert.equal(guides.length, 6);
+  assert.equal(guides.length, 7);
   for (const field of ["slug", "path", "title", "h1", "description", "crumb"]) {
     const values = guides.map((guide) => guide[field]);
     assert.equal(new Set(values).size, values.length, `duplicate ${field}`);
@@ -208,7 +210,7 @@ test("the index groups every guide under one topic, sunglasses and watches alike
     guidesOfTopic(guides, "relojes").map((guide) => guide.slug),
     [GUIDE_SLUGS.invictaOriginals, GUIDE_SLUGS.waterResistance, GUIDE_SLUGS.watchGift],
   );
-  assert.equal(guidesOfTopic(guides, "anteojos").length, 3);
+  assert.equal(guidesOfTopic(guides, "anteojos").length, 4);
   // Display order follows the topics, so the index never interleaves them.
   assert.deepEqual(
     guides.map((guide) => guide.topic),
@@ -283,7 +285,7 @@ test("the word-count rule reads the authored copy: catalog tables and lists are 
   const withCatalog = full.filter((guide) => catalogBlocks(guide).length > 0);
   assert.deepEqual(
     new Set(withCatalog.map((guide) => guide.slug)),
-    new Set([GUIDE_SLUGS.polarized, GUIDE_SLUGS.invictaOriginals, GUIDE_SLUGS.waterResistance, GUIDE_SLUGS.watchGift]),
+    new Set([GUIDE_SLUGS.polarized, GUIDE_SLUGS.rayBanRosario, GUIDE_SLUGS.invictaOriginals, GUIDE_SLUGS.waterResistance, GUIDE_SLUGS.watchGift]),
   );
   for (const guide of withCatalog) {
     const authored = guideAuthoredText(guide);
@@ -436,6 +438,75 @@ test("a model without frame specs in the catalog says so instead of guessing", (
   const table = blocksOf(guide).find((block) => block.type === "table");
   const column = table.head.indexOf("Armazón en Smile");
   for (const row of table.rows) assert.equal(row[column], "Sin dato en las fichas");
+});
+
+// --- Rosario guide ---
+
+const rosarioOf = (guides) => guideOf("rayBanRosario", guides);
+const inStockRayBan = (products) => products.filter((product) => isRayBanProduct(product) && isSunglassesProduct(product));
+
+test("the Rosario guide names Ray-Ban and Rosario in title and description, within the length rules", () => {
+  const guide = rosarioOf(guides);
+  assert.equal(guide.slug, "donde-comprar-ray-ban-originales-en-rosario");
+  for (const text of [guide.title, guide.description]) assert.match(text, /Ray-Ban/), assert.match(text, /Rosario/);
+  assert.ok(`${guide.title}${TITLE_SUFFIX}`.length <= MAX_TITLE_LENGTH);
+  assert.ok(guide.description.length >= 140 && guide.description.length <= 155);
+});
+
+test("the Rosario guide answers first and states pickup, shipping and payment from the shared phrases", () => {
+  for (const scenario of STOCK_SCENARIOS) {
+    const guide = rosarioOf(scenario.guides);
+    const lead = stripLinks(guide.lead);
+    assert.match(lead, /Rosario/, scenario.name);
+    assert.match(lead, /WhatsApp/, scenario.name);
+    assert.match(lead, /Puerto Norte/, scenario.name);
+    const text = guideText(guide);
+    for (const phrase of [STORE_PICKUP_PHRASE, INSTALLMENTS_PHRASE, TRANSFER_DISCOUNT_PHRASE, FREE_SHIPPING_PHRASE]) {
+      assert.ok(text.includes(phrase), `${scenario.name}: missing "${phrase}"`);
+    }
+    assert.ok(guideLinks(guide).includes(`/guias/${GUIDE_SLUGS.rayBanOriginals}`), scenario.name);
+  }
+});
+
+test("the Rosario guide makes no unconfirmed claim and names no competitor", () => {
+  for (const scenario of STOCK_SCENARIOS) {
+    const text = guideText(rosarioOf(scenario.guides));
+    assert.doesNotMatch(text, /distribuidor|autorizad|oficial|certificad|[uú]nica tienda|[uú]nico local/i, scenario.name);
+    assert.doesNotMatch(text, /garant[ií]a|devoluci[oó]n|reembolso|horario|abierto de|calle|avenida|av\./i, scenario.name);
+    assert.doesNotMatch(text, /mercado ?libre|tienda ?nube ?store|opticas?\b/i, scenario.name);
+  }
+});
+
+test("the Rosario guide shows the in-stock Ray-Ban range from the catalog, and omits it without stock", () => {
+  for (const scenario of STOCK_SCENARIOS) {
+    const guide = rosarioOf(scenario.guides);
+    const rayBan = inStockRayBan(scenario.inStock);
+    const section = sectionOf(guide, "precios-ray-ban-en-smile");
+    const table = section.blocks.find((block) => block.type === "table");
+    if (rayBan.length === 0) {
+      assert.equal(table, undefined, `${scenario.name}: no table without stock`);
+      assert.doesNotMatch(section.answer, /\d/, scenario.name);
+      continue;
+    }
+    assert.ok(section.answer.includes(pesosRange(priceRange(rayBan))), `${scenario.name}: ${section.answer}`);
+    assert.ok(section.answer.includes(modelsPhrase(rayBan.length)), scenario.name);
+    for (const row of table.rows) {
+      const hub = RAY_BAN_MODEL_HUBS.find((entry) => row[0].includes(`](${entry.path})`));
+      assert.ok(hub, `${scenario.name}: ${row[0]}`);
+      const products = rayBan.filter(hub.matches);
+      assert.equal(row[1], String(products.length));
+      assert.equal(row[2], pesosRange(priceRange(products)));
+    }
+  }
+});
+
+test("the Rosario guide links every Ray-Ban model hub and the other sunglasses guides link back", () => {
+  const hubs = new Set(guideLinks(rosarioOf(guides)));
+  for (const hub of RAY_BAN_MODEL_HUBS) assert.ok(hubs.has(hub.path), hub.path);
+  const path = rosarioOf(guides).path;
+  for (const key of ["rayBanOriginals", "rayBanModels", "polarized"]) {
+    assert.ok(guideLinks(guideOf(key)).includes(path), `${key} links to the Rosario guide`);
+  }
 });
 
 // --- Watch guides --------------------------------------------------------------

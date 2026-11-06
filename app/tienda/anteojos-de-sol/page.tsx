@@ -49,7 +49,7 @@ export default function SunglassesPage() {
       <HubLinks
         eyebrow="Guías de compra"
         title="Antes de elegir tus anteojos de sol"
-        links={[GUIDE_LINKS.polarized, GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals]}
+        links={[GUIDE_LINKS.polarized, GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals, GUIDE_LINKS.rayBanRosario]}
       />
       <CollectionLinks current="anteojos-de-sol" />
     </main>

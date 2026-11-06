@@ -82,6 +82,7 @@ type GuideKey =
   | "rayBanOriginals"
   | "rayBanModels"
   | "polarized"
+  | "rayBanRosario"
   | "invictaOriginals"
   | "waterResistance"
   | "watchGift";

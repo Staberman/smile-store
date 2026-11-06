@@ -76,7 +76,7 @@ export default function RayBanModelPage({ params }: Props) {
       <HubLinks
         eyebrow="Guías de compra"
         title="Antes de elegir tus Ray-Ban"
-        links={[GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals]}
+        links={[GUIDE_LINKS.rayBanModels, GUIDE_LINKS.rayBanOriginals, GUIDE_LINKS.rayBanRosario]}
       />
       <CollectionLinks />
     </main>
