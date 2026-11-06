@@ -8,8 +8,11 @@ import {
   feedDescription,
   GOOGLE_PRODUCT_CATEGORIES,
   MAX_ADDITIONAL_IMAGES,
+  merchantColor,
   merchantGender,
   merchantPrice,
+  nameColor,
+  specColor,
   variantColor,
 } from "../../lib/merchant-feed.mjs";
 import { descriptionLines, fallbackDescription, splitDescription } from "../../lib/product-copy.mjs";
@@ -430,6 +433,81 @@ test("colors come from the variant's color option, never from its size", () => {
   );
   assert.equal(variantColor({ options: ["STANDARD (M)"] }), null);
   assert.equal(variantColor({ options: [] }), null);
+});
+
+test("colors written at the end of a name are read as the name spells them, up to three", () => {
+  assert.equal(nameColor("Hexagonal Classic 3548 Dorado/Verde"), "Dorado/Verde");
+  assert.equal(nameColor("Aviador Classic Dorado Verde"), "Dorado/Verde");
+  assert.equal(nameColor("Round Folding | Gunmetal/Gris Degradé"), "Gunmetal/Gris degradé");
+  assert.equal(nameColor("Kiliane | Negro/Verde"), "Negro/Verde");
+  assert.equal(nameColor("Hexagonal Classic 3548 Dorado Marron Liso"), "Dorado/Marron liso");
+  assert.equal(nameColor("Aviador Negro Dorado Verde Azul"), "Negro/Dorado/Verde");
+});
+
+test("a name without color words never gives a color", () => {
+  for (const name of [
+    "Gucci GG1443S",
+    "Reloj Tommy Hilfiger 1782779",
+    "Reloj OMEGA x Swatch - Mission to Super Blue Moonphase",
+    "Reloj OMEGA x Swatch - Mission on Earth-Lava",
+    "Erika Nude",
+    "Wayfarer Reverse",
+    "Blue Rose Edition",
+    // A color in the middle of a name is a model name, not the product's color.
+    "Verde Classic 3025",
+    // A modifier alone qualifies nothing.
+    "Aviador Classic Liso",
+    "Aviador Classic Dorado/Liso",
+    "",
+    null,
+    undefined,
+  ]) {
+    assert.equal(nameColor(name), null, String(name));
+  }
+});
+
+test("the dial color of a watch is read from its spec table, parentheses dropped", () => {
+  assert.equal(specColor([{ name: "Color de la esfera", value: "Turquesa (Turquoise Dial)" }]), "Turquesa");
+  assert.equal(specColor([{ name: "Color de la esfera", value: "Negro" }]), "Negro");
+  // The bezel describes a part of the watch, not the watch.
+  assert.equal(specColor([{ name: "Color del bisel", value: "Azul y negro" }]), null);
+  assert.equal(specColor([{ name: "Material del marco", value: "Metal" }]), null);
+  assert.equal(specColor([]), null);
+});
+
+test("merchantColor keeps the variant's color first, then the dial color, then the name", () => {
+  const withColor = { name: "Aviador Classic Dorado Verde", variants: [{ options: ["Negro/Verde"] }] };
+  const bare = (name) => ({ name, variants: [{ options: ["STANDARD (M)"] }] });
+  const dial = [{ name: "Color de la esfera", value: "Azul" }];
+  assert.equal(merchantColor(withColor, withColor.variants[0], dial), "Negro/Verde");
+  assert.equal(merchantColor(bare("Reloj Invicta 1 Dorado"), bare("x").variants[0], dial), "Azul");
+  assert.equal(merchantColor(bare("Reloj Invicta 1 Dorado"), bare("x").variants[0], []), "Dorado");
+  assert.equal(merchantColor(bare("Reloj Invicta 1"), bare("x").variants[0], []), null);
+});
+
+test("over the catalog, a color the feed adds comes from a dial spec or a color word in the name", () => {
+  const COLOR_IN_NAME = /(?:^|[\s/|])(?:negro|blanco|gris|plateado|dorado|azul|celeste|verde|rojo|rosa|amarillo|naranja|violeta|marr[oó]n|beige|bordo|turquesa|bronce|cobre|carey|transparente|gunmetal)\b/i;
+  const { items } = build(catalog);
+  const byId = new Map(catalog.map((product) => [String(product.id), product]));
+  for (const item of items) {
+    const product = byId.get(item.id);
+    const variant = getAvailableVariants(product)[0] ?? null;
+    const specs = copyFor(product).specs;
+    // Out of stock, the item takes the one color every variant shares.
+    const shared = new Set(product.variants.map(variantColor));
+    const fromVariant = variant ? variantColor(variant) : shared.size === 1 ? [...shared][0] : null;
+    if (fromVariant) {
+      // Existing behavior: a variant's color wins and is untouched.
+      assert.equal(item.color, fromVariant, product.name);
+      continue;
+    }
+    if (item.color === null) continue;
+    const fromSpec = specColor(specs);
+    if (item.color === fromSpec) continue;
+    assert.match(product.name, COLOR_IN_NAME, `${product.name} got "${item.color}" with no color word in its name`);
+    assert.equal(item.color, nameColor(product.name), product.name);
+    assert.ok(item.color.split("/").length <= 3, product.name);
+  }
 });
 
 test("gender comes from the spec table, then the gender tags and categories", () => {

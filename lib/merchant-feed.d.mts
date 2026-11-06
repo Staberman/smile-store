@@ -19,6 +19,8 @@ export type FeedVariant = {
 export type FeedProduct = {
   id: string;
   slug: string;
+  /** Catalog name, which may end in the product's colors. */
+  name: string;
   categories: string[];
   tags: string[];
   images: readonly string[];
@@ -89,6 +91,16 @@ export function feedDescription(copy: {
   specs?: readonly ProductSpec[];
 }): string;
 export function variantColor(variant: Pick<FeedVariant, "options"> | null | undefined): string | null;
+/** Colors at the end of a product name ("... Dorado/Verde", "... | Negro/Verde"), or null. */
+export function nameColor(name: string | null | undefined): string | null;
+/** Dial color from a watch's spec table, or null. */
+export function specColor(specs?: readonly ProductSpec[]): string | null;
+/** Variant color, else dial color, else color words in the name; null when none says. */
+export function merchantColor(
+  product: Pick<FeedProduct, "name" | "variants">,
+  variant: Pick<FeedVariant, "options"> | null,
+  specs?: readonly ProductSpec[],
+): string | null;
 export function merchantGender(
   product: Pick<FeedProduct, "categories" | "tags">,
   specs?: readonly ProductSpec[],
