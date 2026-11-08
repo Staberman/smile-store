@@ -10,6 +10,7 @@ import {
   MAX_ADDITIONAL_IMAGES,
   merchantColor,
   merchantGender,
+  merchantGtin,
   merchantPrice,
   nameColor,
   specColor,
@@ -255,11 +256,15 @@ test("every item carries the attributes free listings require", () => {
       childrenNamed(item, "g:additional_image_link").length <= MAX_ADDITIONAL_IMAGES,
       `item ${id}: more than ${MAX_ADDITIONAL_IMAGES} additional images`,
     );
-    // Brand plus MPN, or no identifiers at all.
-    assert.ok(
-      field(item, "g:mpn") || field(item, "g:identifier_exists") === "no",
-      `item ${id}: needs an MPN or identifier_exists no`,
+    // Brand plus a GTIN or an MPN, or no identifiers at all.
+    const hasIdentifier = Boolean(field(item, "g:gtin") || field(item, "g:mpn"));
+    assert.equal(
+      field(item, "g:identifier_exists"),
+      hasIdentifier ? undefined : "no",
+      `item ${id}: identifier_exists only without a GTIN or an MPN`,
     );
+    const gtin = field(item, "g:gtin");
+    assert.ok(gtin === undefined || merchantGtin(gtin) === gtin, `item ${id}: invalid GTIN ${gtin}`);
     const gender = field(item, "g:gender");
     assert.ok(gender === undefined || ["male", "female", "unisex"].includes(gender));
   }
@@ -520,6 +525,118 @@ test("gender comes from the spec table, then the gender tags and categories", ()
   assert.equal(merchantGender({ categories: ["RELOJES", "TOMMY HILFIGER DAMA"], tags: [] }), "female");
   assert.equal(merchantGender({ categories: ["RELOJES", "TOMMY HILFIGER CABALLERO"], tags: [] }), "male");
   assert.equal(merchantGender(noAudience), null);
+});
+
+test("a barcode is a GTIN only with 8, 12, 13 or 14 digits and a correct check digit", () => {
+  // EAN-13, UPC-A, EAN-8 and GTIN-14, trimmed.
+  for (const gtin of ["4006381333931", "7791234567898", "036000291452", "96385074", "00012345600012"]) {
+    assert.equal(merchantGtin(gtin), gtin);
+  }
+  assert.equal(merchantGtin("  7791234567898 "), "7791234567898");
+
+  for (const barcode of [
+    // Wrong check digit.
+    "4006381333932",
+    "7791234567890",
+    // Letters, separators or signs.
+    "40063813339A1",
+    "ABC-123",
+    "4006 381333931",
+    "4006-381333931",
+    "+4006381333931",
+    // Wrong length (11, 9, 15 digits).
+    "40063813339",
+    "123456789",
+    "400638133393100",
+    // All zeros, restricted circulation (EAN 2, UPC 2 and 4) and coupons
+    // (EAN 05, 98, 99, UPC 5), each with a correct check digit.
+    "0000000000000",
+    "2001234567893",
+    "212345678909",
+    "412345678903",
+    "0501234567890",
+    "9812345678902",
+    "512345678900",
+    "",
+    null,
+    undefined,
+  ]) {
+    assert.equal(merchantGtin(barcode), null, String(barcode));
+  }
+});
+
+test("a valid barcode on the item's variant goes out as g:gtin and drops identifier_exists", () => {
+  const product = catalog.find((entry) => getAvailableVariants(entry).length > 0);
+  const offered = getAvailableVariants(product)[0];
+  const withBarcodes = (barcodeFor) => ({
+    ...product,
+    variants: product.variants.map((variant) => {
+      const barcode = barcodeFor(variant);
+      return barcode === undefined ? variant : { ...variant, barcode };
+    }),
+  });
+  const render = (entry, facts = {}) => {
+    const { xml, items } = buildMerchantFeed({
+      channel: CHANNEL,
+      siteUrl: SITE_URL,
+      entries: [{ product: entry, facts: { ...factsFor(entry), ...facts } }],
+    });
+    const [item] = childrenNamed(childrenNamed(parseXml(xml), "channel")[0], "item");
+    return { item: items[0], xml: item };
+  };
+
+  const valid = render(withBarcodes((variant) => (variant === offered ? "4006381333931" : undefined)));
+  assert.equal(valid.item.gtin, "4006381333931");
+  assert.equal(field(valid.xml, "g:gtin"), "4006381333931");
+  assert.equal(field(valid.xml, "g:identifier_exists"), undefined);
+  // Next to the other identifiers, as Google's examples list them.
+  const names = valid.xml.children.map((child) => child.name);
+  assert.deepEqual(names.slice(names.indexOf("g:brand"), names.indexOf("g:brand") + 2), ["g:brand", "g:gtin"]);
+
+  // The GTIN is the offered variant's, not a sold-out variant's before it.
+  const twoVariants = {
+    ...product,
+    variants: [
+      { ...offered, id: 1, stock: 0, available: false, barcode: "7791234567898" },
+      { ...offered, id: 2, barcode: "4006381333931" },
+    ],
+  };
+  assert.equal(render(twoVariants).item.gtin, "4006381333931");
+  const { barcode: _removed, ...noBarcode } = twoVariants.variants[1];
+  assert.equal(render({ ...twoVariants, variants: [twoVariants.variants[0], noBarcode] }).item.gtin, null);
+
+  for (const barcode of ["4006381333932", "40063813339A1", "40063813339", "", undefined]) {
+    const { item, xml } = render(withBarcodes(() => barcode));
+    assert.equal(item.gtin, null, String(barcode));
+    assert.equal(field(xml, "g:gtin"), undefined, String(barcode));
+    // No barcode and no MPN: the item still declares it has no identifiers.
+    assert.equal(field(xml, "g:identifier_exists"), "no", String(barcode));
+  }
+
+  // An MPN alone keeps identifier_exists out too.
+  const mpnOnly = render(product, { mpn: "RB2140" });
+  assert.equal(field(mpnOnly.xml, "g:mpn"), "RB2140");
+  assert.equal(field(mpnOnly.xml, "g:identifier_exists"), undefined);
+});
+
+test("out of stock, the item takes the one GTIN every variant shares", () => {
+  const product = catalog.find((entry) => entry.variants.length > 0);
+  const soldOut = (barcodes) => ({
+    ...product,
+    variants: barcodes.map((barcode, index) => ({
+      ...product.variants[0],
+      id: index + 1,
+      stock: 0,
+      available: false,
+      barcode,
+    })),
+  });
+  const gtinOf = (entry) => build([entry]).items[0].gtin;
+
+  assert.equal(gtinOf(soldOut(["4006381333931"])), "4006381333931");
+  assert.equal(gtinOf(soldOut(["4006381333931", "4006381333931"])), "4006381333931");
+  assert.equal(gtinOf(soldOut(["4006381333931", "7791234567898"])), null);
+  assert.equal(gtinOf(soldOut(["4006381333931", "4006381333932"])), null);
 });
 
 test("the feed route is static XML built from the page's own helpers, outside the sitemap", () => {

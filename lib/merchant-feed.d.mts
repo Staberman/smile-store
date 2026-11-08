@@ -13,6 +13,8 @@ export type FeedVariant = {
   stock: number;
   available: boolean;
   image: string | null;
+  /** Barcode loaded in Tiendanube; sent as g:gtin only when it is a valid GTIN. */
+  barcode?: string;
 };
 
 /** Catalog product fields the feed reads. */
@@ -57,7 +59,9 @@ export type MerchantItem = {
   price: string;
   condition: "new";
   brand: string | null;
+  gtin: string | null;
   mpn: string | null;
+  /** "no" only when the item has neither a GTIN nor an MPN. */
   identifierExists: "no" | null;
   googleProductCategory: number | null;
   productType: string | null;
@@ -101,6 +105,8 @@ export function merchantColor(
   variant: Pick<FeedVariant, "options"> | null,
   specs?: readonly ProductSpec[],
 ): string | null;
+/** The barcode as a valid GTIN-8/12/13/14 (GS1 check digit), else null. */
+export function merchantGtin(barcode: string | null | undefined): string | null;
 export function merchantGender(
   product: Pick<FeedProduct, "categories" | "tags">,
   specs?: readonly ProductSpec[],

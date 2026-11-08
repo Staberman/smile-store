@@ -38,7 +38,18 @@ function normalizeApiVariant(variant, published) {
     promotionalPrice,
     stock,
     available: published && price !== null && stock > 0,
+    barcode: String(variant.barcode ?? "").trim(),
   };
+}
+
+// Variant barcode (GTIN, EAN, ...) as loaded in Tiendanube, stored only when
+// set and as the variant's last key, like `published` on products: variants
+// without one carry no field, and it goes away once Tiendanube clears it.
+// The Merchant feed checks it before sending it as a GTIN
+// (lib/merchant-feed.mjs).
+function withBarcode(variant, barcode) {
+  const { barcode: _previous, ...rest } = variant;
+  return barcode ? { ...rest, barcode } : rest;
 }
 
 function disableVariant(variant) {
@@ -139,13 +150,16 @@ export function mergeCatalogWithTiendanube(catalog, apiProducts) {
           return disableVariant(variant);
         }
 
-        return {
-          ...variant,
-          price: apiVariant.price,
-          promotionalPrice: apiVariant.promotionalPrice,
-          stock: apiVariant.stock,
-          available: apiVariant.available,
-        };
+        return withBarcode(
+          {
+            ...variant,
+            price: apiVariant.price,
+            promotionalPrice: apiVariant.promotionalPrice,
+            stock: apiVariant.stock,
+            available: apiVariant.available,
+          },
+          apiVariant.barcode,
+        );
       });
     }
 

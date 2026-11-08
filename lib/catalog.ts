@@ -11,6 +11,8 @@ export type CatalogVariant = {
   stock: number;
   available: boolean;
   image: string | null;
+  /** Barcode loaded in Tiendanube (sync); absent while the variant has none. */
+  barcode?: string;
 };
 
 export type CatalogProduct = {

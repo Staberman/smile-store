@@ -77,6 +77,36 @@ test("merge updates only commercial catalog fields", () => {
   });
 });
 
+test("variant barcodes are carried trimmed, as the last key, and only when set", () => {
+  const original = catalogProduct();
+  const withBarcode = (barcode) =>
+    apiProduct({ variants: [{ ...apiProduct().variants[0], barcode }] });
+
+  const loaded = mergeCatalogWithTiendanube([original], [withBarcode(" 7791234567898 ")]);
+  const variant = loaded.catalog[0].variants[0];
+  assert.equal(variant.barcode, "7791234567898");
+  // Last key, so adding or clearing it is a one-line diff of the catalog file.
+  assert.equal(Object.keys(variant).at(-1), "barcode");
+  assert.deepEqual(Object.keys(variant).slice(0, -1), Object.keys(original.variants[0]));
+
+  // Unchanged barcode: the entry is left as is.
+  const again = mergeCatalogWithTiendanube(loaded.catalog, [withBarcode("7791234567898")]);
+  assert.deepEqual(again.catalog, loaded.catalog);
+  assert.equal(again.summary.changedProducts, 0);
+
+  // Empty, null or missing in Tiendanube: no field, and a cleared one goes away.
+  for (const barcode of ["", "   ", null, undefined]) {
+    const plain = mergeCatalogWithTiendanube([original], [withBarcode(barcode)]).catalog[0];
+    assert.equal("barcode" in plain.variants[0], false, String(barcode));
+    const cleared = mergeCatalogWithTiendanube(loaded.catalog, [withBarcode(barcode)]).catalog[0];
+    assert.equal("barcode" in cleared.variants[0], false, String(barcode));
+  }
+
+  // The sync stores what Tiendanube has; the Merchant feed decides if it is a GTIN.
+  const invalid = mergeCatalogWithTiendanube([original], [withBarcode("ABC-123")]).catalog[0];
+  assert.equal(invalid.variants[0].barcode, "ABC-123");
+});
+
 test("zero stock and unpublished products become unavailable", () => {
   const zeroStock = mergeCatalogWithTiendanube(
     [catalogProduct()],
