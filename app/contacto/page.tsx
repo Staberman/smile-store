@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import WhatsAppContactLink from "@/components/contact/WhatsAppContactLink";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import JsonLd from "@/components/seo/JsonLd";
@@ -11,7 +12,6 @@ import {
   STORE_EMAIL,
   STORE_LOCATION,
   STORE_PICKUP_PHRASE,
-  WHATSAPP_URL,
 } from "@/lib/store-facts";
 
 export const metadata: Metadata = pageMetadata({
@@ -36,10 +36,21 @@ const contactSchema = {
 
 const instagramHandle = `@${INSTAGRAM_URL.split("/").filter(Boolean).pop()}`;
 
-type ContactItem = { label: string; value: string; href?: string; external?: boolean };
+// A `whatsapp` item links to a chat with the store, with the prefilled message
+// and its reference code (WhatsAppContactLink).
+type ContactItem = {
+  label: string;
+  value: string;
+  href?: string;
+  external?: boolean;
+  whatsapp?: boolean;
+};
+
+const CONTACT_LINK_CLASSES =
+  "underline decoration-white/20 underline-offset-4 transition hover:text-[#c9a96e] hover:decoration-[#c9a96e]";
 
 const contactItems: ContactItem[] = [
-  { label: "WhatsApp", value: PHONE_DISPLAY, href: WHATSAPP_URL, external: true },
+  { label: "WhatsApp", value: PHONE_DISPLAY, whatsapp: true },
   { label: "Teléfono", value: PHONE_DISPLAY, href: `tel:${PHONE_E164}` },
   { label: "Email", value: STORE_EMAIL, href: `mailto:${STORE_EMAIL}` },
   { label: "Instagram", value: instagramHandle, href: INSTAGRAM_URL, external: true },
@@ -48,8 +59,7 @@ const contactItems: ContactItem[] = [
   {
     label: "Retiro",
     value: `Ofrecemos ${STORE_PICKUP_PHRASE}, ${STORE_LOCATION.locality}.`,
-    href: WHATSAPP_URL,
-    external: true,
+    whatsapp: true,
   },
   {
     label: "Consultas",
@@ -89,12 +99,16 @@ export default function ContactPage() {
                   {item.label}
                 </p>
                 <p className="mt-4 break-words text-sm leading-[1.75] text-[#f0ece4]">
-                  {item.href ? (
+                  {item.whatsapp ? (
+                    <WhatsAppContactLink className={CONTACT_LINK_CLASSES}>
+                      {item.value}
+                    </WhatsAppContactLink>
+                  ) : item.href ? (
                     <a
                       href={item.href}
                       target={item.external ? "_blank" : undefined}
                       rel={item.external ? "noopener noreferrer" : undefined}
-                      className="underline decoration-white/20 underline-offset-4 transition hover:text-[#c9a96e] hover:decoration-[#c9a96e]"
+                      className={CONTACT_LINK_CLASSES}
                     >
                       {item.value}
                     </a>

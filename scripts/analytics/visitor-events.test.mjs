@@ -1,35 +1,87 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buyEvent, opensLink, whatsAppEvent } from "../../lib/visitor-events.mjs";
+import { contactMessage, whatsAppContactUrl } from "../../lib/whatsapp-contact.mjs";
 
-const CONTACT_LINK = "https://wa.me/5493412613504";
-const pageOf = (pathname) => whatsAppEvent(CONTACT_LINK, pathname)?.path;
+const STORE_CHAT = "https://wa.me/5493412613504";
+const AVIATOR = { name: "Aviator Classic RB3025", ref: "329817846" };
+// A contact link as WhatsAppContactLink renders it once hydrated.
+const contactLink = (source, product = null) =>
+  whatsAppContactUrl(STORE_CHAT, contactMessage({ source, product }));
+// The page segments of a contact event: the path between /eventos/whatsapp
+// and the trailing source and product segments.
+const pageOf = (pathname) =>
+  whatsAppEvent(contactLink("G"), pathname)?.path.replace(/\/G\/web$/, "");
 
-test("starting a purchase records the product under /eventos/comprar", () => {
-  assert.deepEqual(buyEvent("ray-ban-aviator-classic-rb3025-2mx8q"), {
+test("starting a purchase records the product and the traffic source under /eventos/comprar", () => {
+  assert.deepEqual(buyEvent("ray-ban-aviator-classic-rb3025-2mx8q", "S"), {
     route: "/eventos/comprar/[slug]",
-    path: "/eventos/comprar/ray-ban-aviator-classic-rb3025-2mx8q",
+    path: "/eventos/comprar/ray-ban-aviator-classic-rb3025-2mx8q/S",
   });
+  assert.equal(buyEvent("aviator-2mx8q", "I").path, "/eventos/comprar/aviator-2mx8q/I");
+});
+
+test("a purchase with an unknown source is recorded as D", () => {
+  for (const source of [undefined, null, "", "x", "GG", "web"]) {
+    assert.equal(buyEvent("aviator-2mx8q", source).path, "/eventos/comprar/aviator-2mx8q/D", `source ${JSON.stringify(source)}`);
+  }
 });
 
 test("a slug that is not route-shaped is recorded as _otro", () => {
   for (const slug of ["", "Ray-Ban", "ray ban", "ray%20ban", "a/b", "-ray", "ray--ban", "x".repeat(81), undefined]) {
-    assert.equal(buyEvent(slug).path, "/eventos/comprar/_otro", `slug ${JSON.stringify(slug)}`);
+    assert.equal(buyEvent(slug, "G").path, "/eventos/comprar/_otro/G", `slug ${JSON.stringify(slug)}`);
   }
 });
 
-test("a wa.me link with a phone number is recorded as a contact under /eventos/whatsapp", () => {
+test("a contact records the page, then the source and product of the Ref its message carries", () => {
+  assert.deepEqual(whatsAppEvent(contactLink("G", AVIATOR), "/tienda/productos/aviator-2mx8q", "I"), {
+    route: "/eventos/whatsapp",
+    path: "/eventos/whatsapp/tienda/productos/aviator-2mx8q/G/329817846",
+  });
+  assert.deepEqual(whatsAppEvent(contactLink("M"), "/contacto", "M"), {
+    route: "/eventos/whatsapp",
+    path: "/eventos/whatsapp/contacto/M/web",
+  });
+  // The server-rendered link (before hydration, or without JavaScript).
+  assert.equal(whatsAppEvent(contactLink("D"), "/", "G").path, "/eventos/whatsapp/home/D/web");
+});
+
+test("a contact whose message carries no Ref records the session source and web", () => {
   const links = [
-    CONTACT_LINK,
-    `${CONTACT_LINK}?text=${encodeURIComponent("Hola Smile, estoy interesado/a en Aviator.")}`,
-    `${CONTACT_LINK}#chat`,
+    STORE_CHAT,
+    `${STORE_CHAT}?text=${encodeURIComponent("Hola Smile, estoy interesado/a en Aviator.")}`,
+    `${STORE_CHAT}#chat`,
   ];
   for (const href of links) {
-    assert.deepEqual(whatsAppEvent(href, "/contacto"), {
+    assert.deepEqual(whatsAppEvent(href, "/contacto", "W"), {
       route: "/eventos/whatsapp",
-      path: "/eventos/whatsapp/contacto",
+      path: "/eventos/whatsapp/contacto/W/web",
     });
+    assert.equal(whatsAppEvent(href, "/contacto").path, "/eventos/whatsapp/contacto/D/web");
   }
+});
+
+test("every new path starts with the path the same click recorded before", () => {
+  // Paths recorded before the source and product segments were added.
+  assert.equal(
+    buyEvent("aviator-2mx8q", "G").path.startsWith("/eventos/comprar/aviator-2mx8q/"),
+    true,
+  );
+  const contact = whatsAppEvent(contactLink("S", AVIATOR), "/tienda/productos/aviator-2mx8q", "S").path;
+  assert.equal(contact.startsWith("/eventos/whatsapp/tienda/productos/aviator-2mx8q/"), true);
+  const generic = whatsAppEvent(contactLink("I"), "/contacto", "I").path;
+  assert.equal(generic.startsWith("/eventos/whatsapp/contacto/"), true);
+  // A share keeps its old path exactly.
+  assert.equal(whatsAppEvent("https://wa.me/?text=Aviator", "/contacto", "G").path, "/eventos/compartir/contacto");
+});
+
+test("the source segment is the only single upper-case letter, so old and new paths read apart", () => {
+  const contact = whatsAppEvent(contactLink("A", AVIATOR), "/tienda/marcas/premium/balenciaga", "A").path;
+  const segments = contact.split("/");
+  assert.equal(segments.at(-2), "A");
+  assert.equal(segments.at(-1), "329817846");
+  assert.deepEqual(segments.slice(0, -2).filter((segment) => /^[A-Z]$/.test(segment)), []);
+  assert.equal(buyEvent("aviator-2mx8q", "B").path.split("/").at(-1), "B");
 });
 
 test("a wa.me link without a phone number is recorded as a share under /eventos/compartir", () => {
@@ -40,7 +92,7 @@ test("a wa.me link without a phone number is recorded as a share under /eventos/
     "https://wa.me/#compartir",
   ];
   for (const href of links) {
-    const event = whatsAppEvent(href, productPage);
+    const event = whatsAppEvent(href, productPage, "G");
     assert.deepEqual(event, {
       route: "/eventos/compartir",
       path: "/eventos/compartir/tienda/productos/aviator-2mx8q",
@@ -75,9 +127,9 @@ test("links that are neither a contact nor a share record nothing", () => {
 });
 
 test("the WhatsApp event keeps neither the phone number nor the message", () => {
-  const contact = whatsAppEvent(`${CONTACT_LINK}?text=Hola%20Smile`, "/tienda/productos/aviator-2mx8q");
-  assert.equal(contact.path, "/eventos/whatsapp/tienda/productos/aviator-2mx8q");
-  assert.doesNotMatch(contact.path, /5493412613504|Hola|text/);
+  const contact = whatsAppEvent(contactLink("G", AVIATOR), "/tienda/productos/aviator-2mx8q", "G");
+  assert.equal(contact.path, "/eventos/whatsapp/tienda/productos/aviator-2mx8q/G/329817846");
+  assert.doesNotMatch(contact.path, /5493412613504|Hola|text|Ref|Aviator Classic/);
 
   const share = whatsAppEvent("https://wa.me/?text=Mir%C3%A1%20esto", "/contacto");
   assert.equal(share.path, "/eventos/compartir/contacto");

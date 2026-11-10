@@ -1,100 +1,19 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { absoluteUrl } from "@/lib/seo";
-import { WHATSAPP_URL } from "@/lib/store-facts";
-
-function getPageContext(pathname: string): string {
-  if (pathname.includes("/tienda/productos/")) {
-    return "este producto";
-  }
-
-  if (pathname.includes("/tienda/marcas/ray-ban/ferrari")) {
-    return "la colección Ray-Ban Scuderia Ferrari";
-  }
-
-  if (pathname.includes("/tienda/marcas/ray-ban")) {
-    return "la colección Ray-Ban";
-  }
-
-  if (pathname.includes("/tienda/marcas/premium")) {
-    return "las marcas premium";
-  }
-
-  if (pathname.includes("/tienda/marcas/tommy-hilfiger")) {
-    return "los relojes Tommy Hilfiger";
-  }
-
-  if (pathname.includes("/tienda/marcas/invicta")) {
-    return "los relojes Invicta";
-  }
-
-  if (pathname.includes("/tienda/relojes/omega-swatch")) {
-    return "los Omega x Swatch";
-  }
-
-  if (pathname.includes("/tienda/relojes")) {
-    return "la colección de relojes";
-  }
-
-  if (pathname === "/" || pathname.includes("/tienda")) {
-    return "el catálogo de Smile";
-  }
-
-  return "la tienda Smile";
-}
-
-function prettifySlug(slug: string): string {
-  return decodeURIComponent(slug)
-    .replace(/-[a-z0-9]{5}$/i, "")
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
-    .trim();
-}
-
-function getProductName(pathname: string): string | null {
-  const slug = pathname.split("/tienda/productos/")[1]?.split("/")[0];
-
-  return slug ? prettifySlug(slug) : null;
-}
-
-function buildMessage(pathname: string): string {
-  const isProductPage = pathname.includes("/tienda/productos/");
-  const context = isProductPage
-    ? getProductName(pathname) ?? getPageContext(pathname)
-    : getPageContext(pathname);
-  const pageUrl = absoluteUrl(pathname);
-
-  if (isProductPage) {
-    return [
-      `Hola Smile, estoy interesado/a en ${context}.`,
-      "Quiero confirmar stock, variantes disponibles, cuotas y el beneficio por transferencia.",
-      pageUrl ? `Lo estoy viendo acá: ${pageUrl}` : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
-
-  return [
-    `Hola Smile, estoy mirando ${context}.`,
-    "Me gustaría que me asesoren para elegir la mejor opción según stock, estilo y forma de pago.",
-    pageUrl ? `Estoy en esta página: ${pageUrl}` : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
+import WhatsAppContactLink from "@/components/contact/WhatsAppContactLink";
+import { usePageContactProduct } from "@/lib/contact-product";
 
 export default function WhatsAppFloatingButton() {
   const pathname = usePathname();
   const isProductPage = pathname.includes("/tienda/productos/");
-  const href = `${WHATSAPP_URL}?text=${encodeURIComponent(buildMessage(pathname))}`;
+  // On a product page the message names the product the page announces.
+  const product = usePageContactProduct();
   const positionClass = isProductPage ? "bottom-24 md:bottom-6" : "bottom-5 md:bottom-6";
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <WhatsAppContactLink
+      product={product}
       aria-label="Consultar por WhatsApp"
       className={`group fixed right-3 z-[80] flex items-center gap-3 rounded-full border border-[#c9a96e]/35 bg-[#080706]/92 p-2 text-[#f0ece4] shadow-[0_18px_60px_rgba(0,0,0,0.42)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c9a96e]/70 hover:bg-[#0f0d0a] focus:outline-none focus:ring-2 focus:ring-[#c9a96e]/55 md:right-6 md:px-4 md:py-3 ${positionClass}`}
     >
@@ -123,6 +42,6 @@ export default function WhatsAppFloatingButton() {
           Te ayudo a elegir
         </span>
       </span>
-    </a>
+    </WhatsAppContactLink>
   );
 }

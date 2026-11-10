@@ -4,6 +4,7 @@ import { useState } from "react";
 import { pageview } from "@vercel/analytics";
 import type { CatalogVariant } from "@/lib/catalog";
 import type { ProductDetail } from "@/lib/product-summary";
+import { currentTrafficSource } from "@/lib/traffic-source-session";
 import { buyEvent } from "@/lib/visitor-events.mjs";
 
 type Props = {
@@ -40,7 +41,7 @@ export default function TiendanubeCheckoutForm({
     // Recorded before the checkout request. The analytics script posts it with
     // a keepalive fetch, which can outlive the redirect below.
     try {
-      pageview(buyEvent(product.slug));
+      pageview(buyEvent(product.slug, currentTrafficSource()));
     } catch {
       // Analytics is best effort: it must never stop the purchase.
     }

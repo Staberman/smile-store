@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TiendanubeCheckoutForm from "@/components/checkout/TiendanubeCheckoutForm";
+import WhatsAppContactLink from "@/components/contact/WhatsAppContactLink";
 import PickupNote from "@/components/brand/PickupNote";
 import TrustHighlights from "@/components/brand/TrustHighlights";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
@@ -13,6 +14,7 @@ import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { canonicalBrand } from "@/lib/brand-directory";
 import { useRecentlyViewed } from "@/lib/browser-lists";
 import type { Crumb } from "@/lib/collections";
+import { useAnnouncePageContactProduct } from "@/lib/contact-product";
 import { dedupeImages } from "@/lib/product-seo.mjs";
 import { formatPrice } from "@/lib/format";
 import type {
@@ -31,6 +33,7 @@ import {
   stockUrgencyLabel,
 } from "@/lib/storefront.mjs";
 import { productUrl } from "@/lib/seo";
+import { productRef } from "@/lib/whatsapp-contact.mjs";
 
 interface Props {
   product: ProductDetail;
@@ -42,6 +45,10 @@ interface Props {
 }
 
 const ACCENT = "#c9a96e";
+// The outlined pill of the share and contact links.
+const PILL_LINK_CLASSES =
+  "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-[10px] uppercase tracking-[0.16em] transition-colors hover:text-[#c9a96e]";
+const PILL_LINK_STYLE = { borderColor: "#2a2520", color: "#8b8580" };
 const IMAGE_FALLBACK =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Crect width='600' height='600' fill='%23181410'/%3E%3C/svg%3E";
 
@@ -149,6 +156,14 @@ export default function ProductDetailClient({
     (typeof window !== "undefined" ? window.location.href : "");
   const shareText = `${product.name} ${shareUrl}`;
   const whatsappHref = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+  // The product a WhatsApp chat from this page is about: the contact link
+  // below and the floating button both name it, with its Tiendanube id.
+  const contactProduct = useMemo(
+    () => ({ name: product.name, ref: productRef(product.tiendanubeProductId) }),
+    [product.name, product.tiendanubeProductId]
+  );
+  useAnnouncePageContactProduct(contactProduct);
 
   // Copy the link with a brief confirmation. Clipboard access can be missing or
   // rejected (insecure context, permissions), so guard and degrade gracefully.
@@ -383,6 +398,17 @@ export default function ProductDetailClient({
               className="sticky bottom-4 z-20 md:static"
             />
 
+            {/* A chat with the store about this product, apart from the share
+                link below: the message names the product and its reference. */}
+            <WhatsAppContactLink
+              product={contactProduct}
+              className={`${PILL_LINK_CLASSES} mt-3 self-start`}
+              style={PILL_LINK_STYLE}
+            >
+              <WhatsAppGlyph />
+              Consultar por WhatsApp
+            </WhatsAppContactLink>
+
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <span className="text-[10px] uppercase tracking-[0.28em] text-[#4a4540]">
                 Compartir
@@ -392,18 +418,10 @@ export default function ProductDetailClient({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Compartir por WhatsApp"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-[10px] uppercase tracking-[0.16em] transition-colors hover:text-[#c9a96e]"
-                style={{ borderColor: "#2a2520", color: "#8b8580" }}
+                className={PILL_LINK_CLASSES}
+                style={PILL_LINK_STYLE}
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.87 9.87 0 0 0 4.73 1.2h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.13-2.9-7A9.82 9.82 0 0 0 12.04 2Zm0 1.8c2.16 0 4.19.84 5.72 2.37a8.05 8.05 0 0 1 2.37 5.73c0 4.46-3.63 8.09-8.1 8.09a8.09 8.09 0 0 1-4.12-1.13l-.3-.18-3.05.8.81-2.98-.19-.31a8.03 8.03 0 0 1-1.24-4.3c0-4.46 3.63-8.08 8.09-8.08Zm-2.68 4.3c-.14 0-.37.05-.56.26-.19.21-.74.72-.74 1.76 0 1.03.76 2.03.86 2.17.11.14 1.49 2.28 3.62 3.19.51.22.9.35 1.21.45.51.16.97.14 1.34.08.41-.06 1.26-.51 1.44-1.01.18-.5.18-.93.13-1.02-.05-.09-.19-.14-.4-.25-.21-.11-1.26-.62-1.45-.69-.19-.07-.34-.11-.48.11-.14.21-.55.69-.67.83-.12.14-.25.16-.46.05-.21-.11-.9-.33-1.71-1.06a6.4 6.4 0 0 1-1.18-1.47c-.12-.21-.01-.33.09-.44.1-.1.21-.25.32-.38.11-.13.14-.22.21-.37.07-.14.04-.27-.02-.38-.05-.11-.47-1.16-.65-1.58-.17-.42-.34-.36-.47-.36l-.4-.01Z" />
-                </svg>
+                <WhatsAppGlyph />
                 WhatsApp
               </a>
               <button
@@ -670,5 +688,20 @@ function RecommendationCard({ product }: { product: ProductSummary }) {
         </div>
       </div>
     </Link>
+  );
+}
+
+// The WhatsApp logo of the share and contact links.
+function WhatsAppGlyph() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.87 9.87 0 0 0 4.73 1.2h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.13-2.9-7A9.82 9.82 0 0 0 12.04 2Zm0 1.8c2.16 0 4.19.84 5.72 2.37a8.05 8.05 0 0 1 2.37 5.73c0 4.46-3.63 8.09-8.1 8.09a8.09 8.09 0 0 1-4.12-1.13l-.3-.18-3.05.8.81-2.98-.19-.31a8.03 8.03 0 0 1-1.24-4.3c0-4.46 3.63-8.08 8.09-8.08Zm-2.68 4.3c-.14 0-.37.05-.56.26-.19.21-.74.72-.74 1.76 0 1.03.76 2.03.86 2.17.11.14 1.49 2.28 3.62 3.19.51.22.9.35 1.21.45.51.16.97.14 1.34.08.41-.06 1.26-.51 1.44-1.01.18-.5.18-.93.13-1.02-.05-.09-.19-.14-.4-.25-.21-.11-1.26-.62-1.45-.69-.19-.07-.34-.11-.48.11-.14.21-.55.69-.67.83-.12.14-.25.16-.46.05-.21-.11-.9-.33-1.71-1.06a6.4 6.4 0 0 1-1.18-1.47c-.12-.21-.01-.33.09-.44.1-.1.21-.25.32-.38.11-.13.14-.22.21-.37.07-.14.04-.27-.02-.38-.05-.11-.47-1.16-.65-1.58-.17-.42-.34-.36-.47-.36l-.4-.01Z" />
+    </svg>
   );
 }
