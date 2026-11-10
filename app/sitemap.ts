@@ -3,6 +3,7 @@ import { allProducts, allProductsIncludingOutOfStock } from "@/lib/catalog";
 import { GUIDES, GUIDES_LAST_MODIFIED } from "@/lib/guide-pages";
 import { GUIDES_INDEX } from "@/lib/guides/guides.mjs";
 import { indexableHubs } from "@/lib/hub-pages";
+import { LANDINGS } from "@/lib/landing-pages";
 import { absoluteUrl, productUrl } from "@/lib/seo";
 
 // Date of the last content change to the static routes below. Hardcoded on
@@ -54,6 +55,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: STATIC_ROUTES_LAST_MODIFIED,
       changeFrequency: route === "/" ? "daily" as const : "weekly" as const,
       priority: route === "/" ? 1 : 0.7,
+    })),
+    // Landing pages: each carries its own dateModified; the summer page's also
+    // moves on the calendar switches of its season label (summerSeason).
+    ...LANDINGS.map((landing) => ({
+      url: absoluteUrl(landing.path),
+      lastModified: landing.dateModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
     })),
     // Buying guides: each carries its own dateModified; the index changes
     // whenever one of them does.

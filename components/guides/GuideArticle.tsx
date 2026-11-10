@@ -10,7 +10,7 @@ const LINK_CLASS =
   "text-[#c9a96e] underline decoration-[#c9a96e]/40 underline-offset-4 transition hover:text-[#e2c989] hover:decoration-[#e2c989]";
 
 /** Guide copy with its `[label](/path)` links rendered as links. */
-function Inline({ text }: { text: string }) {
+export function Inline({ text }: { text: string }) {
   return (
     <>
       {inlineSegments(text).map((segment, index) =>
@@ -28,7 +28,8 @@ function Inline({ text }: { text: string }) {
 
 const TEXT_CLASS = "text-[15px] leading-[1.85] text-[#c8c1b6]";
 
-function Block({ block }: { block: GuideBlock }) {
+/** One body block of a guide; the landing pages (lib/landings) use the same format. */
+export function Block({ block }: { block: GuideBlock }) {
   switch (block.type) {
     case "paragraph":
       return (

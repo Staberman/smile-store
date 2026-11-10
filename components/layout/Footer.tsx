@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { hubsOf, indexableHubs } from "@/lib/hub-pages";
+import { landingLinks } from "@/lib/landings/landings.mjs";
 import {
   CONSUMER_DEFENSE_URL,
   ORDER_CANCELLATION_URL,
@@ -14,6 +15,9 @@ function hubLinks(...args: Parameters<typeof hubsOf>): FooterLink[] {
   return indexableHubs(hubsOf(...args)).map((hub) => ({ label: hub.linkLabel, href: hub.path }));
 }
 
+// The landing pages: Rosario and the coming summer (its label follows the build date).
+const landings = landingLinks();
+
 // Every link points to an indexable destination or, under "Ayuda", to the
 // consumer-protection forms required for online sales in Argentina. Each
 // column is one entry here.
@@ -23,6 +27,8 @@ const nav: FooterColumn[] = [
     links: [
       { label: "Anteojos de sol", href: "/tienda/anteojos-de-sol" },
       ...hubLinks("audience", "anteojos-de-sol"),
+      landings.rosario,
+      landings.summer,
       { label: "Relojes", href: "/tienda/relojes" },
       ...hubLinks("audience", "relojes"),
       { label: "Marcas premium", href: "/tienda/marcas/premium" },

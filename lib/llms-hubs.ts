@@ -6,6 +6,7 @@ import {
   type CollectionKey,
 } from "@/lib/collections";
 import { indexableHubs } from "@/lib/hub-pages";
+import { LANDINGS } from "@/lib/landing-pages";
 import type { LlmsHub } from "@/lib/llms-text.mjs";
 
 // The store hubs /llms.txt and /llms-full.txt list. Hubs come from
@@ -22,12 +23,20 @@ const HUB_ORDER: CollectionKey[] = [
   "omega-swatch",
 ];
 
-/** Every indexed hub: sections, model and audience hubs, premium brands with stock. */
+/**
+ * Every indexed hub: sections, the landing pages (Rosario, summer), model and
+ * audience hubs, premium brands with stock.
+ */
 export function llmsHubs(): LlmsHub[] {
   const sections = HUB_ORDER.map((key) => {
     const crumb = COLLECTION_TRAILS[key][COLLECTION_TRAILS[key].length - 1];
     return { name: crumb.name, path: crumb.href, description: COLLECTION_SUMMARIES[key] };
   });
+  const landings = LANDINGS.map((landing) => ({
+    name: landing.linkLabel,
+    path: landing.path,
+    description: landing.summary,
+  }));
   // Model and audience hubs, same rule as the sitemap: only those with enough
   // products in the catalog. The sunglasses hub is in HUB_ORDER.
   const collectionHubs = indexableHubs()
@@ -42,5 +51,5 @@ export function llmsHubs(): LlmsHub[] {
     description: `Anteojos de sol ${brand.name}.`,
   }));
 
-  return [...sections, ...collectionHubs, ...premiumBrands];
+  return [...sections, ...landings, ...collectionHubs, ...premiumBrands];
 }

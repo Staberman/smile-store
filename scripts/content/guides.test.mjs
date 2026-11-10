@@ -33,6 +33,7 @@ import {
   stripLinks,
 } from "../../lib/guides/guides.mjs";
 import { waterUse } from "../../lib/guides/resistencia-al-agua.mjs";
+import { LANDING_PATHS } from "../../lib/landings/landings.mjs";
 import { pesosRange, waterResistance } from "../../lib/guides/watch-facts.mjs";
 import {
   META_DESCRIPTION_MAX_LENGTH,
@@ -134,6 +135,8 @@ const knownPaths = new Set([
   GUIDES_INDEX.path,
   "/guia-de-estilo",
   "/contacto",
+  // Landing pages (lib/landings): /anteojos-de-sol-rosario and /anteojos-de-sol-verano.
+  ...Object.values(LANDING_PATHS),
 ]);
 
 /** Guide text with the shared store phrases removed: what was written by hand. */

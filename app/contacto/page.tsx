@@ -69,7 +69,7 @@ export default function ContactPage() {
       <section className="px-6 pb-20 pt-36 md:px-12 md:pb-28 md:pt-44">
         <div className="mx-auto max-w-5xl">
           <p className="text-[10px] uppercase tracking-[0.42em] text-[#c9a96e]">
-            Smile tienda oficial
+            Smile · Tienda online
           </p>
           <h1 className="font-display mt-4 max-w-3xl text-[3rem] font-light italic leading-[1.02] md:text-[5rem]">
             Contacto

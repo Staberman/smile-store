@@ -181,7 +181,7 @@ function OfferModal({ entered, onClose }: { entered: boolean; onClose: () => voi
         </button>
 
         <div className="border-b border-white/8 bg-white/[0.03] px-6 py-3 text-[10px] uppercase tracking-[0.3em] text-[#c9a96e]">
-          Smile tienda oficial
+          Smile · Tienda online
         </div>
 
         <div className="grid grid-cols-[1.35fr_0.65fr] gap-0">
@@ -205,7 +205,7 @@ function OfferModal({ entered, onClose }: { entered: boolean; onClose: () => voi
             <div className="mt-5 grid grid-cols-3 gap-2 text-[11px] uppercase tracking-[0.2em] text-[#c9a96e]">
               <span>Hasta {INTEREST_FREE_INSTALLMENTS} cuotas sin interés</span>
               <span>{FREE_SHIPPING_PHRASE}</span>
-              <span>Garantía y asesoramiento</span>
+              <span>Asesoramiento personalizado</span>
             </div>
 
             <div className="mt-6 flex gap-3">

@@ -98,6 +98,8 @@ export function isRayBanProduct(product: Pick<HubProduct, "brand" | "categories"
 export function isSunglassesProduct(product: Pick<HubProduct, "categories">): boolean;
 export function productGender(product: HubProduct): Audience;
 export function priceRange(products: readonly HubProduct[]): { min: number; max: number } | null;
+/** Frame format from the "Formato" spec ("cat eye", "aviador"…), or null. */
+export function frameFormat(product: Pick<HubProduct, "descriptionHtml">): string | null;
 export function hubFacts(
   products: readonly HubProduct[],
   context?: Partial<Pick<HubCopyContext, "brandLabel">>,

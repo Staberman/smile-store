@@ -11,7 +11,7 @@ const highlights = [
   },
   {
     title: "Atención personalizada",
-    text: "Consultas y seguimiento desde los canales oficiales de Smile.",
+    text: "Consultas y seguimiento directo con el equipo de Smile.",
   },
   {
     title: "Selección premium",

@@ -76,3 +76,21 @@ test("the pickup point is named only through STORE_PICKUP_PHRASE, once per page"
   assert.doesNotMatch(read("components/store/TiendaCatalog.tsx"), /PickupNote/);
   assert.doesNotMatch(read("components/brand/TrustHighlights.tsx"), /store-facts|store-copy/);
 });
+
+test("no page claims an official status or states warranty terms", () => {
+  // The owner has not confirmed warranty wording, and Smile is not an
+  // official or authorized dealer: "originales" is the claim the site makes.
+  const sourceFiles = ["app", "components", "lib"].flatMap((dir) =>
+    fs
+      .readdirSync(path.join(projectRoot, dir), { recursive: true })
+      .filter((file) => /\.(ts|tsx|mjs|mts|js)$/.test(file))
+      .map((file) => path.join(dir, file)),
+  );
+  for (const file of sourceFiles) {
+    const source = read(file);
+    assert.doesNotMatch(source, /oficial|garant[ií]a/i, file);
+  }
+  for (const { question, answer } of STORE_FAQS) {
+    assert.doesNotMatch(`${question} ${answer}`, /oficial|garant[ií]a|autorizad|certificad/i, question);
+  }
+});

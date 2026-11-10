@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import AboutSection from "@/components/brand/AboutSection";
 import BrandLogoStrip from "@/components/brand/BrandLogoStrip";
 import FaqSection from "@/components/brand/FaqSection";
+import HubLinks from "@/components/brand/HubLinks";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import JsonLd from "@/components/seo/JsonLd";
 import StoreShell from "@/components/store/StoreShell";
@@ -12,6 +13,7 @@ import { getAvailableBrandEntries } from "@/lib/brand-directory";
 import { allProducts, getBestSellers } from "@/lib/catalog";
 import { homeCatalogPreview } from "@/lib/home-catalog.mjs";
 import { hubDescription } from "@/lib/hubs";
+import { landingLinks } from "@/lib/landings/landings.mjs";
 import { TITLE_SUFFIX } from "@/lib/product-seo.mjs";
 import { toProductSummaries } from "@/lib/product-summary";
 import { collectionSchema, pageMetadata } from "@/lib/seo";
@@ -52,6 +54,11 @@ const intro = storeIntro({
   watchBrands: getAvailableBrandEntries(allProducts, "relojes").map((entry) => entry.name),
 });
 
+// Pages for searches the catalog alone does not answer: buying in Rosario,
+// the coming summer, the buying guides.
+const landings = landingLinks();
+const exploreLinks = [landings.rosario, landings.summer, { label: "Guías de compra", href: "/guias" }];
+
 export default function Home() {
   return (
     <StoreShell>
@@ -65,8 +72,9 @@ export default function Home() {
       />
       <WatchesSection products={storeProducts} />
       <RecentlyViewed />
+      <HubLinks eyebrow="Explorar" title="Seguí explorando" links={exploreLinks} />
       {/* Who Smile is, after the catalog and right before the FAQ, which
-          answers the payment, warranty and returns questions it leaves out. */}
+          answers the payment and returns questions it leaves out. */}
       <AboutSection intro={intro} />
       <FaqSection />
       {/* After the visible copy: crawlers that truncate the page read the

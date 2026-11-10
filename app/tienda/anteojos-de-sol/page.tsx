@@ -9,6 +9,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { SUNGLASSES_HUB } from "@/lib/collection-hubs.mjs";
 import { GUIDE_LINKS } from "@/lib/guides/guides.mjs";
 import { getHubPage, hubMetadata, hubSchema, hubsOf, indexableHubs } from "@/lib/hub-pages";
+import { landingLinks } from "@/lib/landings/landings.mjs";
 import { toProductSummaries } from "@/lib/product-summary";
 
 // Every pair of sunglasses in the catalog: the parent of the hombre / mujer
@@ -21,6 +22,7 @@ const sectionLinks = [
   ...indexableHubs(hubsOf("audience", "anteojos-de-sol")),
   ...indexableHubs(hubsOf("model", "ray-ban")),
 ].map((hub) => ({ label: hub.linkLabel, href: hub.path }));
+const landings = landingLinks();
 
 export default function SunglassesPage() {
   return (
@@ -35,6 +37,8 @@ export default function SunglassesPage() {
           ...sectionLinks,
           { label: "Scuderia Ferrari", href: "/tienda/marcas/ray-ban/ferrari" },
           { label: "Marcas premium", href: "/tienda/marcas/premium" },
+          landings.rosario,
+          landings.summer,
         ]}
       />
       {page.inStock.length > 0 && (
