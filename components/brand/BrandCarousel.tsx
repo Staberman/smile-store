@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import PromotionPrice from "@/components/product/PromotionPrice";
 import { canonicalBrand } from "@/lib/brand-directory";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
-import { carouselImage, carouselSlides, isWatch } from "@/lib/storefront.mjs";
+import { carouselImage, carouselSlides, getPromotion, isWatch } from "@/lib/storefront.mjs";
 
 interface Props {
   products: ProductSummary[];
@@ -141,6 +142,7 @@ export default function BrandCarousel({
           const isActive = index === currentIndex;
           const isExiting = index === exiting;
           const image = carouselImage(prod);
+          const promotion = getPromotion(prod);
 
           return (
             <div
@@ -203,6 +205,9 @@ export default function BrandCarousel({
                     style={{ color: ACCENT }}
                   >
                     {formatPrice(index === currentIndex ? price : prod.promotionalPrice ?? prod.price)}
+                    {promotion && (
+                      <PromotionPrice promotion={promotion} className="ml-3 inline-flex align-middle" />
+                    )}
                   </p>
 
                   <a

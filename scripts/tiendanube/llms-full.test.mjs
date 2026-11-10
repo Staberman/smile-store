@@ -16,7 +16,7 @@ import {
   TRANSFER_DISCOUNT_PHRASE,
 } from "../../lib/store-copy.mjs";
 import { STORE_FAQS } from "../../lib/store-faqs.mjs";
-import { getAvailableVariants, getDisplayPrice } from "../../lib/storefront.mjs";
+import { getAvailableVariants, getDisplayPrice, getPromotion } from "../../lib/storefront.mjs";
 
 const projectRoot = process.cwd();
 const read = (relativePath) => fs.readFileSync(path.join(projectRoot, relativePath), "utf8");
@@ -178,12 +178,22 @@ test("every catalog product is listed once with its URL, brand, availability and
   );
 });
 
-test("prices are the price the product page displays", () => {
+test("prices are the prices the product page displays", () => {
+  let promoted = 0;
   for (const product of catalog) {
-    // ProductDetailClient: getDisplayPrice(product, first available variant).
-    const displayed = getDisplayPrice(product, getAvailableVariants(product)[0] ?? null);
-    assert.equal(field(blocks.get(urlOf(product)), "Precio"), formatPrice(displayed), product.slug);
+    // ProductDetailClient: getDisplayPrice and getPromotion of the first
+    // available variant.
+    const variant = getAvailableVariants(product)[0] ?? null;
+    const displayed = formatPrice(getDisplayPrice(product, variant));
+    const promotion = getPromotion(product, variant);
+    if (promotion) promoted += 1;
+    assert.equal(
+      field(blocks.get(urlOf(product)), "Precio"),
+      promotion ? `${displayed} (antes ${formatPrice(promotion.regularPrice)})` : displayed,
+      product.slug,
+    );
   }
+  assert.ok(promoted > 0, "the catalog has in-stock products on promotion");
   // The page selects the first in-stock variant, even when another is cheaper.
   const firstNotCheapest = catalog.find((product) => {
     const [first, ...rest] = getAvailableVariants(product);
@@ -193,7 +203,7 @@ test("prices are the price the product page displays", () => {
   if (firstNotCheapest) {
     const [first] = getAvailableVariants(firstNotCheapest);
     assert.equal(
-      field(blocks.get(urlOf(firstNotCheapest)), "Precio"),
+      field(blocks.get(urlOf(firstNotCheapest)), "Precio").split(" (antes ")[0],
       formatPrice(first.promotionalPrice ?? first.price),
     );
   }

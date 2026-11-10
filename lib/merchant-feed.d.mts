@@ -55,8 +55,10 @@ export type MerchantItem = {
   imageLink: string;
   additionalImageLinks: string[];
   availability: MerchantAvailability;
-  /** "182700.00 ARS" */
+  /** "182700.00 ARS"; the regular price while the item is on promotion. */
   price: string;
+  /** The promotional price charged, "182700.00 ARS"; null without a promotion. */
+  salePrice: string | null;
   condition: "new";
   brand: string | null;
   gtin: string | null;

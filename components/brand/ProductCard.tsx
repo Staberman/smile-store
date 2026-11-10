@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import FavoriteButton from "@/components/product/FavoriteButton";
 import ProductMedia from "@/components/product/ProductMedia";
+import PromotionPrice from "@/components/product/PromotionPrice";
 import { canonicalBrand } from "@/lib/brand-directory";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
@@ -12,6 +13,7 @@ import {
   getAvailableVariants,
   getDisplayPrice,
   getInstallmentPrice,
+  getPromotion,
   getTransferPrice,
   INTEREST_FREE_INSTALLMENTS,
   stockUrgencyLabel,
@@ -57,9 +59,13 @@ export default function ProductCard({
     product.variants.find((variant) => variant.id === selectedVariantId) ?? initialVariant;
 
   const image = selectedVariant?.image ?? product.image;
+  // The price charged: the promotional one while the variant is on
+  // promotion. Transfer and installment amounts derive from it.
   const price = getDisplayPrice(product, selectedVariant);
   const transferPrice = getTransferPrice(price);
   const installmentPrice = getInstallmentPrice(price);
+  // Sold-out cards advertise no discount.
+  const promotion = outOfStock ? null : getPromotion(product, selectedVariant);
   const lowStock = stockUrgencyLabel(product);
   const brand = canonicalBrand(product.brand);
 
@@ -161,6 +167,7 @@ export default function ProductCard({
                 {lowStock}
               </span>
             )}
+            {promotion && <PromotionPrice promotion={promotion} className="mb-0.5 flex" />}
             <p className="text-[13px]" style={{ color: ACCENT }}>
               {formatPrice(price)}
             </p>

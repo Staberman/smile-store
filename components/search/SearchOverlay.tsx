@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import Image from "next/image";
+import PromotionPrice from "@/components/product/PromotionPrice";
 import { formatPrice } from "@/lib/format";
 import type { ProductSummary } from "@/lib/product-summary";
 import {
@@ -355,6 +356,9 @@ function SearchDialog({
                 </span>
                 <span className="shrink-0 whitespace-nowrap text-[13px]" style={{ color: ACCENT }}>
                   {formatPrice(row.price)}
+                  {row.promotion && (
+                    <PromotionPrice promotion={row.promotion} className="mt-0.5 flex justify-end" />
+                  )}
                 </span>
               </li>
             ))}

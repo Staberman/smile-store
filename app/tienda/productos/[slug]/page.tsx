@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import {
-  type CatalogProduct,
   allProducts,
   allProductsIncludingOutOfStock,
   getProductBySlug,
@@ -10,6 +9,7 @@ import {
   hasPurchasableStock,
 } from "@/lib/catalog";
 import { getProductCopy, getProductDescription, getProductSeo } from "@/lib/product-meta";
+import { productOffers } from "@/lib/product-offers.mjs";
 import { toProductDetail, toProductSummaries } from "@/lib/product-summary";
 import { getComplementaryProducts } from "@/lib/storefront.mjs";
 import { getProductTrail } from "@/lib/collections";
@@ -77,7 +77,11 @@ export default function ProductPage({ params }: Props) {
     { name: seo.displayName, href: `/tienda/productos/${product.slug}` },
   ];
   const productLink = productUrl(product);
-  const offers = productOffers(product, productLink, outOfStock);
+  const offers = productOffers(product, {
+    url: productLink,
+    outOfStock,
+    sellerId: ORGANIZATION_ID,
+  });
   const sku = product.variants.map((variant) => variant.sku.trim()).find(Boolean);
   // The spec table on the page, as name/value pairs.
   const { specs } = getProductCopy(product);
@@ -128,48 +132,4 @@ export default function ProductPage({ params }: Props) {
       />
     </>
   );
-}
-
-/**
- * Offer for a single price, AggregateOffer when the offered variants differ
- * in price. In-stock variants are the ones on offer; an out-of-stock product
- * reports its listed variants as out of stock.
- */
-function productOffers(product: CatalogProduct, url: string, outOfStock: boolean) {
-  const offered = product.variants.filter(
-    (variant) => outOfStock || (variant.available && variant.stock > 0),
-  );
-  const prices = offered
-    .map((variant) => variant.promotionalPrice ?? variant.price)
-    .filter((price): price is number => typeof price === "number" && price > 0);
-  const productPrice = product.promotionalPrice ?? product.price;
-  if (prices.length === 0 && !(typeof productPrice === "number" && productPrice > 0)) {
-    return null;
-  }
-
-  const common = {
-    url,
-    priceCurrency: "ARS",
-    itemCondition: "https://schema.org/NewCondition",
-    availability: outOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-    seller: { "@id": ORGANIZATION_ID },
-  };
-  const lowPrice = prices.length > 0 ? Math.min(...prices) : (productPrice as number);
-  const highPrice = prices.length > 0 ? Math.max(...prices) : (productPrice as number);
-
-  if (lowPrice !== highPrice) {
-    return {
-      "@type": "AggregateOffer",
-      ...common,
-      lowPrice,
-      highPrice,
-      offerCount: offered.length,
-    };
-  }
-
-  // Prices sync from Tiendanube hourly; each build restates them.
-  const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
-  return { "@type": "Offer", ...common, price: lowPrice, priceValidUntil };
 }

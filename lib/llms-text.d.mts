@@ -64,6 +64,8 @@ export type LlmsProduct = {
   kind: ProductKind;
   /** As the product page displays it, e.g. "$ 182.700". */
   price: string;
+  /** The regular price the page shows struck through while `price` is a promotional one, e.g. "$ 228.375"; null otherwise. */
+  regularPrice: string | null;
   /** The page's transfer price, e.g. "$ 164.430"; null without a price. */
   transferPrice: string | null;
   /** One interest-free installment, e.g. "$ 30.450"; null without a price. */

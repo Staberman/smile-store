@@ -17,7 +17,7 @@ import {
   variantColor,
 } from "../../lib/merchant-feed.mjs";
 import { descriptionLines, fallbackDescription, splitDescription } from "../../lib/product-copy.mjs";
-import { getAvailableVariants, getDisplayPrice } from "../../lib/storefront.mjs";
+import { getAvailableVariants, getDisplayPrice, getPromotion } from "../../lib/storefront.mjs";
 
 const projectRoot = process.cwd();
 // The products the site lists (lib/catalog.ts drops unpublished ones).
@@ -270,17 +270,32 @@ test("every item carries the attributes free listings require", () => {
   }
 });
 
-test("prices are the price the product page displays, in ARS", () => {
+test("prices are the prices the product page displays, in ARS", () => {
+  let promoted = 0;
   for (const item of xmlItems) {
     const product = productById.get(field(item, "g:id"));
-    // ProductDetailClient: getDisplayPrice(product, first available variant).
-    const displayed = getDisplayPrice(product, getAvailableVariants(product)[0] ?? null);
+    // ProductDetailClient: getDisplayPrice and getPromotion of the first
+    // available variant.
+    const variant = getAvailableVariants(product)[0] ?? null;
+    const displayed = getDisplayPrice(product, variant);
+    const promotion = getPromotion(product, variant);
 
     assert.match(field(item, "g:price"), /^\d+\.\d{2} ARS$/);
-    assert.equal(field(item, "g:price"), `${displayed}.00 ARS`, `${product.slug}`);
-    // The page shows no regular price next to a promotional one.
-    assert.equal(childrenNamed(item, "g:sale_price").length, 0);
+    assert.ok(childrenNamed(item, "g:sale_price").length <= 1, product.slug);
+    if (promotion) {
+      promoted += 1;
+      // The page shows the regular price struck through next to the one charged.
+      assert.equal(field(item, "g:price"), `${promotion.regularPrice}.00 ARS`, product.slug);
+      assert.equal(field(item, "g:sale_price"), `${displayed}.00 ARS`, product.slug);
+      assert.ok(promotion.regularPrice > displayed, product.slug);
+    } else {
+      assert.equal(field(item, "g:price"), `${displayed}.00 ARS`, product.slug);
+      assert.equal(field(item, "g:sale_price"), undefined, product.slug);
+    }
+    // No end date in the catalog, so no effective date is sent.
+    assert.equal(field(item, "g:sale_price_effective_date"), undefined);
   }
+  assert.ok(promoted > 0, "the catalog has in-stock products on promotion");
 
   assert.equal(merchantPrice(182700), "182700.00 ARS");
   assert.equal(merchantPrice(1234.5), "1235.00 ARS");
@@ -290,12 +305,14 @@ test("promotional and per-variant prices follow the page, not the lowest price",
   const itemFor = (slug) => feed.items.find((item) => productById.get(item.id).slug === slug);
   const promoted = catalog.find(
     (product) =>
+      isPurchasable(product) &&
       product.promotionalPrice !== null &&
       product.variants.length === 1 &&
       product.variants[0].promotionalPrice === product.promotionalPrice,
   );
-  assert.ok(promoted, "the catalog has a single-variant product on promotion");
-  assert.equal(itemFor(promoted.slug).price, merchantPrice(promoted.promotionalPrice));
+  assert.ok(promoted, "the catalog has an in-stock single-variant product on promotion");
+  assert.equal(itemFor(promoted.slug).salePrice, merchantPrice(promoted.promotionalPrice));
+  assert.equal(itemFor(promoted.slug).price, merchantPrice(promoted.variants[0].price));
 
   // The page selects the first in-stock variant, even when another is cheaper.
   const firstNotCheapest = catalog.find((product) => {
@@ -305,11 +322,106 @@ test("promotional and per-variant prices follow the page, not the lowest price",
   });
   if (firstNotCheapest) {
     const [first] = getAvailableVariants(firstNotCheapest);
-    assert.equal(
-      itemFor(firstNotCheapest.slug).price,
-      merchantPrice(first.promotionalPrice ?? first.price),
-    );
+    const item = itemFor(firstNotCheapest.slug);
+    // The price charged: sale_price on promotion, else price.
+    assert.equal(item.salePrice ?? item.price, merchantPrice(first.promotionalPrice ?? first.price));
   }
+});
+
+// ── Promotions on synthetic products ─────────────────────────────────────────
+
+const promoVariant = (id, price, promotionalPrice, { stock = 1 } = {}) => ({
+  id,
+  sku: `SKU-${id}`,
+  options: [],
+  price,
+  promotionalPrice,
+  stock,
+  available: stock > 0,
+  image: null,
+});
+
+function promoProduct(variants, { id = "promo-1", tiendanubeProductId = 1 } = {}) {
+  const prices = variants.map((variant) => variant.price).filter((price) => price !== null);
+  const promotional = variants.map((variant) => variant.promotionalPrice).filter((price) => price !== null);
+  return {
+    ...catalog[0],
+    id,
+    slug: `producto-${id}`,
+    tiendanubeProductId,
+    // As the sync aggregates them (scripts/tiendanube/sync-utils.mjs).
+    price: prices.length > 0 ? Math.min(...prices) : null,
+    promotionalPrice: promotional.length > 0 ? Math.min(...promotional) : null,
+    images: ["https://example.com/a.jpg"],
+    variants,
+  };
+}
+
+const onlyItem = (product) => {
+  const { xml, items } = build([product]);
+  assert.equal(items.length, 1);
+  const [item] = childrenNamed(childrenNamed(parseXml(xml), "channel")[0], "item");
+  return item;
+};
+
+test("on promotion, g:price is the regular price and g:sale_price the promotional one", () => {
+  const item = onlyItem(promoProduct([promoVariant(1, 228375, 182700)]));
+  assert.equal(field(item, "g:price"), "228375.00 ARS");
+  assert.equal(field(item, "g:sale_price"), "182700.00 ARS");
+  assert.equal(field(item, "g:availability"), "in_stock");
+  assert.equal(field(item, "g:sale_price_effective_date"), undefined);
+  // Right after g:price, as Merchant Center lists them.
+  const names = item.children.map((child) => child.name);
+  assert.equal(names.indexOf("g:sale_price"), names.indexOf("g:price") + 1);
+});
+
+test("a promotional price not below the price, zero or missing sends only g:price", () => {
+  for (const [promotional, expected] of [
+    [null, "200000.00 ARS"],
+    [0, "0.00 ARS"],
+    [200000, "200000.00 ARS"],
+    [250000, "250000.00 ARS"],
+  ]) {
+    const product = promoProduct([promoVariant(1, 200000, promotional)]);
+    const { items, excluded } = build([product]);
+    if (promotional === 0) {
+      // A zero promotional price is the price getDisplayPrice shows: left
+      // out as unpriced, never sent as a sale.
+      assert.deepEqual(excluded.map((entry) => entry.reason), ["no price"]);
+      continue;
+    }
+    assert.equal(items[0].price, expected, String(promotional));
+    assert.equal(items[0].salePrice, null, String(promotional));
+  }
+});
+
+test("the promotion is the one of the variant the page selects", () => {
+  // First in-stock variant without a promotion, a cheaper promoted one later.
+  const plainFirst = onlyItem(
+    promoProduct([promoVariant(1, 300000, null), promoVariant(2, 280000, 200000)]),
+  );
+  assert.equal(field(plainFirst, "g:price"), "300000.00 ARS");
+  assert.equal(field(plainFirst, "g:sale_price"), undefined);
+
+  // The promoted variant is sold out: the page selects the next one.
+  const soldOutPromo = onlyItem(
+    promoProduct([promoVariant(1, 300000, 200000, { stock: 0 }), promoVariant(2, 310000, 290000)]),
+  );
+  assert.equal(field(soldOutPromo, "g:price"), "310000.00 ARS");
+  assert.equal(field(soldOutPromo, "g:sale_price"), "290000.00 ARS");
+});
+
+test("an out-of-stock item keeps today's variant choice and sends no sale price", () => {
+  const product = promoProduct([
+    promoVariant(1, 300000, 240000, { stock: 0 }),
+    promoVariant(2, 280000, null, { stock: 0 }),
+  ]);
+  const item = onlyItem(product);
+  assert.equal(field(item, "g:availability"), "out_of_stock");
+  // No variant on offer: the product-level price the page shows, as before.
+  assert.equal(field(item, "g:price"), merchantPrice(getDisplayPrice(product, null)));
+  assert.equal(field(item, "g:price"), "240000.00 ARS");
+  assert.equal(field(item, "g:sale_price"), undefined);
 });
 
 test("availability follows real stock and out-of-stock products stay listed", () => {

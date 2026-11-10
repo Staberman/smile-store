@@ -8,6 +8,7 @@ import PickupNote from "@/components/brand/PickupNote";
 import TrustHighlights from "@/components/brand/TrustHighlights";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import FavoriteButton from "@/components/product/FavoriteButton";
+import PromotionPrice from "@/components/product/PromotionPrice";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
 import { canonicalBrand } from "@/lib/brand-directory";
 import { useRecentlyViewed } from "@/lib/browser-lists";
@@ -23,6 +24,7 @@ import {
   getAvailableVariants,
   getDisplayPrice,
   getInstallmentPrice,
+  getPromotion,
   getTransferPrice,
   INTEREST_FREE_INSTALLMENTS,
   isWatch,
@@ -124,9 +126,14 @@ export default function ProductDetailClient({
 
   const complementLabel = isWatch(product) ? "Sumá unos lentes" : "Sumá un reloj";
 
+  // The price charged: the promotional one while the selected variant is on
+  // promotion. Transfer and installment amounts derive from it.
   const displayPrice = getDisplayPrice(product, selectedVariant);
   const transferPrice = getTransferPrice(displayPrice);
   const installmentPrice = getInstallmentPrice(displayPrice);
+  // Same rule as the Merchant feed's g:sale_price and the Offer's
+  // strikethrough price, which Google checks against this page.
+  const promotion = getPromotion(product, selectedVariant);
   const collectionLabel =
     product.categories[product.categories.length - 1] ?? product.brand;
   const subtitle = product.brand;
@@ -307,8 +314,11 @@ export default function ProductDetailClient({
               </span>
             )}
 
+            {promotion && (
+              <PromotionPrice promotion={promotion} size="md" className="mt-6 flex" />
+            )}
             <p
-              className="mt-6 font-display text-[1.8rem] font-light"
+              className={`${promotion ? "mt-1" : "mt-6"} font-display text-[1.8rem] font-light`}
               style={{ color: ACCENT }}
             >
               {formatPrice(displayPrice)}
@@ -610,6 +620,7 @@ function RecommendationCard({ product }: { product: ProductSummary }) {
   const image =
     product.image ?? product.variants.find((variant) => variant.image)?.image;
   const price = product.promotionalPrice ?? product.price;
+  const promotion = getPromotion(product);
   const collectionLabel =
     product.categories[product.categories.length - 1] ?? product.brand;
 
@@ -650,6 +661,7 @@ function RecommendationCard({ product }: { product: ProductSummary }) {
         <p className="mt-1 text-xs text-[#4a4540]">{canonicalBrand(product.brand)}</p>
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-[12px]" style={{ color: ACCENT }}>
+            {promotion && <PromotionPrice promotion={promotion} className="mb-0.5 flex" />}
             {formatPrice(price)}
           </p>
           <span className="text-[10px] uppercase tracking-[0.18em] text-[#6a6560] transition group-hover:text-[#c9a96e]">

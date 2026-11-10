@@ -34,6 +34,8 @@ type FilterableProduct = PriceFields & {
   tags?: string[];
 };
 
+/** Has an id, stock and a price. */
+export function isPurchasableVariant(variant: StockVariant): boolean;
 export function getAvailableVariants<V extends StockVariant>(
   product: ProductWithVariants<V>,
 ): V[];
@@ -43,6 +45,25 @@ export function getDisplayPrice(
   product: PriceFields,
   variant?: PriceFields | null,
 ): number | null;
+/** A promoted price's regular price and its percent off, rounded down. */
+export type Promotion = {
+  regularPrice: number;
+  /** Whole percent off, rounded down; 0 when under 1%. */
+  discountPercent: number;
+};
+/** Percent off, rounded down; 0 when the pair is no promotion. */
+export function discountPercent(
+  price: number | null | undefined,
+  promotionalPrice: number | null | undefined,
+): number;
+/**
+ * The promotion behind getDisplayPrice(product, variant), or null: a
+ * purchasable variant's positive promotional price below its own price.
+ */
+export function getPromotion(
+  product: PriceFields & ProductWithVariants,
+  variant?: StockVariant | null,
+): Promotion | null;
 /** The variant a product card selects first: first purchasable, else first, else null. */
 export function defaultVariant<V extends StockVariant>(
   product: ProductWithVariants<V>,
